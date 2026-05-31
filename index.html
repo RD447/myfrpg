@@ -47,7 +47,6 @@
             gap: 16px;
         }
 
-        /* КАРТОЧКА ПЕРСОНАЖА */
         .hero-card {
             background: linear-gradient(145deg, #0a1525, #050a15);
             border-radius: 28px;
@@ -92,7 +91,6 @@
         }
         .stat-value { color: #ffd966; font-weight: bold; }
 
-        /* ИНВЕНТАРЬ */
         .inventory-card {
             background: linear-gradient(145deg, #0a1525, #050a15);
             border-radius: 28px;
@@ -160,7 +158,6 @@
             color: #ddd;
         }
 
-        /* КАРТА */
         .map-area {
             flex: 1;
             min-width: 500px;
@@ -181,7 +178,6 @@
             margin-top: 6px;
         }
 
-        /* ПРАВАЯ КОЛОНКА */
         .social-panel {
             width: 320px;
             background: linear-gradient(145deg, #0a1525, #050a15);
@@ -245,7 +241,6 @@
             transition: width 0.1s;
         }
 
-        /* ЧАТ */
         .chat-box {
             background: #00000066;
             border-radius: 20px;
@@ -307,7 +302,6 @@
             margin: 2px;
         }
 
-        /* НИЖНЯЯ ПАНЕЛЬ */
         .action-bar {
             background: #0a1520cc;
             border-radius: 28px;
@@ -623,7 +617,6 @@
         skill_power_strike: 0, skill_endurance: 0, skill_berserk: 0
     };
     
-    // Статы персонажа (базовые + бонусы от прокачки)
     let playerExtraStr = 0;
     let playerExtraDef = 0;
     let playerExtraHp = 0;
@@ -637,7 +630,6 @@
     async function loginPlayer(username) {
         if (!supabaseClient) return;
         
-        // Ищем игрока
         const { data, error } = await supabaseClient
             .from("players")
             .select("*")
@@ -650,7 +642,6 @@
         }
         
         if (data) {
-            // Загружаем данные
             currentPlayer.id = data.id;
             currentPlayer.username = data.username;
             currentPlayer.level = data.level;
@@ -667,7 +658,6 @@
             currentPlayer.skill_endurance = data.skill_endurance || 0;
             currentPlayer.skill_berserk = data.skill_berserk || 0;
             
-            // Загружаем дополнительные статы (если есть)
             playerExtraStr = data.extra_str || 0;
             playerExtraDef = data.extra_def || 0;
             playerExtraHp = data.extra_hp || 0;
@@ -678,7 +668,6 @@
             renderSkills();
             return true;
         } else {
-            // Создаём нового
             const { data: newData, error: createError } = await supabaseClient
                 .from("players")
                 .insert({
@@ -726,11 +715,11 @@
     async function savePlayerToCloud() {
         if (!supabaseClient || !currentPlayer.id) return;
         
-        const totalStr = currentPlayer.str + playerExtraStr;
-        const totalDef = currentPlayer.def + playerExtraDef;
+        const totalStr = currentPlayer.str + playerExtraStr * 2;
+        const totalDef = currentPlayer.def + playerExtraDef * 2;
         const totalMaxHp = currentPlayer.maxHp + playerExtraHp * 10;
         
-        const { error } = await supabaseClient
+        await supabaseClient
             .from("players")
             .update({
                 level: currentPlayer.level,
@@ -752,10 +741,6 @@
                 updated_at: new Date().toISOString()
             })
             .eq("id", currentPlayer.id);
-        
-        if (error) {
-            console.error("Ошибка сохранения:", error);
-        }
     }
     
     // ======================== ПРОКАЧКА СТАТОВ ========================
@@ -785,28 +770,21 @@
     }
     
     // ======================== ОБЩИЙ ЧАТ ========================
-    let chatMessages = [];
-    
     async function sendChatMessage() {
         const input = document.getElementById("chatInput");
         const msg = input.value.trim();
         if (!msg || !currentPlayer.username) return;
         
         if (supabaseClient) {
-            const { error } = await supabaseClient
+            await supabaseClient
                 .from("chat_messages")
                 .insert({
                     username: currentPlayer.username,
                     message: msg,
                     created_at: new Date().toISOString()
                 });
-            
-            if (error) {
-                console.error("Ошибка отправки:", error);
-                addSocialMessage("Система", "Не удалось отправить сообщение");
-            } else {
-                input.value = "";
-            }
+            input.value = "";
+            loadChatMessages();
         } else {
             addSocialMessage(currentPlayer.username, msg);
             input.value = "";
@@ -828,23 +806,17 @@
         }
         
         if (data) {
-            chatMessages = data.reverse();
-            renderChat();
+            const chatDiv = document.getElementById("socialChat");
+            chatDiv.innerHTML = '<div class="chat-message"><strong>Система:</strong> Добро пожаловать в общий чат!</div>';
+            for (let i = data.length - 1; i >= 0; i--) {
+                const msg = data[i];
+                const div = document.createElement("div");
+                div.className = "chat-message";
+                div.innerHTML = `<strong>${escapeHtml(msg.username)}:</strong> ${escapeHtml(msg.message)}`;
+                chatDiv.appendChild(div);
+            }
+            chatDiv.scrollTop = chatDiv.scrollHeight;
         }
-    }
-    
-    function renderChat() {
-        const chatDiv = document.getElementById("socialChat");
-        if (!chatDiv) return;
-        
-        chatDiv.innerHTML = "";
-        for (const msg of chatMessages) {
-            const div = document.createElement("div");
-            div.className = "chat-message";
-            div.innerHTML = `<strong>${escapeHtml(msg.username)}:</strong> ${escapeHtml(msg.message)}`;
-            chatDiv.appendChild(div);
-        }
-        chatDiv.scrollTop = chatDiv.scrollHeight;
     }
     
     function addSocialMessage(sender, msg) {
@@ -855,14 +827,6 @@
         div.innerHTML = `<strong>${escapeHtml(sender)}:</strong> ${escapeHtml(msg)}`;
         chatDiv.appendChild(div);
         chatDiv.scrollTop = chatDiv.scrollHeight;
-        
-        if (supabaseClient && sender !== "Система") {
-            supabaseClient.from("chat_messages").insert({
-                username: sender,
-                message: msg,
-                created_at: new Date().toISOString()
-            }).catch(e => console.error(e));
-        }
     }
     
     function escapeHtml(str) {
@@ -1332,7 +1296,6 @@
         return { atk: totalStr, def: totalDef, maxHp: totalMaxHp };
     }
     
-    // ======================== ЧАТЫ ========================
     function addTechnicalLog(msg) {
         const logDiv = document.getElementById("combatLog");
         const entry = document.createElement("div");
@@ -1362,9 +1325,6 @@
         document.getElementById("questOre").innerHTML = `${quests.ore}/10`;
         document.getElementById("questWood").innerHTML = `${quests.wood}/10`;
         document.getElementById("campStatus").innerHTML = campActive ? "🔥 Активен" : "Нет";
-        
-        const heroNameSpan = document.getElementById("heroNameDisplay");
-        if (heroNameSpan) heroNameSpan.innerText = currentPlayer.username || "Игрок";
     }
     
     let quests = { goblins: 0, ore: 0, wood: 0 };
@@ -1628,6 +1588,13 @@
         if (msg && currentPlayer.username) {
             addSocialMessage(currentPlayer.username, msg);
             input.value = "";
+            if (supabaseClient) {
+                supabaseClient.from("chat_messages").insert({
+                    username: currentPlayer.username,
+                    message: msg,
+                    created_at: new Date().toISOString()
+                }).then(() => loadChatMessages()).catch(e => console.error(e));
+            }
         }
     }
     
@@ -1666,6 +1633,8 @@
         if (name && name.length >= 3 && name.length <= 16) {
             await loginPlayer(name);
             input.value = "";
+            loadChatMessages();
+            loadOnlinePlayers();
         } else {
             addTechnicalLog("❌ Имя должно быть от 3 до 16 символов");
         }
@@ -1692,12 +1661,14 @@
             if (btn.getAttribute("data-tab") === "online") {
                 loadOnlinePlayers();
             }
+            if (btn.getAttribute("data-tab") === "chat") {
+                loadChatMessages();
+            }
         };
     });
     
     if (document.querySelector(".tab-btn")) document.querySelector(".tab-btn").click();
     
-    // Запуск игры
     generateMap();
     setTimeout(() => {
         updateTileDisplaySize();
@@ -1718,20 +1689,10 @@
         if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
     });
     
-    // Автосохранение и обновление онлайна
     setInterval(() => {
         if (currentPlayer.id) savePlayerToCloud();
     }, 30000);
-    setInterval(loadChatMessages, 5000);
     setInterval(loadOnlinePlayers, 30000);
-    
-    // Создаём таблицу чата, если её нет
-    if (supabaseClient) {
-        supabaseClient.from("chat_messages").select("count").limit(1).catch(async () => {
-            // Таблицы нет — создаём
-            await supabaseClient.rpc('create_chat_messages_table').catch(e => console.log("Создайте таблицу chat_messages вручную"));
-        });
-    }
 </script>
 </body>
 </html>
