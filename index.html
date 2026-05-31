@@ -672,8 +672,8 @@
         username: null,
         level: 1, exp: 0, hp: 70, maxHp: 70, str: 12, def: 5,
         gold: 150, wood: 0, ore: 0, skillPoints: 2,
-        skill_power_strike: 0, skill_endurance: 0, skill_berserk: 0
-	character_class: 'Мечник'
+        skill_power_strike: 0, skill_endurance: 0, skill_berserk: 0,
+        character_class: 'Мечник'
     };
 	const characterClasses = {
     'Мечник': { name: '🗡️ Мечник', baseStr: 14, baseDef: 6, baseHp: 75, skillBonus: 'powerStrike', icon: '🗡️' },
@@ -715,7 +715,7 @@ async function changeClass(newClass) {
     updateUI();
     savePlayerToCloud();
 }
-};
+
     let isLoggedIn = false;
     
     let playerExtraStr = 0;
