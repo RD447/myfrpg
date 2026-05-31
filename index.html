@@ -713,6 +713,25 @@ function escapeHtml(str) {
     });
 }
 
+// ======================== СОХРАНЕНИЕ ПОЗИЦИИ ========================
+async function savePlayerPosition() {
+    if (!supabaseClient || !isLoggedIn || !currentPlayer.id) return;
+    
+    try {
+        await supabaseClient
+            .from("players")
+            .update({
+                player_x: playerPos.x,
+                player_y: playerPos.y,
+                updated_at: new Date().toISOString()
+            })
+            .eq("id", currentPlayer.id);
+        console.log(`📍 Позиция сохранена: (${playerPos.x}, ${playerPos.y})`);
+    } catch (e) {
+        console.error("Ошибка сохранения позиции:", e);
+    }
+}
+
 // ======================== АВТОРИЗАЦИЯ ========================
 async function loginPlayer(username) {
     if (!supabaseClient) {
@@ -754,11 +773,19 @@ async function loginPlayer(username) {
             playerExtraDef = data.extra_def || 0;
             playerExtraHp = data.extra_hp || 0;
             
+            // Загружаем сохранённую позицию
+            if (data.player_x !== undefined && data.player_x !== null) {
+                playerPos = { x: data.player_x, y: data.player_y };
+            } else {
+                playerPos = { x: 10, y: 10 };
+            }
+            
             addTechnicalLog(`☁️ Добро пожаловать, ${username}! (уровень ${currentPlayer.level})`);
             isLoggedIn = true;
             updateUI();
             renderInventory();
             renderSkills();
+            drawMap();
             return true;
         } else {
             const { data: newData, error: createError } = await supabaseClient
@@ -769,7 +796,9 @@ async function loginPlayer(username) {
                     str: 12, def: 5, gold: 150, wood: 0, ore: 0,
                     skill_points: 2,
                     character_class: 'Мечник',
-                    extra_str: 0, extra_def: 0, extra_hp: 0
+                    extra_str: 0, extra_def: 0, extra_hp: 0,
+                    player_x: 10,
+                    player_y: 10
                 })
                 .select()
                 .single();
@@ -796,12 +825,14 @@ async function loginPlayer(username) {
                 playerExtraStr = newData.extra_str || 0;
                 playerExtraDef = newData.extra_def || 0;
                 playerExtraHp = newData.extra_hp || 0;
+                playerPos = { x: 10, y: 10 };
                 
                 addTechnicalLog(`✨ Создан новый персонаж ${username}!`);
                 isLoggedIn = true;
                 updateUI();
                 renderInventory();
                 renderSkills();
+                drawMap();
                 return true;
             }
         }
@@ -1269,8 +1300,8 @@ function drawMap() {
                 ctx.strokeRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
             }
         }
-        drawOtherPlayers();
     }
+    drawOtherPlayers();
     
     if (!playerPos) return;
     let drawX = playerPos.x * TILE_SIZE;
@@ -1310,12 +1341,9 @@ function animateMove() {
         updateActionButtons();
         addTechnicalLog(`✅ Вы прибыли в ${getCurrentTile().name}`);
         if (Math.random() < 0.15) triggerRandomEvent();
-            // Сохраняем позицию
-    if (supabaseClient && isLoggedIn && currentPlayer.id) {
-        supabaseClient.from("players").update({
-            player_x: playerPos.x,
-            player_y: playerPos.y
-        }).eq("id", currentPlayer.id).catch(e => console.error(e));
+        
+        // Сохраняем позицию после перемещения
+        savePlayerPosition();
     }
 }
 
@@ -1911,6 +1939,54 @@ function createGuild() {
     }
 }
 
+// ======================== ЗАГРУЗКА ДРУГИХ ИГРОКОВ ========================
+async function loadOtherPlayers() {
+    if (!supabaseClient || !isLoggedIn) return;
+    
+    const { data, error } = await supabaseClient
+        .from("players")
+        .select("username, player_x, player_y, character_class")
+        .neq("username", currentPlayer.username)
+        .limit(20);
+    
+    if (error) {
+        console.error("Ошибка загрузки игроков:", error);
+        return;
+    }
+    
+    otherPlayers = data || [];
+    drawMap();
+}
+
+function drawOtherPlayers() {
+    if (!ctx || !otherPlayers.length) return;
+    
+    for (const player of otherPlayers) {
+        if (player.player_x === undefined || player.player_y === null || player.player_x === null) continue;
+        const x = player.player_x * TILE_SIZE;
+        const y = player.player_y * TILE_SIZE;
+        
+        // Зелёная рамка
+        ctx.save();
+        ctx.shadowBlur = 0;
+        ctx.strokeStyle = "#66ff66";
+        ctx.lineWidth = 2;
+        ctx.strokeRect(x, y, TILE_SIZE, TILE_SIZE);
+        
+        // Иконка класса
+        const classData = characterClasses[player.character_class] || characterClasses['Мечник'];
+        ctx.font = `${TILE_SIZE * 0.45}px "Segoe UI Emoji"`;
+        ctx.fillStyle = "#aaffaa";
+        ctx.fillText(classData.icon || '⚔️', x + TILE_SIZE * 0.3, y + TILE_SIZE * 0.75);
+        
+        // Имя
+        ctx.font = `${TILE_SIZE * 0.2}px monospace`;
+        ctx.fillStyle = "#aaffaa";
+        ctx.fillText(player.username.substring(0, 8), x + TILE_SIZE * 0.15, y + TILE_SIZE * 0.55);
+        ctx.restore();
+    }
+}
+
 // ======================== ИНИЦИАЛИЗАЦИЯ ========================
 document.getElementById("fightBtn").onclick = () => {
     const tile = getCurrentTile();
@@ -1935,6 +2011,8 @@ document.getElementById("loginBtn").onclick = async () => {
         input.value = "";
         loadChatMessages();
         loadOnlinePlayers();
+        loadOtherPlayers();
+        drawMap();
     } else {
         addTechnicalLog("❌ Имя должно быть от 3 до 16 символов");
     }
@@ -1943,6 +2021,8 @@ document.getElementById("loginBtn").onclick = async () => {
 document.getElementById("logoutBtn").onclick = () => {
     logoutPlayer();
     loadChatMessages();
+    otherPlayers = [];
+    drawMap();
 };
 
 document.querySelectorAll('.upgrade-stat').forEach(btn => {
@@ -1991,7 +2071,7 @@ document.querySelectorAll(".tab-btn").forEach(btn => {
 if (document.querySelector(".tab-btn")) document.querySelector(".tab-btn").click();
 
 generateMap();
-loadAllTiles();  // Загружаем картинки для карты
+loadAllTiles();
 setTimeout(() => {
     updateTileDisplaySize();
     drawMap();
@@ -2014,56 +2094,9 @@ setInterval(() => {
     if (currentPlayer.id && isLoggedIn) savePlayerToCloud();
 }, 30000);
 setInterval(() => {
-    loadOtherPlayers();
+    if (isLoggedIn) loadOtherPlayers();
 }, 10000);
 setInterval(loadOnlinePlayers, 30000);
-
-async function loadOtherPlayers() {
-    if (!supabaseClient || !isLoggedIn) return;
-    
-    const { data, error } = await supabaseClient
-        .from("players")
-        .select("username, player_x, player_y, character_class")
-        .neq("username", currentPlayer.username)
-        .limit(20);
-    
-    if (error) {
-        console.error("Ошибка загрузки игроков:", error);
-        return;
-    }
-    
-    otherPlayers = data || [];
-}
-
-function drawOtherPlayers() {
-    if (!ctx || !otherPlayers.length) return;
-    
-    for (const player of otherPlayers) {
-        if (player.player_x === undefined || player.player_y === undefined) continue;
-        const x = player.player_x * TILE_SIZE;
-        const y = player.player_y * TILE_SIZE;
-        
-        // Зелёная рамка
-        ctx.save();
-        ctx.shadowBlur = 0;
-        ctx.strokeStyle = "#66ff66";
-        ctx.lineWidth = 2;
-        ctx.strokeRect(x, y, TILE_SIZE, TILE_SIZE);
-        
-        // Иконка класса
-        const classData = characterClasses[player.character_class] || characterClasses['Мечник'];
-        ctx.font = `${TILE_SIZE * 0.45}px "Segoe UI Emoji"`;
-        ctx.fillStyle = "#aaffaa";
-        ctx.fillText(classData.icon || '⚔️', x + TILE_SIZE * 0.3, y + TILE_SIZE * 0.75);
-        
-        // Имя
-        ctx.font = `${TILE_SIZE * 0.2}px monospace`;
-        ctx.fillStyle = "#aaffaa";
-        ctx.fillText(player.username.substring(0, 8), x + TILE_SIZE * 0.15, y + TILE_SIZE * 0.55);
-        ctx.restore();
-    }
-}
-
 </script>
 </body>
 </html>
