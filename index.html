@@ -46,16 +46,42 @@
             flex-direction: column;
             gap: 16px;
         }
+
+        /* КАРТОЧКА ПЕРСОНАЖА */
         .hero-card {
-            background: #010514cc;
+            background: linear-gradient(145deg, #0a1525, #050a15);
             border-radius: 28px;
             padding: 16px;
-            backdrop-filter: blur(4px);
+            border: 1px solid #4a7a9e;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
         }
         .hero-avatar {
             text-align: center;
             font-size: 64px;
             margin-bottom: 12px;
+        }
+        .hero-name-input {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+        .hero-name-input input {
+            flex: 1;
+            background: #1f2a3a;
+            border: 1px solid #4a7a9e;
+            border-radius: 30px;
+            padding: 8px 12px;
+            color: white;
+            font-weight: bold;
+            text-align: center;
+        }
+        .hero-name-input button {
+            background: #2a6e5a;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 30px;
+            color: white;
+            cursor: pointer;
         }
         .hero-stats div {
             display: flex;
@@ -66,11 +92,12 @@
         }
         .stat-value { color: #ffd966; font-weight: bold; }
 
+        /* ИНВЕНТАРЬ */
         .inventory-card {
-            background: #010514cc;
+            background: linear-gradient(145deg, #0a1525, #050a15);
             border-radius: 28px;
             padding: 16px;
-            backdrop-filter: blur(4px);
+            border: 1px solid #4a7a9e;
         }
         .inventory-header {
             display: flex;
@@ -133,6 +160,7 @@
             color: #ddd;
         }
 
+        /* КАРТА */
         .map-area {
             flex: 1;
             min-width: 500px;
@@ -144,6 +172,7 @@
             border-radius: 20px;
             border: 2px solid #ffd966;
             cursor: pointer;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
         }
         .map-hint {
             text-align: center;
@@ -152,20 +181,21 @@
             margin-top: 6px;
         }
 
+        /* ПРАВАЯ КОЛОНКА */
         .social-panel {
             width: 320px;
-            background: #010514cc;
+            background: linear-gradient(145deg, #0a1525, #050a15);
             border-radius: 28px;
             padding: 16px;
-            backdrop-filter: blur(4px);
             display: flex;
             flex-direction: column;
             gap: 12px;
+            border: 1px solid #4a7a9e;
         }
         .tabs {
             display: flex;
             gap: 8px;
-            border-bottom: 1px solid #3a506e;
+            border-bottom: 1px solid #4a7a9e;
             padding-bottom: 8px;
             flex-wrap: wrap;
         }
@@ -174,7 +204,7 @@
             border: none;
             padding: 6px 12px;
             border-radius: 30px;
-            color: #bbddff;
+            color: #cceeff;
             cursor: pointer;
             font-weight: bold;
         }
@@ -192,15 +222,15 @@
             font-size: 0.8rem;
             color: #ddd;
         }
-        .skill-item {
+        .skill-item, .stat-upgrade-item {
             background: #0a1022e0;
             border-radius: 20px;
             padding: 10px;
             margin: 8px 0;
             color: #ddd;
         }
-        .skill-name { font-weight: bold; color: #ffd966; }
-        .skill-desc { font-size: 0.7rem; color: #aaa; margin: 4px 0; }
+        .skill-name, .stat-name { font-weight: bold; color: #ffd966; }
+        .skill-desc, .stat-desc { font-size: 0.7rem; color: #aaa; margin: 4px 0; }
         .skill-progress {
             background: #1a1a2a;
             border-radius: 20px;
@@ -215,15 +245,24 @@
             transition: width 0.1s;
         }
 
+        /* ЧАТ */
         .chat-box {
             background: #00000066;
             border-radius: 20px;
             padding: 12px;
-            height: 200px;
+            height: 250px;
             overflow-y: auto;
             font-size: 0.7rem;
             color: #ddd;
         }
+        .chat-message {
+            margin: 6px 0;
+            padding: 4px 8px;
+            border-radius: 16px;
+            background: #0a152066;
+            word-break: break-word;
+        }
+        .chat-message strong { color: #ffd966; }
         .chat-input {
             display: flex;
             gap: 8px;
@@ -232,13 +271,13 @@
         .chat-input input {
             flex: 1;
             background: #1f2a3a;
-            border: none;
+            border: 1px solid #4a7a9e;
             border-radius: 30px;
             padding: 8px;
             color: white;
         }
         .chat-input button {
-            background: #2a3f5e;
+            background: #2a5a7a;
             border: none;
             padding: 8px 12px;
             border-radius: 30px;
@@ -252,9 +291,25 @@
             font-size: 0.8rem;
             color: #ddd;
         }
+        .online-list {
+            background: #00000066;
+            border-radius: 20px;
+            padding: 8px;
+            font-size: 0.7rem;
+            max-height: 100px;
+            overflow-y: auto;
+        }
+        .online-list span {
+            display: inline-block;
+            background: #2a6e5a;
+            border-radius: 20px;
+            padding: 2px 8px;
+            margin: 2px;
+        }
 
+        /* НИЖНЯЯ ПАНЕЛЬ */
         .action-bar {
-            background: #010514cc;
+            background: #0a1520cc;
             border-radius: 28px;
             padding: 16px;
             backdrop-filter: blur(4px);
@@ -262,9 +317,10 @@
             gap: 12px;
             flex-wrap: wrap;
             justify-content: center;
+            border: 1px solid #4a7a9e;
         }
         .btn {
-            background: #2a3f5e;
+            background: #2a5a7a;
             border: none;
             padding: 10px 20px;
             border-radius: 40px;
@@ -310,7 +366,7 @@
         }
         .auto-panel.dragging { cursor: grabbing; }
         .auto-header {
-            background: #2a3f5e;
+            background: #2a5a7a;
             padding: 10px 16px;
             border-radius: 18px 18px 0 0;
             cursor: pointer;
@@ -341,7 +397,7 @@
             position: fixed;
             bottom: 20px;
             right: 20px;
-            background: #2a3f5e;
+            background: #2a5a7a;
             width: 48px;
             height: 48px;
             border-radius: 30px;
@@ -351,6 +407,7 @@
             font-size: 24px;
             cursor: pointer;
             z-index: 100;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
         }
     </style>
 </head>
@@ -360,6 +417,10 @@
         <div class="left-column">
             <div class="hero-card">
                 <div class="hero-avatar">⚔️</div>
+                <div class="hero-name-input">
+                    <input type="text" id="playerNameInput" placeholder="Ваше имя" maxlength="16">
+                    <button id="saveNameBtn">📝</button>
+                </div>
                 <div class="hero-stats">
                     <div><span>❤️ Здоровье</span><span class="stat-value" id="heroHp">70</span>/<span id="heroMaxHp">70</span></div>
                     <div><span>⭐ Уровень</span><span class="stat-value" id="heroLvl">1</span></div>
@@ -369,6 +430,21 @@
                     <div><span>🛡️ Защита</span><span class="stat-value" id="heroDef">5</span></div>
                     <div><span>🌀 Очки умений</span><span class="stat-value" id="heroSkillPoints">2</span></div>
                 </div>
+                <div style="margin-top: 12px;">
+                    <div style="font-weight: bold; color: #ffd966;">📈 ПРОКАЧКА СТАТОВ</div>
+                    <div class="stat-upgrade-item">
+                        <div class="stat-name">⚔️ Сила (+2 атаки за уровень)</div>
+                        <button class="small-btn upgrade-stat" data-stat="str">Улучшить (1 очко)</button>
+                    </div>
+                    <div class="stat-upgrade-item">
+                        <div class="stat-name">🛡️ Защита (+2 защиты за уровень)</div>
+                        <button class="small-btn upgrade-stat" data-stat="def">Улучшить (1 очко)</button>
+                    </div>
+                    <div class="stat-upgrade-item">
+                        <div class="stat-name">❤️ Выносливость (+10 HP за уровень)</div>
+                        <button class="small-btn upgrade-stat" data-stat="hp">Улучшить (1 очко)</button>
+                    </div>
+                </div>
             </div>
             
             <div class="inventory-card">
@@ -377,7 +453,7 @@
                     <span>▼</span>
                 </div>
                 <div class="inventory-content" id="inventoryContent">
-                    <div style="margin-bottom: 8px; padding-bottom: 6px; border-bottom: 1px solid #3a506e;">
+                    <div style="margin-bottom: 8px; padding-bottom: 6px; border-bottom: 1px solid #4a7a9e;">
                         <div class="resource-row"><span>🌲 Древесина:</span><span class="stat-value" id="heroWood">0</span></div>
                         <div class="resource-row"><span>⛏️ Руда:</span><span class="stat-value" id="heroOre">0</span></div>
                     </div>
@@ -401,10 +477,13 @@
                 <button class="tab-btn" data-tab="quests">📜 КВЕСТЫ</button>
                 <button class="tab-btn" data-tab="skills">🌀 УМЕНИЯ</button>
                 <button class="tab-btn" data-tab="guild">🏰 ГИЛЬДИЯ</button>
+                <button class="tab-btn" data-tab="online">👥 ОНЛАЙН</button>
             </div>
             
             <div id="tab-chat" class="tab-content">
-                <div class="chat-box" id="socialChat"><div class="log-entry">✨ Добро пожаловать в общий чат!</div></div>
+                <div class="chat-box" id="socialChat">
+                    <div class="chat-message"><strong>Система:</strong> Добро пожаловать в общий чат!</div>
+                </div>
                 <div class="chat-input">
                     <input type="text" id="chatInput" placeholder="Сообщение...">
                     <button id="chatSendBtn">📨</button>
@@ -433,8 +512,18 @@
             <div id="tab-guild" class="tab-content">
                 <div class="guild-info"><strong>🏰 ГИЛЬДИЯ</strong><br><span id="guildStatus">Не в гильдии</span></div>
                 <div style="margin-top: 12px;">
-                    <input type="text" id="guildNameInput" placeholder="Название гильдии" style="width:100%; background:#1f2a3a; border:none; border-radius:30px; padding:8px; color:white;">
+                    <input type="text" id="guildNameInput" placeholder="Название гильдии" style="width:100%; background:#1f2a3a; border:1px solid #4a7a9e; border-radius:30px; padding:8px; color:white;">
                     <button id="createGuildBtn" class="small-btn" style="margin-top:8px; width:100%;">🏰 СОЗДАТЬ ГИЛЬДИЮ</button>
+                </div>
+            </div>
+            
+            <div id="tab-online" class="tab-content">
+                <div style="font-weight: bold; margin-bottom: 8px; color: #ffd966;">👥 ИГРОКИ ОНЛАЙН</div>
+                <div class="online-list" id="onlineList">
+                    <span>Загрузка...</span>
+                </div>
+                <div style="margin-top: 8px; font-size: 0.7rem; color: #aaa;">
+                    💡 Статус обновляется каждые 30 секунд
                 </div>
             </div>
         </div>
@@ -487,18 +576,6 @@
         } catch(e) {}
     }
 
-    // ======================== СВОРАЧИВАНИЕ ИНВЕНТАРЯ ========================
-    const inventoryHeader = document.getElementById("inventoryHeader");
-    const inventoryContent = document.getElementById("inventoryContent");
-    let inventoryCollapsed = false;
-    if (inventoryHeader) {
-        inventoryHeader.onclick = () => {
-            inventoryCollapsed = !inventoryCollapsed;
-            inventoryContent.classList.toggle("collapsed");
-            inventoryHeader.querySelector("span").innerHTML = inventoryCollapsed ? "▶" : "▼";
-        };
-    }
-
     // ======================== ПЕРЕМЕЩАЕМОЕ ОКНО ========================
     const autoPanel = document.getElementById("autoPanel");
     const autoHeader = document.getElementById("autoHeader");
@@ -533,16 +610,302 @@
         }
     });
     
+    // ======================== SUPABASE ========================
+    const SUPABASE_URL = "https://wxrrxnlyyugmduvnciem.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind4cnJ4bmx5eXVnbWR1dm5jaWVtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAyMzIzNjgsImV4cCI6MjA5NTgwODM2OH0.6YfLDjAJ2sKu_C6q_UiXBI_GWJRvtE-m21GzB86zisU";
+
+    let supabaseClient = null;
+    let currentPlayer = {
+        id: null,
+        username: null,
+        level: 1, exp: 0, hp: 70, maxHp: 70, str: 12, def: 5,
+        gold: 150, wood: 0, ore: 0, skillPoints: 2,
+        skill_power_strike: 0, skill_endurance: 0, skill_berserk: 0
+    };
+    
+    // Статы персонажа (базовые + бонусы от прокачки)
+    let playerExtraStr = 0;
+    let playerExtraDef = 0;
+    let playerExtraHp = 0;
+    
+    if (typeof supabase !== "undefined" && SUPABASE_URL && SUPABASE_ANON_KEY) {
+        supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        addTechnicalLog("☁️ Supabase подключён");
+    }
+    
+    // ======================== АВТОРИЗАЦИЯ ========================
+    async function loginPlayer(username) {
+        if (!supabaseClient) return;
+        
+        // Ищем игрока
+        const { data, error } = await supabaseClient
+            .from("players")
+            .select("*")
+            .eq("username", username)
+            .maybeSingle();
+        
+        if (error) {
+            addTechnicalLog(`❌ Ошибка: ${error.message}`);
+            return false;
+        }
+        
+        if (data) {
+            // Загружаем данные
+            currentPlayer.id = data.id;
+            currentPlayer.username = data.username;
+            currentPlayer.level = data.level;
+            currentPlayer.exp = data.exp;
+            currentPlayer.hp = data.hp;
+            currentPlayer.maxHp = data.max_hp;
+            currentPlayer.str = data.str;
+            currentPlayer.def = data.def;
+            currentPlayer.gold = data.gold;
+            currentPlayer.wood = data.wood;
+            currentPlayer.ore = data.ore;
+            currentPlayer.skillPoints = data.skill_points;
+            currentPlayer.skill_power_strike = data.skill_power_strike || 0;
+            currentPlayer.skill_endurance = data.skill_endurance || 0;
+            currentPlayer.skill_berserk = data.skill_berserk || 0;
+            
+            // Загружаем дополнительные статы (если есть)
+            playerExtraStr = data.extra_str || 0;
+            playerExtraDef = data.extra_def || 0;
+            playerExtraHp = data.extra_hp || 0;
+            
+            addTechnicalLog(`☁️ Загружен игрок ${username} (уровень ${currentPlayer.level})`);
+            updateUI();
+            renderInventory();
+            renderSkills();
+            return true;
+        } else {
+            // Создаём нового
+            const { data: newData, error: createError } = await supabaseClient
+                .from("players")
+                .insert({
+                    username: username,
+                    level: 1, exp: 0, hp: 70, max_hp: 70,
+                    str: 12, def: 5, gold: 150, wood: 0, ore: 0,
+                    skill_points: 2,
+                    extra_str: 0, extra_def: 0, extra_hp: 0
+                })
+                .select()
+                .single();
+            
+            if (createError) {
+                addTechnicalLog(`❌ Ошибка создания: ${createError.message}`);
+                return false;
+            }
+            
+            if (newData) {
+                currentPlayer.id = newData.id;
+                currentPlayer.username = newData.username;
+                currentPlayer.level = newData.level;
+                currentPlayer.exp = newData.exp;
+                currentPlayer.hp = newData.hp;
+                currentPlayer.maxHp = newData.max_hp;
+                currentPlayer.str = newData.str;
+                currentPlayer.def = newData.def;
+                currentPlayer.gold = newData.gold;
+                currentPlayer.wood = newData.wood;
+                currentPlayer.ore = newData.ore;
+                currentPlayer.skillPoints = newData.skill_points;
+                playerExtraStr = newData.extra_str || 0;
+                playerExtraDef = newData.extra_def || 0;
+                playerExtraHp = newData.extra_hp || 0;
+                
+                addTechnicalLog(`✨ Создан новый игрок ${username}!`);
+                updateUI();
+                renderInventory();
+                renderSkills();
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    async function savePlayerToCloud() {
+        if (!supabaseClient || !currentPlayer.id) return;
+        
+        const totalStr = currentPlayer.str + playerExtraStr;
+        const totalDef = currentPlayer.def + playerExtraDef;
+        const totalMaxHp = currentPlayer.maxHp + playerExtraHp * 10;
+        
+        const { error } = await supabaseClient
+            .from("players")
+            .update({
+                level: currentPlayer.level,
+                exp: currentPlayer.exp,
+                hp: currentPlayer.hp,
+                max_hp: totalMaxHp,
+                str: totalStr,
+                def: totalDef,
+                gold: currentPlayer.gold,
+                wood: currentPlayer.wood,
+                ore: currentPlayer.ore,
+                skill_points: currentPlayer.skillPoints,
+                skill_power_strike: currentPlayer.skill_power_strike,
+                skill_endurance: currentPlayer.skill_endurance,
+                skill_berserk: currentPlayer.skill_berserk,
+                extra_str: playerExtraStr,
+                extra_def: playerExtraDef,
+                extra_hp: playerExtraHp,
+                updated_at: new Date().toISOString()
+            })
+            .eq("id", currentPlayer.id);
+        
+        if (error) {
+            console.error("Ошибка сохранения:", error);
+        }
+    }
+    
+    // ======================== ПРОКАЧКА СТАТОВ ========================
+    function upgradeStat(stat) {
+        if (currentPlayer.skillPoints <= 0) {
+            addTechnicalLog("❌ Нет очков умений!");
+            return;
+        }
+        
+        currentPlayer.skillPoints--;
+        
+        if (stat === 'str') {
+            playerExtraStr++;
+            addTechnicalLog("⚔️ Сила увеличена! +2 к атаке");
+        } else if (stat === 'def') {
+            playerExtraDef++;
+            addTechnicalLog("🛡️ Защита увеличена! +2 к защите");
+        } else if (stat === 'hp') {
+            playerExtraHp++;
+            currentPlayer.maxHp += 10;
+            currentPlayer.hp += 10;
+            addTechnicalLog("❤️ Выносливость увеличена! +10 HP");
+        }
+        
+        updateUI();
+        savePlayerToCloud();
+    }
+    
+    // ======================== ОБЩИЙ ЧАТ ========================
+    let chatMessages = [];
+    
+    async function sendChatMessage() {
+        const input = document.getElementById("chatInput");
+        const msg = input.value.trim();
+        if (!msg || !currentPlayer.username) return;
+        
+        if (supabaseClient) {
+            const { error } = await supabaseClient
+                .from("chat_messages")
+                .insert({
+                    username: currentPlayer.username,
+                    message: msg,
+                    created_at: new Date().toISOString()
+                });
+            
+            if (error) {
+                console.error("Ошибка отправки:", error);
+                addSocialMessage("Система", "Не удалось отправить сообщение");
+            } else {
+                input.value = "";
+            }
+        } else {
+            addSocialMessage(currentPlayer.username, msg);
+            input.value = "";
+        }
+    }
+    
+    async function loadChatMessages() {
+        if (!supabaseClient) return;
+        
+        const { data, error } = await supabaseClient
+            .from("chat_messages")
+            .select("*")
+            .order("created_at", { ascending: false })
+            .limit(50);
+        
+        if (error) {
+            console.error("Ошибка загрузки чата:", error);
+            return;
+        }
+        
+        if (data) {
+            chatMessages = data.reverse();
+            renderChat();
+        }
+    }
+    
+    function renderChat() {
+        const chatDiv = document.getElementById("socialChat");
+        if (!chatDiv) return;
+        
+        chatDiv.innerHTML = "";
+        for (const msg of chatMessages) {
+            const div = document.createElement("div");
+            div.className = "chat-message";
+            div.innerHTML = `<strong>${escapeHtml(msg.username)}:</strong> ${escapeHtml(msg.message)}`;
+            chatDiv.appendChild(div);
+        }
+        chatDiv.scrollTop = chatDiv.scrollHeight;
+    }
+    
+    function addSocialMessage(sender, msg) {
+        const chatDiv = document.getElementById("socialChat");
+        if (!chatDiv) return;
+        const div = document.createElement("div");
+        div.className = "chat-message";
+        div.innerHTML = `<strong>${escapeHtml(sender)}:</strong> ${escapeHtml(msg)}`;
+        chatDiv.appendChild(div);
+        chatDiv.scrollTop = chatDiv.scrollHeight;
+        
+        if (supabaseClient && sender !== "Система") {
+            supabaseClient.from("chat_messages").insert({
+                username: sender,
+                message: msg,
+                created_at: new Date().toISOString()
+            }).catch(e => console.error(e));
+        }
+    }
+    
+    function escapeHtml(str) {
+        if (!str) return "";
+        return str.replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        });
+    }
+    
+    // ======================== ОНЛАЙН ИГРОКИ ========================
+    async function loadOnlinePlayers() {
+        if (!supabaseClient) return;
+        
+        const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000).toISOString();
+        const { data, error } = await supabaseClient
+            .from("players")
+            .select("username, updated_at")
+            .gte("updated_at", fiveMinutesAgo)
+            .limit(20);
+        
+        if (error) {
+            console.error("Ошибка загрузки онлайна:", error);
+            return;
+        }
+        
+        const onlineDiv = document.getElementById("onlineList");
+        if (onlineDiv) {
+            if (data && data.length > 0) {
+                onlineDiv.innerHTML = data.map(p => `<span>${escapeHtml(p.username)}</span>`).join("");
+            } else {
+                onlineDiv.innerHTML = "<span>Нет активных игроков</span>";
+            }
+        }
+    }
+    
     // ======================== ЗАГРУЗКА КАРТИНОК ========================
     const tileFiles = {
-        GRASS: 'grass.png',
-        FOREST: 'forest.png',
-        MOUNTAIN: 'mountain.png',
-        VILLAGE: 'village.png',
-        WATER: 'water.png',
-        CAVE: 'cave.png',
-        BANDIT: 'bandit.png',
-        WASTELAND: 'wasteland.png'
+        GRASS: 'grass.png', FOREST: 'forest.png', MOUNTAIN: 'mountain.png',
+        VILLAGE: 'village.png', WATER: 'water.png', CAVE: 'cave.png',
+        BANDIT: 'bandit.png', WASTELAND: 'wasteland.png'
     };
     
     let loadedTiles = {};
@@ -594,7 +957,7 @@
     }
     
     window.addEventListener('resize', () => { updateTileDisplaySize(); drawMap(); });
-
+    
     const TILES_DATA = {
         GRASS: { color: '#3a7e3a', icon: '🌿', name: '🌿 Трава', walkable: true, type: 'empty', typeKey: 'GRASS' },
         FOREST: { color: '#2a6a2a', icon: '🌲', name: '🌲 Лес', walkable: true, type: 'combat', resource: 'wood', enemy: 'goblin', typeKey: 'FOREST' },
@@ -605,7 +968,7 @@
         BANDIT: { color: '#7a4a4a', icon: '⚔️', name: '⚔️ Лагерь', walkable: true, type: 'combat', enemy: 'bandit', typeKey: 'BANDIT' },
         WASTELAND: { color: '#9a8a6a', icon: '🏜️', name: '🏜️ Пустошь', walkable: true, type: 'empty', typeKey: 'WASTELAND' }
     };
-
+    
     let mapTiles = [];
     
     const MAP_LAYOUT = [
@@ -634,7 +997,7 @@
             }
         }
     }
-
+    
     function drawMap() {
         if (!canvas || !ctx) return;
         updateTileDisplaySize();
@@ -678,7 +1041,7 @@
         ctx.fillText("⚔️", drawX + TILE_SIZE * 0.2, drawY + TILE_SIZE * 0.75);
         ctx.shadowBlur = 0;
     }
-
+    
     let playerPos = { x: 10, y: 10 };
     let isMoving = false;
     let moveProgress = 0;
@@ -686,7 +1049,7 @@
     let moveTo = null;
     let moveStartTime = 0;
     let moveDuration = 0;
-
+    
     function animateMove() {
         if (!isMoving) return;
         const now = Date.now();
@@ -705,7 +1068,7 @@
             requestAnimationFrame(animateMove);
         }
     }
-
+    
     function startMoveTo(tx, ty) {
         if (isMoving) { addTechnicalLog("❌ Вы уже в пути!"); return; }
         if (autoActive) { addTechnicalLog("❌ Нельзя перемещаться во время автодействия! Остановите его."); return; }
@@ -726,7 +1089,7 @@
         addTechnicalLog(`🚶 Вы идёте в ${tile.name} (${distance} клеток, ${Math.floor(moveDuration/1000)} сек)`);
         animateMove();
     }
-
+    
     canvas.addEventListener('click', (e) => {
         const rect = canvas.getBoundingClientRect();
         const scaleX = canvas.width / rect.width;
@@ -739,9 +1102,9 @@
             startMoveTo(tileX, tileY);
         }
     });
-
+    
     function getCurrentTile() { return mapTiles[playerPos.y][playerPos.x]; }
-
+    
     function updateActionButtons() {
         const tile = getCurrentTile();
         const fightBtn = document.getElementById("fightBtn");
@@ -775,15 +1138,13 @@
         const stopBtn = document.getElementById("stopAutoBtn");
         stopBtn.style.display = autoActive ? "block" : "none";
     }
-
+    
     // ======================== УМЕНИЯ ========================
     let skills = {
-        powerStrike: { level: 0, maxLevel: 5, name: "💥 Мощный удар", desc: "Каждые 5 ударов наносит 100% дополнительного урона" },
-        endurance: { level: 0, maxLevel: 5, name: "🛡️ Стойкость", desc: "Пассивно увеличивает защиту на +2 за уровень" },
-        berserk: { level: 0, maxLevel: 5, name: "⚔️ Берсерк", desc: "Каждые 10 секунд увеличивает атаку на 30% на 3 секунды" }
+        powerStrike: { level: currentPlayer.skill_power_strike, maxLevel: 5, name: "💥 Мощный удар", desc: "Каждые 5 ударов наносит 100% дополнительного урона" },
+        endurance: { level: currentPlayer.skill_endurance, maxLevel: 5, name: "🛡️ Стойкость", desc: "Пассивно увеличивает защиту на +2 за уровень" },
+        berserk: { level: currentPlayer.skill_berserk, maxLevel: 5, name: "⚔️ Берсерк", desc: "Каждые 10 секунд увеличивает атаку на 30% на 3 секунды" }
     };
-    
-    let skillPoints = 2;
     
     function renderSkills() {
         const container = document.getElementById("skillsList");
@@ -794,21 +1155,21 @@
                 <div class="skill-name">${skills.powerStrike.name} (${skills.powerStrike.level}/${skills.powerStrike.maxLevel})</div>
                 <div class="skill-desc">${skills.powerStrike.desc}</div>
                 <div class="skill-progress"><div class="skill-progress-fill" style="width: ${(skills.powerStrike.level/skills.powerStrike.maxLevel)*100}%"></div></div>
-                <button class="small-btn upgrade-skill" data-skill="powerStrike" ${skills.powerStrike.level >= skills.powerStrike.maxLevel || skillPoints <= 0 ? 'disabled' : ''}>Улучшить (1 очко)</button>
+                <button class="small-btn upgrade-skill" data-skill="powerStrike" ${skills.powerStrike.level >= skills.powerStrike.maxLevel || currentPlayer.skillPoints <= 0 ? 'disabled' : ''}>Улучшить (1 очко)</button>
             </div>
             <div class="skill-item">
                 <div class="skill-name">${skills.endurance.name} (${skills.endurance.level}/${skills.endurance.maxLevel})</div>
                 <div class="skill-desc">${skills.endurance.desc}</div>
                 <div class="skill-progress"><div class="skill-progress-fill" style="width: ${(skills.endurance.level/skills.endurance.maxLevel)*100}%"></div></div>
-                <button class="small-btn upgrade-skill" data-skill="endurance" ${skills.endurance.level >= skills.endurance.maxLevel || skillPoints <= 0 ? 'disabled' : ''}>Улучшить (1 очко)</button>
+                <button class="small-btn upgrade-skill" data-skill="endurance" ${skills.endurance.level >= skills.endurance.maxLevel || currentPlayer.skillPoints <= 0 ? 'disabled' : ''}>Улучшить (1 очко)</button>
             </div>
             <div class="skill-item">
                 <div class="skill-name">${skills.berserk.name} (${skills.berserk.level}/${skills.berserk.maxLevel})</div>
                 <div class="skill-desc">${skills.berserk.desc}</div>
                 <div class="skill-progress"><div class="skill-progress-fill" style="width: ${(skills.berserk.level/skills.berserk.maxLevel)*100}%"></div></div>
-                <button class="small-btn upgrade-skill" data-skill="berserk" ${skills.berserk.level >= skills.berserk.maxLevel || skillPoints <= 0 ? 'disabled' : ''}>Улучшить (1 очко)</button>
+                <button class="small-btn upgrade-skill" data-skill="berserk" ${skills.berserk.level >= skills.berserk.maxLevel || currentPlayer.skillPoints <= 0 ? 'disabled' : ''}>Улучшить (1 очко)</button>
             </div>
-            <div style="margin-top: 12px; color: #ffd966;">⭐ Очков умений: ${skillPoints}</div>
+            <div style="margin-top: 12px; color: #ffd966;">⭐ Очков умений: ${currentPlayer.skillPoints}</div>
         `;
         
         document.querySelectorAll('.upgrade-skill').forEach(btn => {
@@ -817,7 +1178,7 @@
     }
     
     function upgradeSkill(skillName) {
-        if (skillPoints <= 0) {
+        if (currentPlayer.skillPoints <= 0) {
             addTechnicalLog("❌ Нет очков умений!");
             return;
         }
@@ -826,10 +1187,16 @@
             return;
         }
         skills[skillName].level++;
-        skillPoints--;
+        currentPlayer.skillPoints--;
+        
+        if (skillName === 'powerStrike') currentPlayer.skill_power_strike = skills.powerStrike.level;
+        if (skillName === 'endurance') currentPlayer.skill_endurance = skills.endurance.level;
+        if (skillName === 'berserk') currentPlayer.skill_berserk = skills.berserk.level;
+        
         addTechnicalLog(`✨ ${skills[skillName].name} улучшен до ${skills[skillName].level} уровня!`);
         renderSkills();
         updateUI();
+        savePlayerToCloud();
     }
     
     function getSkillBonuses() {
@@ -840,7 +1207,6 @@
     // ======================== ИНВЕНТАРЬ ========================
     let inventory = [];
     let equipment = { weapon: null, armor: null, ring: null };
-    
     const rarityColors = { common: 'обычное', rare: 'редкое', epic: 'эпическое' };
     
     function generateRandomItem() {
@@ -897,10 +1263,11 @@
             if (equipment.armor && equipment.armor.id === item.id) equipment.armor = null;
             if (equipment.ring && equipment.ring.id === item.id) equipment.ring = null;
             
-            player.gold += item.sellPrice;
+            currentPlayer.gold += item.sellPrice;
             inventory.splice(index, 1);
             addTechnicalLog(`💰 Продано ${item.name} за ${item.sellPrice} монет`);
             renderInventory(); updateUI();
+            savePlayerToCloud();
         }
     }
     
@@ -914,9 +1281,10 @@
             if (equipment.ring && equipment.ring.id === item.id) equipment.ring = null;
         }
         inventory = inventory.filter(item => item.rarity !== 'common');
-        player.gold += totalGold;
+        currentPlayer.gold += totalGold;
         addTechnicalLog(`💰 Продано всё обычное снаряжение за ${totalGold} монет`);
         renderInventory(); updateUI();
+        savePlayerToCloud();
     }
     
     function renderInventory() {
@@ -958,7 +1326,10 @@
         if (equipment.ring) { bonusAtk += equipment.ring.atk; bonusDef += equipment.ring.def; }
         const skillBonuses = getSkillBonuses();
         bonusDef += skillBonuses.bonusDef;
-        return { bonusAtk, bonusDef };
+        const totalStr = currentPlayer.str + playerExtraStr * 2 + bonusAtk;
+        const totalDef = currentPlayer.def + playerExtraDef * 2 + bonusDef;
+        const totalMaxHp = currentPlayer.maxHp + playerExtraHp * 10;
+        return { atk: totalStr, def: totalDef, maxHp: totalMaxHp };
     }
     
     // ======================== ЧАТЫ ========================
@@ -971,61 +1342,51 @@
         if (logDiv.children.length > 30) logDiv.removeChild(logDiv.lastChild);
     }
     
-    function addSocialMessage(sender, msg) {
-        const chatDiv = document.getElementById("socialChat");
-        const entry = document.createElement("div");
-        entry.className = "log-entry";
-        entry.innerHTML = `💬 ${sender}: ${msg}`;
-        chatDiv.prepend(entry);
-        if (chatDiv.children.length > 40) chatDiv.removeChild(chatDiv.lastChild);
+    function updateUI() {
+        const expNeeded = currentPlayer.level * 150;
+        const stats = recalcStats();
+        
+        document.getElementById("heroHp").innerText = currentPlayer.hp;
+        document.getElementById("heroMaxHp").innerText = stats.maxHp;
+        document.getElementById("heroLvl").innerText = currentPlayer.level;
+        document.getElementById("heroExp").innerText = currentPlayer.exp;
+        document.getElementById("heroExpNeed").innerText = expNeeded;
+        document.getElementById("heroGold").innerText = currentPlayer.gold;
+        document.getElementById("heroStr").innerHTML = `${stats.atk} <span style="color:#4caf50;">(+${playerExtraStr * 2 + (equipment.weapon?.atk || 0)})</span>`;
+        document.getElementById("heroDef").innerHTML = `${stats.def} <span style="color:#4caf50;">(+${playerExtraDef * 2 + (equipment.armor?.def || 0) + (equipment.ring?.def || 0)})</span>`;
+        document.getElementById("heroWood").innerText = currentPlayer.wood;
+        document.getElementById("heroOre").innerText = currentPlayer.ore;
+        document.getElementById("heroSkillPoints").innerText = currentPlayer.skillPoints;
+        
+        document.getElementById("questGoblins").innerHTML = `${quests.goblins}/5`;
+        document.getElementById("questOre").innerHTML = `${quests.ore}/10`;
+        document.getElementById("questWood").innerHTML = `${quests.wood}/10`;
+        document.getElementById("campStatus").innerHTML = campActive ? "🔥 Активен" : "Нет";
+        
+        const heroNameSpan = document.getElementById("heroNameDisplay");
+        if (heroNameSpan) heroNameSpan.innerText = currentPlayer.username || "Игрок";
     }
-
-    // ======================== ИГРОВЫЕ ДАННЫЕ ========================
-    let player = {
-        level: 1, exp: 0, hp: 70, maxHp: 70, str: 12, def: 5,
-        gold: 150, wood: 0, ore: 0
-    };
+    
     let quests = { goblins: 0, ore: 0, wood: 0 };
     let campActive = false;
-
     let autoActive = false;
     let autoType = null;
     let autoInterval = null;
-
+    
     const autoContent = document.getElementById("autoContent");
     let autoPanelCollapsed = false;
     document.getElementById("autoHeader").onclick = () => {
         autoPanelCollapsed = !autoPanelCollapsed;
         autoContent.classList.toggle("visible");
     };
-
+    
     function updateAutoPanel(title, text, progress) {
         document.getElementById("autoTitle").innerHTML = title;
         document.getElementById("autoText").innerHTML = text;
         if (progress !== undefined) document.getElementById("autoProgress").style.width = (progress * 100) + "%";
         if (!autoContent.classList.contains("visible")) autoContent.classList.add("visible");
     }
-
-    function updateUI() {
-        const expNeeded = player.level * 150;
-        const bonus = recalcStats();
-        document.getElementById("heroHp").innerText = player.hp;
-        document.getElementById("heroMaxHp").innerText = player.maxHp;
-        document.getElementById("heroLvl").innerText = player.level;
-        document.getElementById("heroExp").innerText = player.exp;
-        document.getElementById("heroExpNeed").innerText = expNeeded;
-        document.getElementById("heroGold").innerText = player.gold;
-        document.getElementById("heroStr").innerHTML = `${player.str + bonus.bonusAtk} <span style="color:#4caf50;">(+${bonus.bonusAtk})</span>`;
-        document.getElementById("heroDef").innerHTML = `${player.def + bonus.bonusDef} <span style="color:#4caf50;">(+${bonus.bonusDef})</span>`;
-        document.getElementById("heroWood").innerText = player.wood;
-        document.getElementById("heroOre").innerText = player.ore;
-        document.getElementById("heroSkillPoints").innerText = skillPoints;
-        document.getElementById("questGoblins").innerHTML = `${quests.goblins}/5`;
-        document.getElementById("questOre").innerHTML = `${quests.ore}/10`;
-        document.getElementById("questWood").innerHTML = `${quests.wood}/10`;
-        document.getElementById("campStatus").innerHTML = campActive ? "🔥 Активен" : "Нет";
-    }
-
+    
     const enemies = {
         goblin: { name: "Гоблин", baseHp: 35, baseAtk: 9, gold: 8, exp: 25, quest: "goblins", icon: "👺" },
         troll: { name: "Тролль", baseHp: 55, baseAtk: 13, gold: 15, exp: 40, icon: "🗿" },
@@ -1033,10 +1394,10 @@
     };
     
     function getCurrentStats() {
-        const bonus = recalcStats();
-        return { str: player.str + bonus.bonusAtk, def: player.def + bonus.bonusDef };
+        const stats = recalcStats();
+        return { str: stats.atk, def: stats.def };
     }
-
+    
     function triggerRandomEvent() {
         const events = [
             { text: "🍄 Вы нашли грибы! +5 монет", gold: 5 },
@@ -1045,15 +1406,13 @@
             { text: "🐺 На вас напал волк! -5 HP", damage: 5 }
         ];
         const event = events[Math.floor(Math.random() * events.length)];
-        if (event.gold) player.gold += event.gold;
-        if (event.heal) player.hp = Math.min(player.maxHp, player.hp + event.heal);
-        if (event.damage) player.hp = Math.max(1, player.hp - event.damage);
+        if (event.gold) currentPlayer.gold += event.gold;
+        if (event.heal) currentPlayer.hp = Math.min(recalcStats().maxHp, currentPlayer.hp + event.heal);
+        if (event.damage) currentPlayer.hp = Math.max(1, currentPlayer.hp - event.damage);
         addTechnicalLog(`✨ ${event.text}`);
         updateUI();
+        savePlayerToCloud();
     }
-
-    // ======================== АВТОБОЙ ========================
-    let combatCounter = 0;
     
     function startAutoCombat() {
         if (autoActive) { addTechnicalLog("❌ Автодействие уже активно!"); return; }
@@ -1070,7 +1429,7 @@
             if (!autoActive || autoType !== "combat") return;
             const tile2 = getCurrentTile();
             if (tile2.type !== "combat") {
-                addTechnicalLog(`❌ Локация из变了, автобой остановлен.`);
+                addTechnicalLog(`❌ Локация изменилась, автобой остановлен.`);
                 stopAuto();
                 return;
             }
@@ -1078,9 +1437,9 @@
             const enemyTemplate = enemies[tile2.enemy];
             let enemy = {
                 ...enemyTemplate,
-                hp: enemyTemplate.baseHp + Math.floor(player.level * 1.5),
-                maxHp: enemyTemplate.baseHp + Math.floor(player.level * 1.5),
-                atk: enemyTemplate.baseAtk + Math.floor(player.level * 0.5)
+                hp: enemyTemplate.baseHp + Math.floor(currentPlayer.level * 1.5),
+                maxHp: enemyTemplate.baseHp + Math.floor(currentPlayer.level * 1.5),
+                atk: enemyTemplate.baseAtk + Math.floor(currentPlayer.level * 0.5)
             };
             
             addTechnicalLog(`⚔️ Новый враг: ${enemy.name} (${enemy.hp} HP)`);
@@ -1090,19 +1449,21 @@
             
             function fightStep() {
                 if (!autoActive || autoType !== "combat") return;
-                if (player.hp <= 0) {
+                const stats = recalcStats();
+                if (currentPlayer.hp <= 0) {
                     addTechnicalLog(`💀 Вы пали в бою! Возврат в деревню.`);
                     stopAuto();
-                    player.hp = player.maxHp;
+                    currentPlayer.hp = stats.maxHp;
                     playerPos = { x: 5, y: 5 };
                     drawMap();
                     updateActionButtons();
                     updateUI();
+                    savePlayerToCloud();
                     return;
                 }
                 if (enemy.hp <= 0) {
-                    player.gold += enemy.gold;
-                    player.exp += enemy.exp;
+                    currentPlayer.gold += enemy.gold;
+                    currentPlayer.exp += enemy.exp;
                     if (tile2.enemy === "goblin") quests.goblins = Math.min(5, quests.goblins + 1);
                     
                     if (Math.random() < 0.3) {
@@ -1112,22 +1473,23 @@
                     }
                     
                     let leveled = false;
-                    const expNeeded = player.level * 150;
-                    if (player.exp >= expNeeded) {
-                        player.level++;
-                        player.exp -= expNeeded;
-                        player.maxHp += 10;
-                        player.hp = player.maxHp;
-                        player.str += 2;
-                        player.def += 1;
-                        skillPoints++;
+                    const expNeeded = currentPlayer.level * 150;
+                    if (currentPlayer.exp >= expNeeded) {
+                        currentPlayer.level++;
+                        currentPlayer.exp -= expNeeded;
+                        currentPlayer.maxHp += 10;
+                        currentPlayer.hp = currentPlayer.maxHp;
+                        currentPlayer.str += 2;
+                        currentPlayer.def += 1;
+                        currentPlayer.skillPoints++;
                         leveled = true;
                         renderSkills();
                     }
                     addTechnicalLog(`🏆 Победа над ${enemy.name}! +${enemy.gold} монет, +${enemy.exp} опыта`);
-                    if (leveled) addTechnicalLog(`✨ УРОВЕНЬ ${player.level}! +1 очко умений`);
+                    if (leveled) addTechnicalLog(`✨ УРОВЕНЬ ${currentPlayer.level}! +1 очко умений`);
                     playSound("levelup");
                     updateUI();
+                    savePlayerToCloud();
                     
                     setTimeout(() => { if (autoActive && autoType === "combat") fightLoop(); }, 500);
                     return;
@@ -1159,10 +1521,10 @@
                 enemy.hp -= dmg;
                 
                 let enemyDmg = Math.max(2, enemy.atk - Math.floor(baseStats.def / 2) + Math.floor(Math.random() * 4));
-                player.hp -= enemyDmg;
+                currentPlayer.hp -= enemyDmg;
                 
                 const progress = 1 - (enemy.hp / enemy.maxHp);
-                updateAutoPanel(`⚔️ БИТВА С ${enemy.name}`, `${enemy.icon} наносит ${enemyDmg} урона | ❤️ ${player.hp}/${player.maxHp} | 👺 ${Math.max(0, Math.floor(enemy.hp))}/${enemy.maxHp}`, progress);
+                updateAutoPanel(`⚔️ БИТВА С ${enemy.name}`, `${enemy.icon} наносит ${enemyDmg} урона | ❤️ ${currentPlayer.hp}/${stats.maxHp} | 👺 ${Math.max(0, Math.floor(enemy.hp))}/${enemy.maxHp}`, progress);
                 updateUI();
                 playSound("combat");
                 
@@ -1173,7 +1535,6 @@
         fightLoop();
     }
     
-    // ======================== АВТОСБОР ========================
     function startAutoGather() {
         if (autoActive) { addTechnicalLog("❌ Автодействие уже активно!"); return; }
         if (isMoving) { addTechnicalLog("❌ Нельзя собирать во время перемещения!"); return; }
@@ -1194,19 +1555,20 @@
                 if (!autoActive) return;
                 if (resource === "wood") {
                     let amount = 2 + Math.floor(Math.random() * 4);
-                    player.wood += amount;
+                    currentPlayer.wood += amount;
                     quests.wood = Math.min(10, quests.wood + amount);
-                    addTechnicalLog(`🌲 Вы собрали ${amount} древесины! Всего: ${player.wood}`);
+                    addTechnicalLog(`🌲 Вы собрали ${amount} древесины! Всего: ${currentPlayer.wood}`);
                     updateAutoPanel(`🌲 СБОР ДРЕВЕСИНЫ`, `+${amount} древесины!`, 1);
                 } else {
                     let amount = 1 + Math.floor(Math.random() * 3);
-                    player.ore += amount;
+                    currentPlayer.ore += amount;
                     quests.ore = Math.min(10, quests.ore + amount);
-                    addTechnicalLog(`⛏️ Вы добыли ${amount} руды! Всего: ${player.ore}`);
+                    addTechnicalLog(`⛏️ Вы добыли ${amount} руды! Всего: ${currentPlayer.ore}`);
                     updateAutoPanel(`⛏️ ДОБЫЧА РУДЫ`, `+${amount} руды!`, 1);
                 }
                 updateUI();
                 playSound("gather");
+                savePlayerToCloud();
                 setTimeout(() => { if (autoActive && autoType === "gather") gatherLoop(); }, 800);
             }, 2000);
         }
@@ -1214,13 +1576,15 @@
     }
     
     function restHeal() {
-        if (player.gold >= 5 && player.hp < player.maxHp) {
-            player.gold -= 5;
+        const stats = recalcStats();
+        if (currentPlayer.gold >= 5 && currentPlayer.hp < stats.maxHp) {
+            currentPlayer.gold -= 5;
             let heal = 10 + Math.floor(Math.random() * 10);
-            player.hp = Math.min(player.maxHp, player.hp + heal);
+            currentPlayer.hp = Math.min(stats.maxHp, currentPlayer.hp + heal);
             addTechnicalLog(`💊 Вы отдохнули. +${heal} HP. -5 монет`);
             updateUI();
-        } else if (player.hp >= player.maxHp) {
+            savePlayerToCloud();
+        } else if (currentPlayer.hp >= stats.maxHp) {
             addTechnicalLog("💚 Вы уже полностью здоровы!");
         } else {
             addTechnicalLog("❌ Не хватает монет (нужно 5)");
@@ -1256,14 +1620,13 @@
         addTechnicalLog(`⏹️ Автодействие остановлено.`);
     }
     
-    // ======================== ЧАТ И ГИЛЬДИЯ ========================
     let guild = null;
     
-    function sendChatMessage() {
+    function sendChatMessageHandler() {
         const input = document.getElementById("chatInput");
         const msg = input.value.trim();
-        if (msg) {
-            addSocialMessage("Игрок", msg);
+        if (msg && currentPlayer.username) {
+            addSocialMessage(currentPlayer.username, msg);
             input.value = "";
         }
     }
@@ -1280,97 +1643,8 @@
             addTechnicalLog("❌ Введите название гильдии");
         }
     }
-
-    // ======================== SUPABASE (ОБЛАЧНОЕ СОХРАНЕНИЕ) ========================
-    const SUPABASE_URL = "https://wxrrxnlyyugmduvnciem.supabase.co";
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind4cnJ4bmx5eXVnbWR1dm5jaWVtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAyMzIzNjgsImV4cCI6MjA5NTgwODM2OH0.6YfLDjAJ2sKu_C6q_UiXBI_GWJRvtE-m21GzB86zisU";
-    const PLAYER_USERNAME = "Игрок_1";
-
-    let supabaseClient = null;
-    let supabaseLoaded = false;
-
-    if (typeof supabase !== "undefined" && SUPABASE_URL && SUPABASE_ANON_KEY) {
-        supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        supabaseLoaded = true;
-
-        async function saveToCloud() {
-            try {
-                const payload = {
-                    username: PLAYER_USERNAME,
-                    level: player.level,
-                    exp: player.exp,
-                    hp: player.hp,
-                    max_hp: player.maxHp,
-                    str: player.str,
-                    def: player.def,
-                    gold: player.gold,
-                    wood: player.wood,
-                    ore: player.ore,
-                    skill_points: skillPoints,
-                    skill_power_strike: skills.powerStrike.level,
-                    skill_endurance: skills.endurance.level,
-                    skill_berserk: skills.berserk.level,
-                    updated_at: new Date().toISOString()
-                };
-
-                const { error } = await supabaseClient
-                    .from("players")
-                    .upsert(payload, { onConflict: "username" });
-
-                if (error) throw error;
-
-                addTechnicalLog("☁️ Прогресс сохранён в облако!");
-            } catch (error) {
-                console.error("❌ Ошибка сохранения в Supabase:", error);
-                addTechnicalLog(`❌ Ошибка сохранения: ${error.message}`);
-            }
-        }
-
-        async function loadFromCloud() {
-            try {
-                const { data, error } = await supabaseClient
-                    .from("players")
-                    .select("*")
-                    .eq("username", PLAYER_USERNAME)
-                    .maybeSingle();
-
-                if (error) throw error;
-
-                if (data) {
-                    player.level = data.level ?? player.level;
-                    player.exp = data.exp ?? player.exp;
-                    player.hp = data.hp ?? player.hp;
-                    player.maxHp = data.max_hp ?? player.maxHp;
-                    player.str = data.str ?? player.str;
-                    player.def = data.def ?? player.def;
-                    player.gold = data.gold ?? player.gold;
-                    player.wood = data.wood ?? player.wood;
-                    player.ore = data.ore ?? player.ore;
-                    skillPoints = data.skill_points ?? skillPoints;
-                    skills.powerStrike.level = data.skill_power_strike ?? 0;
-                    skills.endurance.level = data.skill_endurance ?? 0;
-                    skills.berserk.level = data.skill_berserk ?? 0;
-
-                    addTechnicalLog(`☁️ Загружен прогресс игрока ${data.username}!`);
-                    renderInventory();
-                    renderSkills();
-                    updateUI();
-                } else {
-                    addTechnicalLog("ℹ️ Прогресс не найден — сохраню его при первом автосейве.");
-                }
-            } catch (error) {
-                console.error("❌ Ошибка загрузки из Supabase:", error);
-                addTechnicalLog(`❌ Ошибка загрузки: ${error.message}`);
-            }
-        }
-
-        setInterval(saveToCloud, 30000);
-        setTimeout(loadFromCloud, 1000);
-    } else {
-        addTechnicalLog("⚠️ Supabase не настроен. Облачное сохранение не работает.");
-    }
-
-    // ======================== КНОПКИ ========================
+    
+    // ======================== ИНИЦИАЛИЗАЦИЯ ========================
     document.getElementById("fightBtn").onclick = () => {
         const tile = getCurrentTile();
         if (tile.type === "safe") restHeal();
@@ -1379,11 +1653,26 @@
     document.getElementById("gatherBtn").onclick = () => startAutoGather();
     document.getElementById("campBtn").onclick = () => toggleCamp();
     document.getElementById("stopAutoBtn").onclick = () => stopAuto();
-    document.getElementById("chatSendBtn").onclick = sendChatMessage;
+    document.getElementById("chatSendBtn").onclick = sendChatMessageHandler;
     document.getElementById("createGuildBtn").onclick = createGuild;
     document.getElementById("sellAllCommonBtn").onclick = () => sellAllCommon();
     document.getElementById("chatInput").addEventListener("keypress", (e) => {
-        if (e.key === "Enter") sendChatMessage();
+        if (e.key === "Enter") sendChatMessageHandler();
+    });
+    
+    document.getElementById("saveNameBtn").onclick = async () => {
+        const input = document.getElementById("playerNameInput");
+        const name = input.value.trim();
+        if (name && name.length >= 3 && name.length <= 16) {
+            await loginPlayer(name);
+            input.value = "";
+        } else {
+            addTechnicalLog("❌ Имя должно быть от 3 до 16 символов");
+        }
+    };
+    
+    document.querySelectorAll('.upgrade-stat').forEach(btn => {
+        btn.onclick = () => upgradeStat(btn.getAttribute('data-stat'));
     });
     
     window.unequipItem = unequipItem;
@@ -1399,13 +1688,16 @@
             document.querySelectorAll(".tab-content").forEach(tc => tc.classList.remove("active"));
             btn.classList.add("active");
             document.getElementById(`tab-${btn.getAttribute("data-tab")}`).classList.add("active");
+            
+            if (btn.getAttribute("data-tab") === "online") {
+                loadOnlinePlayers();
+            }
         };
     });
     
-    // Включаем первую вкладку (чат)
     if (document.querySelector(".tab-btn")) document.querySelector(".tab-btn").click();
     
-    // ======================== ЗАПУСК ========================
+    // Запуск игры
     generateMap();
     setTimeout(() => {
         updateTileDisplaySize();
@@ -1415,18 +1707,31 @@
     updateUI();
     renderInventory();
     renderSkills();
-    
     loadAllTiles();
     
     addTechnicalLog("🗺️ КАРТА 20×20! Кликайте по клеткам для перемещения");
-    addTechnicalLog("🌀 Улучшайте умения во вкладке УМЕНИЯ");
-    addTechnicalLog("⚠️ Лагерь блокирует перемещение — сначала нужно его снять");
-    addTechnicalLog("🖱️ Окно автобоя можно перетаскивать мышкой");
-    addSocialMessage("Система", "Добро пожаловать в общий чат!");
+    addTechnicalLog("🌀 Улучшайте умения и статы");
+    addTechnicalLog("💬 Чат работает — введите имя и общайтесь!");
+    addTechnicalLog("👥 Вкладка ОНЛАЙН показывает активных игроков");
     
     document.body.addEventListener('click', () => {
         if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
     });
+    
+    // Автосохранение и обновление онлайна
+    setInterval(() => {
+        if (currentPlayer.id) savePlayerToCloud();
+    }, 30000);
+    setInterval(loadChatMessages, 5000);
+    setInterval(loadOnlinePlayers, 30000);
+    
+    // Создаём таблицу чата, если её нет
+    if (supabaseClient) {
+        supabaseClient.from("chat_messages").select("count").limit(1).catch(async () => {
+            // Таблицы нет — создаём
+            await supabaseClient.rpc('create_chat_messages_table').catch(e => console.log("Создайте таблицу chat_messages вручную"));
+        });
+    }
 </script>
 </body>
 </html>
