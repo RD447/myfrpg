@@ -1141,6 +1141,47 @@ async function loadOnlinePlayers() {
     }
 }
 
+// ======================== ЗАГРУЗКА КАРТИНОК ========================
+const tileFiles = {
+    GRASS: 'grass.png', FOREST: 'forest.png', MOUNTAIN: 'mountain.png',
+    VILLAGE: 'village.png', WATER: 'water.png', CAVE: 'cave.png',
+    BANDIT: 'bandit.png', WASTELAND: 'wasteland.png'
+};
+
+let loadedTiles = {};
+let imagesToLoad = Object.keys(tileFiles).length;
+let imagesLoaded = 0;
+
+function tryLoadImage(key, path) {
+    const img = new Image();
+    img.onload = () => {
+        loadedTiles[key] = img;
+        imagesLoaded++;
+        if (imagesLoaded === imagesToLoad) {
+            addTechnicalLog(`🎨 Загружено ${imagesLoaded} картинок для карты!`);
+            drawMap();
+        }
+    };
+    img.onerror = () => {
+        if (path === `images/${tileFiles[key]}`) {
+            tryLoadImage(key, tileFiles[key]);
+        } else {
+            imagesLoaded++;
+            if (imagesLoaded === imagesToLoad) {
+                addTechnicalLog(`⚠️ Картинки не найдены. Используем цветные квадраты.`);
+                drawMap();
+            }
+        }
+    };
+    img.src = path;
+}
+
+function loadAllTiles() {
+    for (const [key, filename] of Object.entries(tileFiles)) {
+        tryLoadImage(key, `images/${filename}`);
+    }
+}
+
 // ======================== КАРТА ========================
 const canvas = document.getElementById('worldMap');
 const ctx = canvas.getContext('2d');
@@ -1207,22 +1248,32 @@ function drawMap() {
         for (let x = 0; x < MAP_SIZE; x++) {
             if (!mapTiles[y] || !mapTiles[y][x]) continue;
             const tile = mapTiles[y][x];
+            const pngImage = loadedTiles[tile.typeKey];
             
-            ctx.fillStyle = tile.color;
-            ctx.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE - 1, TILE_SIZE - 1);
-            ctx.font = `${TILE_SIZE * 0.5}px "Segoe UI Emoji"`;
-            ctx.fillStyle = "#ffffff";
-            ctx.shadowBlur = 4;
-            ctx.fillText(tile.icon, x * TILE_SIZE + TILE_SIZE * 0.25, y * TILE_SIZE + TILE_SIZE * 0.7);
-            ctx.shadowBlur = 0;
-            ctx.strokeStyle = "#2a2a2a";
-            ctx.strokeRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+            if (pngImage && pngImage.complete && pngImage.naturalWidth > 0) {
+                ctx.drawImage(pngImage, x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+            } else {
+                ctx.fillStyle = tile.color;
+                ctx.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE - 1, TILE_SIZE - 1);
+                ctx.font = `${TILE_SIZE * 0.5}px "Segoe UI Emoji"`;
+                ctx.fillStyle = "#ffffff";
+                ctx.shadowBlur = 4;
+                ctx.fillText(tile.icon, x * TILE_SIZE + TILE_SIZE * 0.25, y * TILE_SIZE + TILE_SIZE * 0.7);
+                ctx.shadowBlur = 0;
+                ctx.strokeStyle = "#2a2a2a";
+                ctx.strokeRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+            }
         }
     }
     
     if (!playerPos) return;
     let drawX = playerPos.x * TILE_SIZE;
     let drawY = playerPos.y * TILE_SIZE;
+    if (isMoving && moveFrom && moveTo) {
+        const t = Math.min(1, moveProgress);
+        drawX = (moveFrom.x * TILE_SIZE) * (1 - t) + (moveTo.x * TILE_SIZE) * t;
+        drawY = (moveFrom.y * TILE_SIZE) * (1 - t) + (moveTo.y * TILE_SIZE) * t;
+    }
     
     ctx.font = `${TILE_SIZE * 0.6}px "Segoe UI Emoji"`;
     ctx.fillStyle = "#ffdd88";
@@ -1533,7 +1584,7 @@ function updateActionButtons() {
     gatherBtn.style.display = "none";
     campBtn.style.display = "block";
     
-    // Удаляем кнопку класса, если она есть (будем создавать заново при необходимости)
+    // Удаляем кнопку класса, если она есть
     if (classBtn) {
         classBtn.remove();
     }
@@ -1565,7 +1616,6 @@ function updateActionButtons() {
         else campBtn.classList.remove("active");
         
     } else {
-        // Для пустошей, леса, гор и т.д. - только лагерь
         if (campActive) campBtn.classList.add("active");
         else campBtn.classList.remove("active");
     }
@@ -1931,6 +1981,7 @@ document.querySelectorAll(".tab-btn").forEach(btn => {
 if (document.querySelector(".tab-btn")) document.querySelector(".tab-btn").click();
 
 generateMap();
+loadAllTiles();  // Загружаем картинки для карты
 setTimeout(() => {
     updateTileDisplaySize();
     drawMap();
