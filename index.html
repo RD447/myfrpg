@@ -871,69 +871,99 @@
     
     function toggleCamp() {
         if (!isLoggedIn) {
-            addTechnicalLog("❌ Сначала войдите в аккаунт!");
-            return;
-        }
-        if (isMoving) {
-            addTechnicalLog("❌ Нельзя ставить лагерь во время перемещения!");
-            return;
-        }
-        const tile = getCurrentTile();
-        if (tile.type !== "combat" && tile.type !== "empty") {
-            addTechnicalLog("❌ Лагерь можно ставить в лесу, горах, пещере, пустошах!");
-            return;
-        }
-        campActive = !campActive;
-        const campBtn = document.getElementById("campBtn");
-        if (campActive) {
-            campBtn.classList.add("active");
-            campBtn.innerHTML = "🔥 СНЯТЬ ЛАГЕРЬ";
-            addTechnicalLog("🏕️ Лагерь установлен! Можно лечиться (5 монет) и готовить еду (2 дерева)");
-        } else {
-            campBtn.classList.remove("active");
-            campBtn.innerHTML = "🏕️ ЛАГЕРЬ";
-            addTechnicalLog("🔥 Лагерь свёрнут.");
-        }
-        updateUI();
+        addTechnicalLog("❌ Сначала войдите в аккаунт!");
+        return;
     }
-    
-    function campHeal() {
-        if (!campActive) {
-            addTechnicalLog("❌ Нет активного лагеря!");
-            return;
-        }
-        const stats = recalcStats();
-        if (currentPlayer.gold >= 5 && currentPlayer.hp < stats.maxHp) {
-            currentPlayer.gold -= 5;
-            let heal = 15 + Math.floor(Math.random() * 15);
-            currentPlayer.hp = Math.min(stats.maxHp, currentPlayer.hp + heal);
-            addTechnicalLog(`💊 Вы отдохнули в лагере и восстановили ${heal} HP. -5 монет`);
-            updateUI();
-            savePlayerToCloud();
-        } else if (currentPlayer.hp >= stats.maxHp) {
-            addTechnicalLog("💚 Вы уже полностью здоровы!");
-        } else {
-            addTechnicalLog("❌ Не хватает монет (нужно 5)");
-        }
+    if (isMoving) {
+        addTechnicalLog("❌ Нельзя ставить лагерь во время перемещения!");
+        return;
     }
-    
-    function campCook() {
-        if (!campActive) {
-            addTechnicalLog("❌ Нет активного лагеря!");
-            return;
-        }
-        if (currentPlayer.wood < 2) {
-            addTechnicalLog("❌ Не хватает древесины! Нужно 2");
-            return;
-        }
-        currentPlayer.wood -= 2;
-        let heal = 20 + Math.floor(Math.random() * 15);
-        const stats = recalcStats();
+    const tile = getCurrentTile();
+    // Лагерь можно ставить в лесу, горах, пещере, пустошах (НЕ в деревне)
+    if (tile.type !== "combat" && tile.type !== "empty") {
+        addTechnicalLog("❌ Лагерь можно ставить в лесу, горах, пещере, пустошах!");
+        return;
+    }
+    campActive = !campActive;
+    const campBtn = document.getElementById("campBtn");
+    if (campActive) {
+        campBtn.classList.add("active");
+        campBtn.innerHTML = "🔥 СНЯТЬ ЛАГЕРЬ";
+        addTechnicalLog("🏕️ Лагерь установлен! Можно лечиться (5 монет) и готовить еду (2 дерева)");
+        // Добавляем кнопки в панель действий
+        addCampButtons();
+    } else {
+        campBtn.classList.remove("active");
+        campBtn.innerHTML = "🏕️ ЛАГЕРЬ";
+        addTechnicalLog("🔥 Лагерь свёрнут.");
+        removeCampButtons();
+    }
+    updateUI();
+}
+
+function addCampButtons() {
+    let actionBar = document.getElementById("actionBar");
+    // Удаляем старые, если есть
+    removeCampButtons();
+    // Создаём кнопку лечения
+    const healBtn = document.createElement("button");
+    healBtn.id = "campHealBtn";
+    healBtn.className = "btn btn-success";
+    healBtn.innerHTML = "💊 ЛЕЧЕНИЕ В ЛАГЕРЕ (5✨)";
+    healBtn.onclick = () => campHeal();
+    actionBar.appendChild(healBtn);
+    // Создаём кнопку готовки
+    const cookBtn = document.createElement("button");
+    cookBtn.id = "campCookBtn";
+    cookBtn.className = "btn btn-camp";
+    cookBtn.innerHTML = "🍲 ПРИГОТОВИТЬ ЕДУ (2🌲)";
+    cookBtn.onclick = () => campCook();
+    actionBar.appendChild(cookBtn);
+}
+
+function removeCampButtons() {
+    const healBtn = document.getElementById("campHealBtn");
+    const cookBtn = document.getElementById("campCookBtn");
+    if (healBtn) healBtn.remove();
+    if (cookBtn) cookBtn.remove();
+}
+function campHeal() {
+    if (!campActive) {
+        addTechnicalLog("❌ Нет активного лагеря!");
+        return;
+    }
+    const stats = recalcStats();
+    if (currentPlayer.gold >= 5 && currentPlayer.hp < stats.maxHp) {
+        currentPlayer.gold -= 5;
+        let heal = 15 + Math.floor(Math.random() * 15);
         currentPlayer.hp = Math.min(stats.maxHp, currentPlayer.hp + heal);
-        addTechnicalLog(`🍲 Вы приготовили еду на костре! +${heal} HP. -2 древесины`);
+        addTechnicalLog(`💊 Вы отдохнули в лагере и восстановили ${heal} HP. -5 монет`);
         updateUI();
         savePlayerToCloud();
+    } else if (currentPlayer.hp >= stats.maxHp) {
+        addTechnicalLog("💚 Вы уже полностью здоровы!");
+    } else {
+        addTechnicalLog("❌ Не хватает монет (нужно 5)");
     }
+}
+
+function campCook() {
+    if (!campActive) {
+        addTechnicalLog("❌ Нет активного лагеря!");
+        return;
+    }
+    if (currentPlayer.wood < 2) {
+        addTechnicalLog("❌ Не хватает древесины! Нужно 2");
+        return;
+    }
+    currentPlayer.wood -= 2;
+    let heal = 20 + Math.floor(Math.random() * 15);
+    const stats = recalcStats();
+    currentPlayer.hp = Math.min(stats.maxHp, currentPlayer.hp + heal);
+    addTechnicalLog(`🍲 Вы приготовили еду на костре! +${heal} HP. -2 древесины`);
+    updateUI();
+    savePlayerToCloud();
+}
     
     // ======================== ЧАТ ========================
     async function sendChatMessage() {
