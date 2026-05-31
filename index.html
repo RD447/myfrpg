@@ -1271,62 +1271,66 @@ function campCook() {
     function getCurrentTile() { return mapTiles[playerPos.y][playerPos.x]; }
     
     function updateActionButtons() {
-        const tile = getCurrentTile();
-        const fightBtn = document.getElementById("fightBtn");
-        const gatherBtn = document.getElementById("gatherBtn");
-        const campBtn = document.getElementById("campBtn");
-        
-        fightBtn.style.display = "none";
-        gatherBtn.style.display = "none";
+    const tile = getCurrentTile();
+    const fightBtn = document.getElementById("fightBtn");
+    const gatherBtn = document.getElementById("gatherBtn");
+    const campBtn = document.getElementById("campBtn");
+    
+    // Скрываем стандартные кнопки
+    fightBtn.style.display = "none";
+    gatherBtn.style.display = "none";
+    campBtn.style.display = "block";
+    
+    if (tile.type === "combat") {
+        fightBtn.style.display = "block";
+        fightBtn.innerHTML = `⚔️ АВТОБОЙ (${tile.enemy === 'goblin' ? 'Гоблин' : tile.enemy === 'troll' ? 'Тролль' : 'Разбойник'})`;
+        if (tile.resource) {
+            gatherBtn.style.display = "block";
+            gatherBtn.innerHTML = tile.resource === "wood" ? "🌲 АВТОСБОР ДРЕВЕСИНЫ" : "⛏️ АВТОСБОР РУДЫ";
+        }
+        if (campActive) campBtn.classList.add("active");
+        else campBtn.classList.remove("active");
+    } else if (tile.type === "safe") {
+        fightBtn.style.display = "block";
+        fightBtn.innerHTML = "💊 ОТДОХНУТЬ (+10 HP за 5 монет)";
         campBtn.style.display = "block";
-        
-        if (tile.type === "combat") {
-            fightBtn.style.display = "block";
-            fightBtn.innerHTML = `⚔️ АВТОБОЙ (${tile.enemy === 'goblin' ? 'Гоблин' : tile.enemy === 'troll' ? 'Тролль' : 'Разбойник'})`;
-            if (tile.resource) {
-                gatherBtn.style.display = "block";
-                gatherBtn.innerHTML = tile.resource === "wood" ? "🌲 АВТОСБОР ДРЕВЕСИНЫ" : "⛏️ АВТОСБОР РУДЫ";
-            }
-            if (campActive) campBtn.classList.add("active");
-            else campBtn.classList.remove("active");
-        } else if (tile.type === "safe") {
-            fightBtn.style.display = "block";
-            fightBtn.innerHTML = "💊 ОТДОХНУТЬ (+10 HP за 5 монет)";
-            campBtn.style.display = "block";
-        } else {
-            if (campActive) campBtn.classList.add("active");
-            else campBtn.classList.remove("active");
-        }
-        
-        const stopBtn = document.getElementById("stopAutoBtn");
-        stopBtn.style.display = autoActive ? "block" : "none";
-        
-        // Добавляем кнопки лагеря в панель действий (если лагерь активен)
-        let actionBar = document.getElementById("actionBar");
-        let existingHealBtn = document.getElementById("campHealBtn");
-        let existingCookBtn = document.getElementById("campCookBtn");
-        
-        if (campActive) {
-            if (!existingHealBtn) {
-                const healCampBtn = document.createElement("button");
-                healCampBtn.id = "campHealBtn";
-                healCampBtn.className = "btn btn-success";
-                healCampBtn.innerHTML = "💊 ЛЕЧЕНИЕ В ЛАГЕРЕ (5✨)";
-                healCampBtn.onclick = () => campHeal();
-                actionBar.appendChild(healCampBtn);
-                
-                const cookCampBtn = document.createElement("button");
-                cookCampBtn.id = "campCookBtn";
-                cookCampBtn.className = "btn btn-camp";
-                cookCampBtn.innerHTML = "🍲 ПРИГОТОВИТЬ ЕДУ (2🌲)";
-                cookCampBtn.onclick = () => campCook();
-                actionBar.appendChild(cookCampBtn);
-            }
-        } else {
-            if (existingHealBtn) existingHealBtn.remove();
-            if (existingCookBtn) existingCookBtn.remove();
-        }
+    } else {
+        if (campActive) campBtn.classList.add("active");
+        else campBtn.classList.remove("active");
     }
+    
+    const stopBtn = document.getElementById("stopAutoBtn");
+    stopBtn.style.display = autoActive ? "block" : "none";
+    
+    // ========== ГЛАВНОЕ: добавляем кнопки лагеря, если лагерь активен ==========
+    // Проверяем, есть ли уже кнопки, чтобы не создавать дубликаты
+    let existingHealBtn = document.getElementById("campHealBtn");
+    let existingCookBtn = document.getElementById("campCookBtn");
+    
+    if (campActive) {
+        // Если кнопок нет — создаём
+        if (!existingHealBtn) {
+            const healCampBtn = document.createElement("button");
+            healCampBtn.id = "campHealBtn";
+            healCampBtn.className = "btn btn-success";
+            healCampBtn.innerHTML = "💊 ЛЕЧЕНИЕ В ЛАГЕРЕ (5✨)";
+            healCampBtn.onclick = () => campHeal();
+            document.getElementById("actionBar").appendChild(healCampBtn);
+        }
+        if (!existingCookBtn) {
+            const cookCampBtn = document.createElement("button");
+            cookCampBtn.id = "campCookBtn";
+            cookCampBtn.className = "btn btn-camp";
+            cookCampBtn.innerHTML = "🍲 ПРИГОТОВИТЬ ЕДУ (2🌲)";
+            cookCampBtn.onclick = () => campCook();
+            document.getElementById("actionBar").appendChild(cookCampBtn);
+        }
+    } else {
+        // Если лагерь не активен — удаляем кнопки
+        if (existingHealBtn) existingHealBtn.remove();
+        if (existingCookBtn) existingCookBtn.remove();
+    }
+}
     
     // ======================== УМЕНИЯ ========================
     let skills = {
