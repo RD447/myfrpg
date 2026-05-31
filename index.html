@@ -457,7 +457,7 @@
                         <button id="logoutBtn" class="logout-btn">🚪 ВЫЙТИ</button>
                     </div>
                 </div>
-                
+                <div id="heroClassDisplay" style="text-align: center; font-size: 1rem; margin: 8px 0; color: #ffd966;">🗡️ Мечник</div>
                 <div class="hero-stats">
                     <div><span>❤️ Здоровье</span><span class="stat-value" id="heroHp">70</span>/<span id="heroMaxHp">70</span></div>
                     <div><span>⭐ Уровень</span><span class="stat-value" id="heroLvl">1</span></div>
@@ -599,6 +599,13 @@
 </div>
 
 <div class="sound-btn" id="soundBtn">🔊</div>
+<!-- ======== МОДАЛЬНОЕ ОКНО ДЛЯ ВЫБОРА КЛАССА ======== -->
+<div id="classModal" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #0e1625; border: 2px solid #ffd966; border-radius: 28px; padding: 20px; z-index: 1000; width: 320px;">
+    <h3 style="color: #ffd966; margin-bottom: 16px; text-align: center;">🌀 ВЫБОР КЛАССА</h3>
+    <div id="classButtons"></div>
+    <button onclick="document.getElementById('classModal').style.display='none'" style="margin-top: 16px; background: #8b3a3a; border: none; padding: 10px; border-radius: 30px; color: white; width: 100%; cursor: pointer;">ЗАКРЫТЬ</button>
+</div>
+<div id="modalOverlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 999;" onclick="document.getElementById('classModal').style.display='none'; document.getElementById('modalOverlay').style.display='none'"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
@@ -666,7 +673,47 @@
         level: 1, exp: 0, hp: 70, maxHp: 70, str: 12, def: 5,
         gold: 150, wood: 0, ore: 0, skillPoints: 2,
         skill_power_strike: 0, skill_endurance: 0, skill_berserk: 0
+	character_class: 'Мечник'
     };
+	const characterClasses = {
+    'Мечник': { name: '🗡️ Мечник', baseStr: 14, baseDef: 6, baseHp: 75, 	skillBonus: 'powerStrike', icon: '🗡️' },
+    'Лучник': { name: '🏹 Лучник', baseStr: 12, baseDef: 5, baseHp: 70, 	skillBonus: 'berserk', icon: '🏹' },
+    'Послушник': { name: '🙏 Послушник', baseStr: 11, baseDef: 7, baseHp: 72, 	skillBonus: 'endurance', icon: '🙏' },
+    'Адепт': { name: '🔮 Адепт', baseStr: 13, baseDef: 5, baseHp: 68, 	skillBonus: 'powerStrike', icon: '🔮' },
+    'Вор': { name: '🗡️ Вор', baseStr: 13, baseDef: 5, baseHp: 70, skillBonus: 	'berserk', icon: '🗡️' 
+}
+async function changeClass(newClass) {
+    if (!isLoggedIn) {
+        addTechnicalLog("❌ Сначала войдите в аккаунт!");
+        return;
+    }
+    const tile = getCurrentTile();
+    if (tile.id !== 'village' && tile.name !== '🏠 Деревня') {
+        addTechnicalLog("❌ Сменить класс можно только в деревне!");
+        return;
+    }
+    if (currentPlayer.gold < 50) {
+        addTechnicalLog("❌ Смена класса стоит 50 монет!");
+        return;
+    }
+    
+    const classData = characterClasses[newClass];
+    if (!classData) return;
+    
+    currentPlayer.gold -= 50;
+    currentPlayer.character_class = newClass;
+    
+    // Меняем базовые статы
+    currentPlayer.str = classData.baseStr;
+    currentPlayer.def = classData.baseDef;
+    currentPlayer.maxHp = classData.baseHp;
+    currentPlayer.hp = classData.baseHp;
+    
+    addTechnicalLog(`✨ Вы сменили класс на ${classData.name}! -50 монет`);
+    updateUI();
+    savePlayerToCloud();
+}
+};
     let isLoggedIn = false;
     
     let playerExtraStr = 0;
@@ -1282,22 +1329,36 @@ function campCook() {
     campBtn.style.display = "block";
     
     if (tile.type === "combat") {
-        fightBtn.style.display = "block";
-        fightBtn.innerHTML = `⚔️ АВТОБОЙ (${tile.enemy === 'goblin' ? 'Гоблин' : tile.enemy === 'troll' ? 'Тролль' : 'Разбойник'})`;
-        if (tile.resource) {
-            gatherBtn.style.display = "block";
-            gatherBtn.innerHTML = tile.resource === "wood" ? "🌲 АВТОСБОР ДРЕВЕСИНЫ" : "⛏️ АВТОСБОР РУДЫ";
-        }
-        if (campActive) campBtn.classList.add("active");
-        else campBtn.classList.remove("active");
-    } else if (tile.type === "safe") {
-        fightBtn.style.display = "block";
-        fightBtn.innerHTML = "💊 ОТДОХНУТЬ (+10 HP за 5 монет)";
-        campBtn.style.display = "block";
-    } else {
-        if (campActive) campBtn.classList.add("active");
-        else campBtn.classList.remove("active");
+    fightBtn.style.display = "block";
+    fightBtn.innerHTML = `⚔️ АВТОБОЙ (${tile.enemy === 'goblin' ? 'Гоблин' : tile.enemy === 'troll' ? 'Тролль' : 'Разбойник'})`;
+    if (tile.resource) {
+        gatherBtn.style.display = "block";
+        gatherBtn.innerHTML = tile.resource === "wood" ? "🌲 АВТОСБОР ДРЕВЕСИНЫ" : "⛏️ АВТОСБОР РУДЫ";
     }
+    if (campActive) campBtn.classList.add("active");
+    else campBtn.classList.remove("active");
+} else if (tile.type === "safe") {
+    fightBtn.style.display = "block";
+    fightBtn.innerHTML = "💊 ОТДОХНУТЬ (+10 HP за 5 монет)";
+    campBtn.style.display = "block";
+    
+    // ======== КНОПКА СМЕНЫ КЛАССА ========
+    let classBtn = document.getElementById("changeClassBtn");
+    if (!classBtn) {
+        classBtn = document.createElement("button");
+        classBtn.id = "changeClassBtn";
+        classBtn.className = "btn btn-camp";
+        classBtn.innerHTML = "🔄 СМЕНИТЬ КЛАСС (50✨)";
+        classBtn.onclick = () => showClassSelector();
+        document.getElementById("actionBar").appendChild(classBtn);
+    } else {
+        classBtn.style.display = "block";
+    }
+} else {
+    // Это для всех остальных локаций (пустоши, вода и т.д.)
+    if (campActive) campBtn.classList.add("active");
+    else campBtn.classList.remove("active");
+}
     
     const stopBtn = document.getElementById("stopAutoBtn");
     stopBtn.style.display = autoActive ? "block" : "none";
@@ -1560,6 +1621,12 @@ function campCook() {
         document.getElementById("campStatus").innerHTML = campActive ? "🔥 Активен" : "Нет";
         
         updateLoginUI();
+// ======== ОТОБРАЖЕНИЕ КЛАССА ========
+    const classDisplay = document.getElementById("heroClassDisplay");
+    if (classDisplay && currentPlayer.character_class) {
+        const classData = characterClasses[currentPlayer.character_class] || characterClasses['Мечник'];
+        classDisplay.innerHTML = `${classData.icon || '⚔️'} ${currentPlayer.character_class}`;
+    	}
     }
     
     let quests = { goblins: 0, ore: 0, wood: 0 };
@@ -1932,6 +1999,31 @@ function campCook() {
         if (currentPlayer.id && isLoggedIn) savePlayerToCloud();
     }, 30000);
     setInterval(loadOnlinePlayers, 30000);
+function showClassSelector() {
+    const modal = document.getElementById("classModal");
+    const overlay = document.getElementById("modalOverlay");
+    const container = document.getElementById("classButtons");
+    
+    container.innerHTML = "";
+    for (const [key, data] of Object.entries(characterClasses)) {
+        const btn = document.createElement("button");
+        btn.className = "small-btn";
+        btn.style.margin = "6px";
+        btn.style.padding = "10px";
+        btn.style.width = "calc(100% - 12px)";
+        btn.innerHTML = `${data.icon || data.name} ${data.name}<br><span style="font-size:0.6rem;">⚔️${data.baseStr} 🛡️${data.baseDef} ❤️${data.baseHp}</span>`;
+        btn.onclick = () => {
+            changeClass(key);
+            modal.style.display = "none";
+            overlay.style.display = "none";
+        };
+        container.appendChild(btn);
+    }
+    
+    modal.style.display = "block";
+    overlay.style.display = "block";
+}
+
 </script>
 </body>
 </html>
