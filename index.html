@@ -1527,10 +1527,16 @@ function updateActionButtons() {
     const fightBtn = document.getElementById("fightBtn");
     const gatherBtn = document.getElementById("gatherBtn");
     const campBtn = document.getElementById("campBtn");
+    const classBtn = document.getElementById("changeClassBtn");
     
     fightBtn.style.display = "none";
     gatherBtn.style.display = "none";
     campBtn.style.display = "block";
+    
+    // Удаляем кнопку класса, если она есть (будем создавать заново при необходимости)
+    if (classBtn) {
+        classBtn.remove();
+    }
     
     if (tile.type === "combat") {
         fightBtn.style.display = "block";
@@ -1541,23 +1547,25 @@ function updateActionButtons() {
         }
         if (campActive) campBtn.classList.add("active");
         else campBtn.classList.remove("active");
+        
     } else if (tile.type === "safe") {
         fightBtn.style.display = "block";
         fightBtn.innerHTML = "💊 ОТДОХНУТЬ (+10 HP за 5 монет)";
         campBtn.style.display = "block";
         
-        let classBtn = document.getElementById("changeClassBtn");
-        if (!classBtn) {
-            classBtn = document.createElement("button");
-            classBtn.id = "changeClassBtn";
-            classBtn.className = "btn btn-camp";
-            classBtn.innerHTML = "🔄 СМЕНИТЬ КЛАСС (50✨)";
-            classBtn.onclick = () => showClassSelector();
-            document.getElementById("actionBar").appendChild(classBtn);
-        } else {
-            classBtn.style.display = "block";
-        }
+        // СОЗДАЁМ КНОПКУ СМЕНЫ КЛАССА ТОЛЬКО В ДЕРЕВНЕ
+        const newClassBtn = document.createElement("button");
+        newClassBtn.id = "changeClassBtn";
+        newClassBtn.className = "btn btn-camp";
+        newClassBtn.innerHTML = "🔄 СМЕНИТЬ КЛАСС (50✨)";
+        newClassBtn.onclick = () => showClassSelector();
+        document.getElementById("actionBar").appendChild(newClassBtn);
+        
+        if (campActive) campBtn.classList.add("active");
+        else campBtn.classList.remove("active");
+        
     } else {
+        // Для пустошей, леса, гор и т.д. - только лагерь
         if (campActive) campBtn.classList.add("active");
         else campBtn.classList.remove("active");
     }
