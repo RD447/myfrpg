@@ -1,0 +1,1432 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+    <title>Кристальные земли — RPG</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background: #0a0f1a;
+            font-family: 'Segoe UI', monospace;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .game {
+            max-width: 1400px;
+            width: 100%;
+            background: #0e1625;
+            border-radius: 32px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .main-area {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .left-column {
+            width: 320px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .hero-card {
+            background: #010514cc;
+            border-radius: 28px;
+            padding: 16px;
+            backdrop-filter: blur(4px);
+        }
+        .hero-avatar {
+            text-align: center;
+            font-size: 64px;
+            margin-bottom: 12px;
+        }
+        .hero-stats div {
+            display: flex;
+            justify-content: space-between;
+            margin: 8px 0;
+            font-size: 0.8rem;
+            color: #ddd;
+        }
+        .stat-value { color: #ffd966; font-weight: bold; }
+
+        .inventory-card {
+            background: #010514cc;
+            border-radius: 28px;
+            padding: 16px;
+            backdrop-filter: blur(4px);
+        }
+        .inventory-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            color: #ffd966;
+            font-weight: bold;
+            margin-bottom: 12px;
+        }
+        .inventory-header h3 { margin: 0; font-size: 1rem; }
+        .inventory-header span { font-size: 1.2rem; }
+        .inventory-content { display: block; }
+        .inventory-content.collapsed { display: none; }
+        .inventory-grid {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .item-card {
+            background: #0a1022e0;
+            border-radius: 20px;
+            padding: 8px 12px;
+            margin: 6px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-left: 6px solid;
+            font-size: 0.7rem;
+            color: #ddd;
+        }
+        .rarity-common { border-left-color: #9e9e9e; }
+        .rarity-rare { border-left-color: #4caf50; background: #1e3a2e; }
+        .rarity-epic { border-left-color: #d500f9; background: #2a1e4a; }
+        
+        .equipment-slot {
+            background: #00000066;
+            border-radius: 20px;
+            padding: 8px;
+            margin: 6px 0;
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            color: #ddd;
+        }
+        .small-btn {
+            background: #2d3e5a;
+            border: none;
+            padding: 4px 12px;
+            border-radius: 30px;
+            color: white;
+            cursor: pointer;
+            font-size: 0.7rem;
+        }
+        .sell-btn { background: #8b3a3a; }
+        .resource-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 6px 0;
+            font-size: 0.75rem;
+            color: #ddd;
+        }
+
+        .map-area {
+            flex: 1;
+            min-width: 500px;
+        }
+        canvas {
+            width: 100%;
+            height: auto;
+            background: #1a2a3a;
+            border-radius: 20px;
+            border: 2px solid #ffd966;
+            cursor: pointer;
+        }
+        .map-hint {
+            text-align: center;
+            font-size: 0.65rem;
+            color: #aaa;
+            margin-top: 6px;
+        }
+
+        .social-panel {
+            width: 320px;
+            background: #010514cc;
+            border-radius: 28px;
+            padding: 16px;
+            backdrop-filter: blur(4px);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .tabs {
+            display: flex;
+            gap: 8px;
+            border-bottom: 1px solid #3a506e;
+            padding-bottom: 8px;
+            flex-wrap: wrap;
+        }
+        .tab-btn {
+            background: none;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 30px;
+            color: #bbddff;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .tab-btn.active {
+            background: #c97e2a;
+            color: #1a1208;
+        }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        
+        .quest-item {
+            display: flex;
+            justify-content: space-between;
+            margin: 8px 0;
+            font-size: 0.8rem;
+            color: #ddd;
+        }
+        .skill-item {
+            background: #0a1022e0;
+            border-radius: 20px;
+            padding: 10px;
+            margin: 8px 0;
+            color: #ddd;
+        }
+        .skill-name { font-weight: bold; color: #ffd966; }
+        .skill-desc { font-size: 0.7rem; color: #aaa; margin: 4px 0; }
+        .skill-progress {
+            background: #1a1a2a;
+            border-radius: 20px;
+            height: 6px;
+            margin: 6px 0;
+            overflow: hidden;
+        }
+        .skill-progress-fill {
+            background: #ffd966;
+            width: 0%;
+            height: 100%;
+            transition: width 0.1s;
+        }
+
+        .chat-box {
+            background: #00000066;
+            border-radius: 20px;
+            padding: 12px;
+            height: 200px;
+            overflow-y: auto;
+            font-size: 0.7rem;
+            color: #ddd;
+        }
+        .chat-input {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+        }
+        .chat-input input {
+            flex: 1;
+            background: #1f2a3a;
+            border: none;
+            border-radius: 30px;
+            padding: 8px;
+            color: white;
+        }
+        .chat-input button {
+            background: #2a3f5e;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 30px;
+            color: white;
+            cursor: pointer;
+        }
+        .guild-info {
+            background: #00000066;
+            border-radius: 20px;
+            padding: 12px;
+            font-size: 0.8rem;
+            color: #ddd;
+        }
+
+        .action-bar {
+            background: #010514cc;
+            border-radius: 28px;
+            padding: 16px;
+            backdrop-filter: blur(4px);
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .btn {
+            background: #2a3f5e;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 40px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 0.85rem;
+        }
+        .btn:active { transform: scale(0.97); }
+        .btn-danger { background: #8b3a3a; }
+        .btn-success { background: #2a6e5a; }
+        .btn-camp { background: #8b6e3a; }
+        .btn-camp.active { background: #d4a017; }
+        .btn-stop { background: #aa4444; }
+
+        .log-area {
+            background: #00000088;
+            border-radius: 20px;
+            padding: 12px;
+            height: 120px;
+            overflow-y: auto;
+            font-size: 0.7rem;
+            color: #ddd;
+        }
+        .log-entry {
+            margin: 4px 0;
+            border-left: 2px solid #ffd966;
+            padding-left: 8px;
+        }
+
+        .auto-panel {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            width: 280px;
+            background: #1a1f30;
+            border-radius: 20px;
+            border: 2px solid #ffd966;
+            z-index: 200;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+            cursor: grab;
+            color: #ddd;
+        }
+        .auto-panel.dragging { cursor: grabbing; }
+        .auto-header {
+            background: #2a3f5e;
+            padding: 10px 16px;
+            border-radius: 18px 18px 0 0;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            font-weight: bold;
+        }
+        .auto-content {
+            padding: 16px;
+            display: none;
+        }
+        .auto-content.visible { display: block; }
+        .auto-progress {
+            background: #1a1a2a;
+            border-radius: 20px;
+            height: 8px;
+            margin: 10px 0;
+            overflow: hidden;
+        }
+        .auto-progress-fill {
+            background: #ffd966;
+            width: 0%;
+            height: 100%;
+            transition: width 0.1s;
+        }
+
+        .sound-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #2a3f5e;
+            width: 48px;
+            height: 48px;
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            cursor: pointer;
+            z-index: 100;
+        }
+    </style>
+</head>
+<body>
+<div class="game">
+    <div class="main-area">
+        <div class="left-column">
+            <div class="hero-card">
+                <div class="hero-avatar">⚔️</div>
+                <div class="hero-stats">
+                    <div><span>❤️ Здоровье</span><span class="stat-value" id="heroHp">70</span>/<span id="heroMaxHp">70</span></div>
+                    <div><span>⭐ Уровень</span><span class="stat-value" id="heroLvl">1</span></div>
+                    <div><span>📊 Опыт</span><span class="stat-value" id="heroExp">0</span>/<span id="heroExpNeed">150</span></div>
+                    <div><span>💰 Монеты</span><span class="stat-value" id="heroGold">150</span></div>
+                    <div><span>⚔️ Сила</span><span class="stat-value" id="heroStr">12</span></div>
+                    <div><span>🛡️ Защита</span><span class="stat-value" id="heroDef">5</span></div>
+                    <div><span>🌀 Очки умений</span><span class="stat-value" id="heroSkillPoints">2</span></div>
+                </div>
+            </div>
+            
+            <div class="inventory-card">
+                <div class="inventory-header" id="inventoryHeader">
+                    <h3>🎒 ИНВЕНТАРЬ</h3>
+                    <span>▼</span>
+                </div>
+                <div class="inventory-content" id="inventoryContent">
+                    <div style="margin-bottom: 8px; padding-bottom: 6px; border-bottom: 1px solid #3a506e;">
+                        <div class="resource-row"><span>🌲 Древесина:</span><span class="stat-value" id="heroWood">0</span></div>
+                        <div class="resource-row"><span>⛏️ Руда:</span><span class="stat-value" id="heroOre">0</span></div>
+                    </div>
+                    <div><strong>⚔️ ЭКИПИРОВКА</strong></div>
+                    <div id="equipmentSlots"></div>
+                    <div style="margin-top: 12px;"><strong>🎒 СУМКА</strong></div>
+                    <div class="inventory-grid" id="inventoryList"></div>
+                    <button id="sellAllCommonBtn" class="small-btn" style="margin-top: 8px; width:100%;">💰 ПРОДАТЬ ВСЁ ОБЫЧНОЕ</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="map-area">
+            <canvas id="worldMap" width="800" height="800" style="width:100%; height:auto; max-width:800px; aspect-ratio:1/1"></canvas>
+            <div class="map-hint">🖱️ Клик по карте — перемещение (3 сек на клетку)</div>
+        </div>
+
+        <div class="social-panel">
+            <div class="tabs">
+                <button class="tab-btn" data-tab="chat">💬 ЧАТ</button>
+                <button class="tab-btn" data-tab="quests">📜 КВЕСТЫ</button>
+                <button class="tab-btn" data-tab="skills">🌀 УМЕНИЯ</button>
+                <button class="tab-btn" data-tab="guild">🏰 ГИЛЬДИЯ</button>
+            </div>
+            
+            <div id="tab-chat" class="tab-content">
+                <div class="chat-box" id="socialChat"><div class="log-entry">✨ Добро пожаловать в общий чат!</div></div>
+                <div class="chat-input">
+                    <input type="text" id="chatInput" placeholder="Сообщение...">
+                    <button id="chatSendBtn">📨</button>
+                </div>
+            </div>
+            
+            <div id="tab-quests" class="tab-content">
+                <div style="font-weight: bold; margin-bottom: 8px; color: #ffd966;">📜 ТЕКУЩИЕ ЗАДАНИЯ</div>
+                <div class="quest-item"><span>⚔️ Убить гоблинов</span><span id="questGoblins">0/5</span></div>
+                <div class="quest-item"><span>⛏️ Собрать руду</span><span id="questOre">0/10</span></div>
+                <div class="quest-item"><span>🌲 Собрать древесину</span><span id="questWood">0/10</span></div>
+                <div class="quest-item" style="margin-top: 12px;"><span>🏕️ Лагерь</span><span id="campStatus">Нет</span></div>
+            </div>
+            
+            <div id="tab-skills" class="tab-content">
+                <div style="font-weight: bold; margin-bottom: 8px; color: #ffd966;">🌀 ДЕРЕВО УМЕНИЙ</div>
+                <div id="skillsList"></div>
+                <div style="margin-top: 12px; background: #00000066; border-radius: 20px; padding: 8px; color: #aaa;">
+                    <div>💡 Умения применяются автоматически в бою!</div>
+                    <div>• Мощный удар — каждые 5 ударов (+100% урона)</div>
+                    <div>• Стойкость — постоянная защита +2</div>
+                    <div>• Берсерк — временное увеличение атаки</div>
+                </div>
+            </div>
+            
+            <div id="tab-guild" class="tab-content">
+                <div class="guild-info"><strong>🏰 ГИЛЬДИЯ</strong><br><span id="guildStatus">Не в гильдии</span></div>
+                <div style="margin-top: 12px;">
+                    <input type="text" id="guildNameInput" placeholder="Название гильдии" style="width:100%; background:#1f2a3a; border:none; border-radius:30px; padding:8px; color:white;">
+                    <button id="createGuildBtn" class="small-btn" style="margin-top:8px; width:100%;">🏰 СОЗДАТЬ ГИЛЬДИЮ</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="action-bar" id="actionBar">
+        <button class="btn btn-danger" id="fightBtn" style="display: none;">⚔️ АВТОБОЙ</button>
+        <button class="btn btn-success" id="gatherBtn" style="display: none;">🌲 АВТОСБОР</button>
+        <button class="btn btn-camp" id="campBtn" style="display: none;">🏕️ ЛАГЕРЬ</button>
+        <button class="btn btn-stop" id="stopAutoBtn" style="display: none;">⏹️ ОСТАНОВИТЬ</button>
+    </div>
+
+    <div class="log-area" id="combatLog">
+        <div class="log-entry">✨ Добро пожаловать в игру!</div>
+        <div class="log-entry">🗺️ Карта 20×20. Кликайте по клеткам для перемещения</div>
+    </div>
+</div>
+
+<div class="auto-panel" id="autoPanel">
+    <div class="auto-header" id="autoHeader">
+        <span id="autoTitle">⚔️ АВТОБОЙ</span>
+        <span>▼</span>
+    </div>
+    <div class="auto-content" id="autoContent">
+        <div id="autoText">Бой не активен</div>
+        <div class="auto-progress"><div class="auto-progress-fill" id="autoProgress"></div></div>
+    </div>
+</div>
+
+<div class="sound-btn" id="soundBtn">🔊</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+    // ======================== ЗВУК ========================
+    let soundEnabled = true;
+    let audioCtx = null;
+    function initAudio() { if (!audioCtx) { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } if (audioCtx.state === 'suspended') audioCtx.resume(); }
+    function playSound(type) {
+        if (!soundEnabled) return;
+        try {
+            initAudio();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain); gain.connect(audioCtx.destination);
+            if (type === 'combat') { osc.frequency.value = 220; gain.gain.value = 0.1; osc.type = 'sawtooth'; gain.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + 0.15); }
+            else if (type === 'gather') { osc.frequency.value = 660; gain.gain.value = 0.08; osc.type = 'triangle'; gain.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + 0.2); }
+            else if (type === 'levelup') { osc.frequency.value = 880; gain.gain.value = 0.1; osc.type = 'triangle'; gain.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + 0.3); }
+            else return;
+            osc.start(); osc.stop(audioCtx.currentTime + 0.2);
+        } catch(e) {}
+    }
+
+    // ======================== СВОРАЧИВАНИЕ ИНВЕНТАРЯ ========================
+    const inventoryHeader = document.getElementById("inventoryHeader");
+    const inventoryContent = document.getElementById("inventoryContent");
+    let inventoryCollapsed = false;
+    if (inventoryHeader) {
+        inventoryHeader.onclick = () => {
+            inventoryCollapsed = !inventoryCollapsed;
+            inventoryContent.classList.toggle("collapsed");
+            inventoryHeader.querySelector("span").innerHTML = inventoryCollapsed ? "▶" : "▼";
+        };
+    }
+
+    // ======================== ПЕРЕМЕЩАЕМОЕ ОКНО ========================
+    const autoPanel = document.getElementById("autoPanel");
+    const autoHeader = document.getElementById("autoHeader");
+    let isDragging = false;
+    let dragOffsetX = 0, dragOffsetY = 0;
+    
+    if (autoHeader) {
+        autoHeader.addEventListener("mousedown", (e) => {
+            isDragging = true;
+            dragOffsetX = e.clientX - autoPanel.offsetLeft;
+            dragOffsetY = e.clientY - autoPanel.offsetTop;
+            autoPanel.style.cursor = "grabbing";
+            autoPanel.classList.add("dragging");
+            e.preventDefault();
+        });
+    }
+    
+    document.addEventListener("mousemove", (e) => {
+        if (isDragging) {
+            autoPanel.style.left = (e.clientX - dragOffsetX) + "px";
+            autoPanel.style.top = (e.clientY - dragOffsetY) + "px";
+            autoPanel.style.bottom = "auto";
+            autoPanel.style.right = "auto";
+        }
+    });
+    
+    document.addEventListener("mouseup", () => {
+        if (isDragging) {
+            isDragging = false;
+            autoPanel.style.cursor = "grab";
+            autoPanel.classList.remove("dragging");
+        }
+    });
+    
+    // ======================== ЗАГРУЗКА КАРТИНОК ========================
+    const tileFiles = {
+        GRASS: 'grass.png',
+        FOREST: 'forest.png',
+        MOUNTAIN: 'mountain.png',
+        VILLAGE: 'village.png',
+        WATER: 'water.png',
+        CAVE: 'cave.png',
+        BANDIT: 'bandit.png',
+        WASTELAND: 'wasteland.png'
+    };
+    
+    let loadedTiles = {};
+    let imagesToLoad = Object.keys(tileFiles).length;
+    let imagesLoaded = 0;
+    
+    function tryLoadImage(key, path) {
+        const img = new Image();
+        img.onload = () => {
+            loadedTiles[key] = img;
+            imagesLoaded++;
+            if (imagesLoaded === imagesToLoad) {
+                addTechnicalLog(`🎨 Загружено ${imagesLoaded} картинок для карты!`);
+                drawMap();
+            }
+        };
+        img.onerror = () => {
+            if (path === `images/${tileFiles[key]}`) {
+                tryLoadImage(key, tileFiles[key]);
+            } else {
+                imagesLoaded++;
+                if (imagesLoaded === imagesToLoad) {
+                    addTechnicalLog(`⚠️ Картинки не найдены. Используем цветные квадраты.`);
+                    drawMap();
+                }
+            }
+        };
+        img.src = path;
+    }
+    
+    function loadAllTiles() {
+        for (const [key, filename] of Object.entries(tileFiles)) {
+            tryLoadImage(key, `images/${filename}`);
+        }
+    }
+    
+    // ======================== КАРТА ========================
+    const canvas = document.getElementById('worldMap');
+    const ctx = canvas.getContext('2d');
+    const MAP_SIZE = 20;
+    let TILE_SIZE = 40;
+    
+    function updateTileDisplaySize() {
+        if (canvas.width > 0) {
+            TILE_SIZE = Math.floor(canvas.width / MAP_SIZE);
+        } else {
+            TILE_SIZE = 40;
+        }
+    }
+    
+    window.addEventListener('resize', () => { updateTileDisplaySize(); drawMap(); });
+
+    const TILES_DATA = {
+        GRASS: { color: '#3a7e3a', icon: '🌿', name: '🌿 Трава', walkable: true, type: 'empty', typeKey: 'GRASS' },
+        FOREST: { color: '#2a6a2a', icon: '🌲', name: '🌲 Лес', walkable: true, type: 'combat', resource: 'wood', enemy: 'goblin', typeKey: 'FOREST' },
+        MOUNTAIN: { color: '#7a7a6a', icon: '🗻', name: '🗻 Горы', walkable: true, type: 'combat', resource: 'ore', enemy: 'troll', typeKey: 'MOUNTAIN' },
+        VILLAGE: { color: '#8b6e4a', icon: '🏠', name: '🏠 Деревня', walkable: true, type: 'safe', typeKey: 'VILLAGE' },
+        WATER: { color: '#2a6a8a', icon: '💧', name: '💧 Вода', walkable: false, type: 'empty', typeKey: 'WATER' },
+        CAVE: { color: '#5a5a5a', icon: '⛰️', name: '⛰️ Пещера', walkable: true, type: 'combat', resource: 'ore', enemy: 'troll', typeKey: 'CAVE' },
+        BANDIT: { color: '#7a4a4a', icon: '⚔️', name: '⚔️ Лагерь', walkable: true, type: 'combat', enemy: 'bandit', typeKey: 'BANDIT' },
+        WASTELAND: { color: '#9a8a6a', icon: '🏜️', name: '🏜️ Пустошь', walkable: true, type: 'empty', typeKey: 'WASTELAND' }
+    };
+
+    let mapTiles = [];
+    
+    const MAP_LAYOUT = [
+        "WGGGFGGGGGGGFGGGGFGP", "WGGGGGGGGFGGGVGFGGGP", "WGGFGGGGGGWGGGGGFGGP",
+        "WGGGGGGFGGGGFGGGGGGP", "WGGGFGGGGGGGBFGGGFGP", "WGMGGGGGFGGGGGGGFGGP",
+        "WGGGGGGGGGGGFGGGCGGP", "WGGGGGFGGGGGGGGWGGGP", "WGVGGGGGGGFGGGGGGGFP",
+        "WGGGFGGGGGGGGGGGGGGP", "WGGGGGGGGGGFGGGGGGGP", "WGGGFGGGGGMGGGGMGGGP",
+        "WGGGGGGVGGGGGBFGGGGP", "WFGGGGGGGGGGGGGGGWGP", "WGGGGGGBFCGGGGGGGGGP",
+        "WGGMGGGGGGFGGGGGGGGP", "WGGGFGGGGGGGGGGGGVGP", "WGGGGGGGGFGGGGGGGGGP",
+        "WGGGGGGGGGGGGGFGGGGP", "WGGGFCGGGGGMGGGGGGMP"
+    ];
+    
+    const letterToTile = {
+        'G': 'GRASS', 'F': 'FOREST', 'M': 'MOUNTAIN', 'V': 'VILLAGE',
+        'W': 'WATER', 'C': 'CAVE', 'B': 'BANDIT', 'P': 'WASTELAND'
+    };
+    
+    function generateMap() {
+        for (let y = 0; y < MAP_SIZE; y++) {
+            mapTiles[y] = [];
+            const row = MAP_LAYOUT[y];
+            for (let x = 0; x < MAP_SIZE; x++) {
+                const letter = row[x] || 'G';
+                const tileType = letterToTile[letter] || 'GRASS';
+                mapTiles[y][x] = { ...TILES_DATA[tileType], x, y };
+            }
+        }
+    }
+
+    function drawMap() {
+        if (!canvas || !ctx) return;
+        updateTileDisplaySize();
+        canvas.width = MAP_SIZE * TILE_SIZE;
+        canvas.height = MAP_SIZE * TILE_SIZE;
+        
+        for (let y = 0; y < MAP_SIZE; y++) {
+            for (let x = 0; x < MAP_SIZE; x++) {
+                if (!mapTiles[y] || !mapTiles[y][x]) continue;
+                const tile = mapTiles[y][x];
+                const pngImage = loadedTiles[tile.typeKey];
+                
+                if (pngImage && pngImage.complete && pngImage.naturalWidth > 0) {
+                    ctx.drawImage(pngImage, x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+                } else {
+                    ctx.fillStyle = tile.color;
+                    ctx.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE - 1, TILE_SIZE - 1);
+                    ctx.font = `${TILE_SIZE * 0.5}px "Segoe UI Emoji"`;
+                    ctx.fillStyle = "#ffffff";
+                    ctx.shadowBlur = 4;
+                    ctx.fillText(tile.icon, x * TILE_SIZE + TILE_SIZE * 0.25, y * TILE_SIZE + TILE_SIZE * 0.7);
+                    ctx.shadowBlur = 0;
+                    ctx.strokeStyle = "#2a2a2a";
+                    ctx.strokeRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+                }
+            }
+        }
+        
+        if (!playerPos) return;
+        let drawX = playerPos.x * TILE_SIZE;
+        let drawY = playerPos.y * TILE_SIZE;
+        if (isMoving && moveFrom && moveTo) {
+            const t = Math.min(1, moveProgress);
+            drawX = (moveFrom.x * TILE_SIZE) * (1 - t) + (moveTo.x * TILE_SIZE) * t;
+            drawY = (moveFrom.y * TILE_SIZE) * (1 - t) + (moveTo.y * TILE_SIZE) * t;
+        }
+        
+        ctx.font = `${TILE_SIZE * 0.6}px "Segoe UI Emoji"`;
+        ctx.fillStyle = "#ffdd88";
+        ctx.shadowBlur = 6;
+        ctx.fillText("⚔️", drawX + TILE_SIZE * 0.2, drawY + TILE_SIZE * 0.75);
+        ctx.shadowBlur = 0;
+    }
+
+    let playerPos = { x: 10, y: 10 };
+    let isMoving = false;
+    let moveProgress = 0;
+    let moveFrom = null;
+    let moveTo = null;
+    let moveStartTime = 0;
+    let moveDuration = 0;
+
+    function animateMove() {
+        if (!isMoving) return;
+        const now = Date.now();
+        moveProgress = Math.min(1, (now - moveStartTime) / moveDuration);
+        drawMap();
+        if (moveProgress >= 1) {
+            isMoving = false;
+            playerPos = { x: moveTo.x, y: moveTo.y };
+            moveFrom = null;
+            moveTo = null;
+            drawMap();
+            updateActionButtons();
+            addTechnicalLog(`✅ Вы прибыли в ${getCurrentTile().name}`);
+            if (Math.random() < 0.15) triggerRandomEvent();
+        } else {
+            requestAnimationFrame(animateMove);
+        }
+    }
+
+    function startMoveTo(tx, ty) {
+        if (isMoving) { addTechnicalLog("❌ Вы уже в пути!"); return; }
+        if (autoActive) { addTechnicalLog("❌ Нельзя перемещаться во время автодействия! Остановите его."); return; }
+        if (campActive) { addTechnicalLog("❌ Сначала нужно снять лагерь!"); return; }
+        
+        const tile = mapTiles[ty][tx];
+        if (!tile || !tile.walkable) { addTechnicalLog(`❌ Нельзя пройти в ${tile?.name || "эту клетку"}`); return; }
+        if (tx === playerPos.x && ty === playerPos.y) { addTechnicalLog(`📍 Вы уже здесь`); return; }
+        
+        const distance = Math.abs(tx - playerPos.x) + Math.abs(ty - playerPos.y);
+        moveDuration = distance * 3000;
+        
+        moveFrom = { x: playerPos.x, y: playerPos.y };
+        moveTo = { x: tx, y: ty };
+        isMoving = true;
+        moveProgress = 0;
+        moveStartTime = Date.now();
+        addTechnicalLog(`🚶 Вы идёте в ${tile.name} (${distance} клеток, ${Math.floor(moveDuration/1000)} сек)`);
+        animateMove();
+    }
+
+    canvas.addEventListener('click', (e) => {
+        const rect = canvas.getBoundingClientRect();
+        const scaleX = canvas.width / rect.width;
+        const scaleY = canvas.height / rect.height;
+        const mouseX = (e.clientX - rect.left) * scaleX;
+        const mouseY = (e.clientY - rect.top) * scaleY;
+        const tileX = Math.floor(mouseX / TILE_SIZE);
+        const tileY = Math.floor(mouseY / TILE_SIZE);
+        if (tileX >= 0 && tileX < MAP_SIZE && tileY >= 0 && tileY < MAP_SIZE) {
+            startMoveTo(tileX, tileY);
+        }
+    });
+
+    function getCurrentTile() { return mapTiles[playerPos.y][playerPos.x]; }
+
+    function updateActionButtons() {
+        const tile = getCurrentTile();
+        const fightBtn = document.getElementById("fightBtn");
+        const gatherBtn = document.getElementById("gatherBtn");
+        const campBtn = document.getElementById("campBtn");
+        
+        fightBtn.style.display = "none";
+        gatherBtn.style.display = "none";
+        campBtn.style.display = "none";
+        
+        if (tile.type === "combat") {
+            fightBtn.style.display = "block";
+            fightBtn.innerHTML = `⚔️ АВТОБОЙ (${tile.enemy === 'goblin' ? 'Гоблин' : tile.enemy === 'troll' ? 'Тролль' : 'Разбойник'})`;
+            if (tile.resource) {
+                gatherBtn.style.display = "block";
+                gatherBtn.innerHTML = tile.resource === "wood" ? "🌲 АВТОСБОР ДРЕВЕСИНЫ" : "⛏️ АВТОСБОР РУДЫ";
+            }
+            campBtn.style.display = "block";
+            if (campActive) campBtn.classList.add("active");
+            else campBtn.classList.remove("active");
+        } else if (tile.type === "safe") {
+            fightBtn.style.display = "block";
+            fightBtn.innerHTML = "💊 ОТДОХНУТЬ (+10 HP за 5 монет)";
+            campBtn.style.display = "none";
+        } else {
+            campBtn.style.display = "block";
+            if (campActive) campBtn.classList.add("active");
+            else campBtn.classList.remove("active");
+        }
+        
+        const stopBtn = document.getElementById("stopAutoBtn");
+        stopBtn.style.display = autoActive ? "block" : "none";
+    }
+
+    // ======================== УМЕНИЯ ========================
+    let skills = {
+        powerStrike: { level: 0, maxLevel: 5, name: "💥 Мощный удар", desc: "Каждые 5 ударов наносит 100% дополнительного урона" },
+        endurance: { level: 0, maxLevel: 5, name: "🛡️ Стойкость", desc: "Пассивно увеличивает защиту на +2 за уровень" },
+        berserk: { level: 0, maxLevel: 5, name: "⚔️ Берсерк", desc: "Каждые 10 секунд увеличивает атаку на 30% на 3 секунды" }
+    };
+    
+    let skillPoints = 2;
+    
+    function renderSkills() {
+        const container = document.getElementById("skillsList");
+        if (!container) return;
+        
+        container.innerHTML = `
+            <div class="skill-item">
+                <div class="skill-name">${skills.powerStrike.name} (${skills.powerStrike.level}/${skills.powerStrike.maxLevel})</div>
+                <div class="skill-desc">${skills.powerStrike.desc}</div>
+                <div class="skill-progress"><div class="skill-progress-fill" style="width: ${(skills.powerStrike.level/skills.powerStrike.maxLevel)*100}%"></div></div>
+                <button class="small-btn upgrade-skill" data-skill="powerStrike" ${skills.powerStrike.level >= skills.powerStrike.maxLevel || skillPoints <= 0 ? 'disabled' : ''}>Улучшить (1 очко)</button>
+            </div>
+            <div class="skill-item">
+                <div class="skill-name">${skills.endurance.name} (${skills.endurance.level}/${skills.endurance.maxLevel})</div>
+                <div class="skill-desc">${skills.endurance.desc}</div>
+                <div class="skill-progress"><div class="skill-progress-fill" style="width: ${(skills.endurance.level/skills.endurance.maxLevel)*100}%"></div></div>
+                <button class="small-btn upgrade-skill" data-skill="endurance" ${skills.endurance.level >= skills.endurance.maxLevel || skillPoints <= 0 ? 'disabled' : ''}>Улучшить (1 очко)</button>
+            </div>
+            <div class="skill-item">
+                <div class="skill-name">${skills.berserk.name} (${skills.berserk.level}/${skills.berserk.maxLevel})</div>
+                <div class="skill-desc">${skills.berserk.desc}</div>
+                <div class="skill-progress"><div class="skill-progress-fill" style="width: ${(skills.berserk.level/skills.berserk.maxLevel)*100}%"></div></div>
+                <button class="small-btn upgrade-skill" data-skill="berserk" ${skills.berserk.level >= skills.berserk.maxLevel || skillPoints <= 0 ? 'disabled' : ''}>Улучшить (1 очко)</button>
+            </div>
+            <div style="margin-top: 12px; color: #ffd966;">⭐ Очков умений: ${skillPoints}</div>
+        `;
+        
+        document.querySelectorAll('.upgrade-skill').forEach(btn => {
+            btn.onclick = () => upgradeSkill(btn.getAttribute('data-skill'));
+        });
+    }
+    
+    function upgradeSkill(skillName) {
+        if (skillPoints <= 0) {
+            addTechnicalLog("❌ Нет очков умений!");
+            return;
+        }
+        if (skills[skillName].level >= skills[skillName].maxLevel) {
+            addTechnicalLog(`❌ ${skills[skillName].name} уже максимального уровня!`);
+            return;
+        }
+        skills[skillName].level++;
+        skillPoints--;
+        addTechnicalLog(`✨ ${skills[skillName].name} улучшен до ${skills[skillName].level} уровня!`);
+        renderSkills();
+        updateUI();
+    }
+    
+    function getSkillBonuses() {
+        let bonusDef = skills.endurance.level * 2;
+        return { bonusDef };
+    }
+    
+    // ======================== ИНВЕНТАРЬ ========================
+    let inventory = [];
+    let equipment = { weapon: null, armor: null, ring: null };
+    
+    const rarityColors = { common: 'обычное', rare: 'редкое', epic: 'эпическое' };
+    
+    function generateRandomItem() {
+        const types = ['weapon', 'armor', 'ring'];
+        const type = types[Math.floor(Math.random() * types.length)];
+        const rarityRand = Math.random();
+        let rarity = 'common';
+        if (rarityRand > 0.85) rarity = 'epic';
+        else if (rarityRand > 0.6) rarity = 'rare';
+        
+        let stats = {};
+        if (type === 'weapon') {
+            stats.atk = rarity === 'common' ? 2 + Math.floor(Math.random() * 3) : rarity === 'rare' ? 5 + Math.floor(Math.random() * 3) : 8 + Math.floor(Math.random() * 4);
+            stats.def = 0;
+        } else if (type === 'armor') {
+            stats.atk = 0;
+            stats.def = rarity === 'common' ? 1 + Math.floor(Math.random() * 2) : rarity === 'rare' ? 3 + Math.floor(Math.random() * 2) : 5 + Math.floor(Math.random() * 3);
+        } else {
+            stats.atk = rarity === 'common' ? 1 : rarity === 'rare' ? 2 : 3;
+            stats.def = rarity === 'common' ? 1 : rarity === 'rare' ? 2 : 3;
+        }
+        
+        return {
+            id: Date.now() + Math.random(),
+            name: `${rarity === 'epic' ? '💎' : rarity === 'rare' ? '✨' : '⚙️'} ${rarityColors[rarity]} ${type === 'weapon' ? 'оружие' : type === 'armor' ? 'броня' : 'кольцо'}`,
+            type: type,
+            rarity: rarity,
+            atk: stats.atk,
+            def: stats.def,
+            sellPrice: rarity === 'common' ? 10 : rarity === 'rare' ? 40 : 100
+        };
+    }
+    
+    function addItemToInventory(item) { inventory.push(item); renderInventory(); }
+    
+    function equipItem(item) {
+        if (item.type === 'weapon') equipment.weapon = item;
+        else if (item.type === 'armor') equipment.armor = item;
+        else if (item.type === 'ring') equipment.ring = item;
+        renderInventory(); updateUI();
+    }
+    
+    function unequipItem(type) {
+        if (type === 'weapon') equipment.weapon = null;
+        else if (type === 'armor') equipment.armor = null;
+        else if (type === 'ring') equipment.ring = null;
+        renderInventory(); updateUI();
+    }
+    
+    function sellItem(index) {
+        const item = inventory[index];
+        if (item) {
+            if (equipment.weapon && equipment.weapon.id === item.id) equipment.weapon = null;
+            if (equipment.armor && equipment.armor.id === item.id) equipment.armor = null;
+            if (equipment.ring && equipment.ring.id === item.id) equipment.ring = null;
+            
+            player.gold += item.sellPrice;
+            inventory.splice(index, 1);
+            addTechnicalLog(`💰 Продано ${item.name} за ${item.sellPrice} монет`);
+            renderInventory(); updateUI();
+        }
+    }
+    
+    function sellAllCommon() {
+        const commonItems = inventory.filter(item => item.rarity === 'common');
+        let totalGold = 0;
+        for (const item of commonItems) {
+            totalGold += item.sellPrice;
+            if (equipment.weapon && equipment.weapon.id === item.id) equipment.weapon = null;
+            if (equipment.armor && equipment.armor.id === item.id) equipment.armor = null;
+            if (equipment.ring && equipment.ring.id === item.id) equipment.ring = null;
+        }
+        inventory = inventory.filter(item => item.rarity !== 'common');
+        player.gold += totalGold;
+        addTechnicalLog(`💰 Продано всё обычное снаряжение за ${totalGold} монет`);
+        renderInventory(); updateUI();
+    }
+    
+    function renderInventory() {
+        const inventoryDiv = document.getElementById("inventoryList");
+        const equipmentDiv = document.getElementById("equipmentSlots");
+        
+        equipmentDiv.innerHTML = `
+            <div class="equipment-slot"><span>🗡️ Оружие</span><span>${equipment.weapon ? equipment.weapon.name + ` (+${equipment.weapon.atk}⚔️)` : '—'}</span>${equipment.weapon ? `<button class="small-btn" onclick="window.unequipItem('weapon')">Снять</button>` : ''}</div>
+            <div class="equipment-slot"><span>🛡️ Броня</span><span>${equipment.armor ? equipment.armor.name + ` (+${equipment.armor.def}🛡️)` : '—'}</span>${equipment.armor ? `<button class="small-btn" onclick="window.unequipItem('armor')">Снять</button>` : ''}</div>
+            <div class="equipment-slot"><span>💍 Кольцо</span><span>${equipment.ring ? equipment.ring.name + ` (+${equipment.ring.atk}⚔️ +${equipment.ring.def}🛡️)` : '—'}</span>${equipment.ring ? `<button class="small-btn" onclick="window.unequipItem('ring')">Снять</button>` : ''}</div>
+        `;
+        
+        if (inventory.length === 0) {
+            inventoryDiv.innerHTML = '<div class="log-entry">🎒 Сумка пуста</div>';
+            return;
+        }
+        
+        inventoryDiv.innerHTML = '';
+        inventory.forEach((item, index) => {
+            const rarityClass = item.rarity === 'common' ? 'rarity-common' : (item.rarity === 'rare' ? 'rarity-rare' : 'rarity-epic');
+            const div = document.createElement('div');
+            div.className = `item-card ${rarityClass}`;
+            div.innerHTML = `<span>${item.name} (⚔️${item.atk} 🛡️${item.def})</span><div><button class="small-btn equip-btn" data-index="${index}">🔧</button><button class="small-btn sell-btn" data-index="${index}">💰</button></div>`;
+            inventoryDiv.appendChild(div);
+        });
+        
+        document.querySelectorAll('.equip-btn').forEach(btn => {
+            btn.onclick = () => equipItem(inventory[parseInt(btn.getAttribute('data-index'))]);
+        });
+        document.querySelectorAll('.sell-btn').forEach(btn => {
+            btn.onclick = () => sellItem(parseInt(btn.getAttribute('data-index')));
+        });
+    }
+    
+    function recalcStats() {
+        let bonusAtk = 0, bonusDef = 0;
+        if (equipment.weapon) bonusAtk += equipment.weapon.atk;
+        if (equipment.armor) bonusDef += equipment.armor.def;
+        if (equipment.ring) { bonusAtk += equipment.ring.atk; bonusDef += equipment.ring.def; }
+        const skillBonuses = getSkillBonuses();
+        bonusDef += skillBonuses.bonusDef;
+        return { bonusAtk, bonusDef };
+    }
+    
+    // ======================== ЧАТЫ ========================
+    function addTechnicalLog(msg) {
+        const logDiv = document.getElementById("combatLog");
+        const entry = document.createElement("div");
+        entry.className = "log-entry";
+        entry.innerHTML = `[${new Date().toLocaleTimeString()}] ${msg}`;
+        logDiv.prepend(entry);
+        if (logDiv.children.length > 30) logDiv.removeChild(logDiv.lastChild);
+    }
+    
+    function addSocialMessage(sender, msg) {
+        const chatDiv = document.getElementById("socialChat");
+        const entry = document.createElement("div");
+        entry.className = "log-entry";
+        entry.innerHTML = `💬 ${sender}: ${msg}`;
+        chatDiv.prepend(entry);
+        if (chatDiv.children.length > 40) chatDiv.removeChild(chatDiv.lastChild);
+    }
+
+    // ======================== ИГРОВЫЕ ДАННЫЕ ========================
+    let player = {
+        level: 1, exp: 0, hp: 70, maxHp: 70, str: 12, def: 5,
+        gold: 150, wood: 0, ore: 0
+    };
+    let quests = { goblins: 0, ore: 0, wood: 0 };
+    let campActive = false;
+
+    let autoActive = false;
+    let autoType = null;
+    let autoInterval = null;
+
+    const autoContent = document.getElementById("autoContent");
+    let autoPanelCollapsed = false;
+    document.getElementById("autoHeader").onclick = () => {
+        autoPanelCollapsed = !autoPanelCollapsed;
+        autoContent.classList.toggle("visible");
+    };
+
+    function updateAutoPanel(title, text, progress) {
+        document.getElementById("autoTitle").innerHTML = title;
+        document.getElementById("autoText").innerHTML = text;
+        if (progress !== undefined) document.getElementById("autoProgress").style.width = (progress * 100) + "%";
+        if (!autoContent.classList.contains("visible")) autoContent.classList.add("visible");
+    }
+
+    function updateUI() {
+        const expNeeded = player.level * 150;
+        const bonus = recalcStats();
+        document.getElementById("heroHp").innerText = player.hp;
+        document.getElementById("heroMaxHp").innerText = player.maxHp;
+        document.getElementById("heroLvl").innerText = player.level;
+        document.getElementById("heroExp").innerText = player.exp;
+        document.getElementById("heroExpNeed").innerText = expNeeded;
+        document.getElementById("heroGold").innerText = player.gold;
+        document.getElementById("heroStr").innerHTML = `${player.str + bonus.bonusAtk} <span style="color:#4caf50;">(+${bonus.bonusAtk})</span>`;
+        document.getElementById("heroDef").innerHTML = `${player.def + bonus.bonusDef} <span style="color:#4caf50;">(+${bonus.bonusDef})</span>`;
+        document.getElementById("heroWood").innerText = player.wood;
+        document.getElementById("heroOre").innerText = player.ore;
+        document.getElementById("heroSkillPoints").innerText = skillPoints;
+        document.getElementById("questGoblins").innerHTML = `${quests.goblins}/5`;
+        document.getElementById("questOre").innerHTML = `${quests.ore}/10`;
+        document.getElementById("questWood").innerHTML = `${quests.wood}/10`;
+        document.getElementById("campStatus").innerHTML = campActive ? "🔥 Активен" : "Нет";
+    }
+
+    const enemies = {
+        goblin: { name: "Гоблин", baseHp: 35, baseAtk: 9, gold: 8, exp: 25, quest: "goblins", icon: "👺" },
+        troll: { name: "Тролль", baseHp: 55, baseAtk: 13, gold: 15, exp: 40, icon: "🗿" },
+        bandit: { name: "Разбойник", baseHp: 45, baseAtk: 11, gold: 20, exp: 35, icon: "🗡️" }
+    };
+    
+    function getCurrentStats() {
+        const bonus = recalcStats();
+        return { str: player.str + bonus.bonusAtk, def: player.def + bonus.bonusDef };
+    }
+
+    function triggerRandomEvent() {
+        const events = [
+            { text: "🍄 Вы нашли грибы! +5 монет", gold: 5 },
+            { text: "🌿 Вы нашли целебные травы! +10 HP", heal: 10 },
+            { text: "💎 Вы нашли кристалл! +15 монет", gold: 15 },
+            { text: "🐺 На вас напал волк! -5 HP", damage: 5 }
+        ];
+        const event = events[Math.floor(Math.random() * events.length)];
+        if (event.gold) player.gold += event.gold;
+        if (event.heal) player.hp = Math.min(player.maxHp, player.hp + event.heal);
+        if (event.damage) player.hp = Math.max(1, player.hp - event.damage);
+        addTechnicalLog(`✨ ${event.text}`);
+        updateUI();
+    }
+
+    // ======================== АВТОБОЙ ========================
+    let combatCounter = 0;
+    
+    function startAutoCombat() {
+        if (autoActive) { addTechnicalLog("❌ Автодействие уже активно!"); return; }
+        if (isMoving) { addTechnicalLog("❌ Нельзя начать бой во время перемещения!"); return; }
+        const tile = getCurrentTile();
+        if (tile.type !== "combat") { addTechnicalLog("❌ Здесь нет врагов!"); return; }
+        
+        autoActive = true;
+        autoType = "combat";
+        updateActionButtons();
+        addTechnicalLog(`⚔️ Начат БЕСКОНЕЧНЫЙ автобой в ${tile.name}`);
+        
+        function fightLoop() {
+            if (!autoActive || autoType !== "combat") return;
+            const tile2 = getCurrentTile();
+            if (tile2.type !== "combat") {
+                addTechnicalLog(`❌ Локация из变了, автобой остановлен.`);
+                stopAuto();
+                return;
+            }
+            
+            const enemyTemplate = enemies[tile2.enemy];
+            let enemy = {
+                ...enemyTemplate,
+                hp: enemyTemplate.baseHp + Math.floor(player.level * 1.5),
+                maxHp: enemyTemplate.baseHp + Math.floor(player.level * 1.5),
+                atk: enemyTemplate.baseAtk + Math.floor(player.level * 0.5)
+            };
+            
+            addTechnicalLog(`⚔️ Новый враг: ${enemy.name} (${enemy.hp} HP)`);
+            updateAutoPanel(`⚔️ БИТВА С ${enemy.name}`, `Начало боя!`, 0);
+            
+            let skillCombatCounter = 0;
+            
+            function fightStep() {
+                if (!autoActive || autoType !== "combat") return;
+                if (player.hp <= 0) {
+                    addTechnicalLog(`💀 Вы пали в бою! Возврат в деревню.`);
+                    stopAuto();
+                    player.hp = player.maxHp;
+                    playerPos = { x: 5, y: 5 };
+                    drawMap();
+                    updateActionButtons();
+                    updateUI();
+                    return;
+                }
+                if (enemy.hp <= 0) {
+                    player.gold += enemy.gold;
+                    player.exp += enemy.exp;
+                    if (tile2.enemy === "goblin") quests.goblins = Math.min(5, quests.goblins + 1);
+                    
+                    if (Math.random() < 0.3) {
+                        const item = generateRandomItem();
+                        addItemToInventory(item);
+                        addTechnicalLog(`🎁 Выпал предмет: ${item.name}!`);
+                    }
+                    
+                    let leveled = false;
+                    const expNeeded = player.level * 150;
+                    if (player.exp >= expNeeded) {
+                        player.level++;
+                        player.exp -= expNeeded;
+                        player.maxHp += 10;
+                        player.hp = player.maxHp;
+                        player.str += 2;
+                        player.def += 1;
+                        skillPoints++;
+                        leveled = true;
+                        renderSkills();
+                    }
+                    addTechnicalLog(`🏆 Победа над ${enemy.name}! +${enemy.gold} монет, +${enemy.exp} опыта`);
+                    if (leveled) addTechnicalLog(`✨ УРОВЕНЬ ${player.level}! +1 очко умений`);
+                    playSound("levelup");
+                    updateUI();
+                    
+                    setTimeout(() => { if (autoActive && autoType === "combat") fightLoop(); }, 500);
+                    return;
+                }
+                
+                skillCombatCounter++;
+                const baseStats = getCurrentStats();
+                const now = Date.now();
+                
+                let finalPlayerStr = baseStats.str;
+                let critMsg = "";
+                
+                if (skills.powerStrike.level > 0 && skillCombatCounter % 5 === 0) {
+                    finalPlayerStr = baseStats.str * 1.5;
+                    critMsg = " 💥 МОЩНЫЙ УДАР!";
+                }
+                
+                if (skills.berserk.level > 0) {
+                    if (!skills.berserk.lastTrigger) skills.berserk.lastTrigger = 0;
+                    if (now - skills.berserk.lastTrigger > 10000) {
+                        finalPlayerStr = baseStats.str * 1.3;
+                        skills.berserk.lastTrigger = now;
+                        critMsg = " ⚔️ БЕРСЕРК! +30% к атаке!";
+                    }
+                }
+                
+                let dmg = Math.floor(Math.random() * finalPlayerStr) + 5;
+                if (critMsg) addTechnicalLog(critMsg);
+                enemy.hp -= dmg;
+                
+                let enemyDmg = Math.max(2, enemy.atk - Math.floor(baseStats.def / 2) + Math.floor(Math.random() * 4));
+                player.hp -= enemyDmg;
+                
+                const progress = 1 - (enemy.hp / enemy.maxHp);
+                updateAutoPanel(`⚔️ БИТВА С ${enemy.name}`, `${enemy.icon} наносит ${enemyDmg} урона | ❤️ ${player.hp}/${player.maxHp} | 👺 ${Math.max(0, Math.floor(enemy.hp))}/${enemy.maxHp}`, progress);
+                updateUI();
+                playSound("combat");
+                
+                autoInterval = setTimeout(fightStep, 1000);
+            }
+            fightStep();
+        }
+        fightLoop();
+    }
+    
+    // ======================== АВТОСБОР ========================
+    function startAutoGather() {
+        if (autoActive) { addTechnicalLog("❌ Автодействие уже активно!"); return; }
+        if (isMoving) { addTechnicalLog("❌ Нельзя собирать во время перемещения!"); return; }
+        const tile = getCurrentTile();
+        if (tile.type !== "combat" || !tile.resource) { addTechnicalLog("❌ Здесь нельзя собирать ресурсы!"); return; }
+        
+        autoActive = true;
+        autoType = "gather";
+        updateActionButtons();
+        const resource = tile.resource;
+        addTechnicalLog(`⏳ Начат БЕСКОНЕЧНЫЙ автосбор ${resource === "wood" ? "древесины" : "руды"} в ${tile.name}`);
+        
+        function gatherLoop() {
+            if (!autoActive || autoType !== "gather") return;
+            updateAutoPanel(resource === "wood" ? "🌲 СБОР ДРЕВЕСИНЫ" : "⛏️ ДОБЫЧА РУДЫ", `Сбор ресурсов...`, 0.3);
+            
+            setTimeout(() => {
+                if (!autoActive) return;
+                if (resource === "wood") {
+                    let amount = 2 + Math.floor(Math.random() * 4);
+                    player.wood += amount;
+                    quests.wood = Math.min(10, quests.wood + amount);
+                    addTechnicalLog(`🌲 Вы собрали ${amount} древесины! Всего: ${player.wood}`);
+                    updateAutoPanel(`🌲 СБОР ДРЕВЕСИНЫ`, `+${amount} древесины!`, 1);
+                } else {
+                    let amount = 1 + Math.floor(Math.random() * 3);
+                    player.ore += amount;
+                    quests.ore = Math.min(10, quests.ore + amount);
+                    addTechnicalLog(`⛏️ Вы добыли ${amount} руды! Всего: ${player.ore}`);
+                    updateAutoPanel(`⛏️ ДОБЫЧА РУДЫ`, `+${amount} руды!`, 1);
+                }
+                updateUI();
+                playSound("gather");
+                setTimeout(() => { if (autoActive && autoType === "gather") gatherLoop(); }, 800);
+            }, 2000);
+        }
+        gatherLoop();
+    }
+    
+    function restHeal() {
+        if (player.gold >= 5 && player.hp < player.maxHp) {
+            player.gold -= 5;
+            let heal = 10 + Math.floor(Math.random() * 10);
+            player.hp = Math.min(player.maxHp, player.hp + heal);
+            addTechnicalLog(`💊 Вы отдохнули. +${heal} HP. -5 монет`);
+            updateUI();
+        } else if (player.hp >= player.maxHp) {
+            addTechnicalLog("💚 Вы уже полностью здоровы!");
+        } else {
+            addTechnicalLog("❌ Не хватает монет (нужно 5)");
+        }
+    }
+    
+    function toggleCamp() {
+        const tile = getCurrentTile();
+        if (tile.type !== "combat" && tile.type !== "empty") {
+            addTechnicalLog("❌ Лагерь можно ставить в лесу, горах, пещере, пустошах!");
+            return;
+        }
+        campActive = !campActive;
+        const campBtn = document.getElementById("campBtn");
+        if (campActive) {
+            campBtn.classList.add("active");
+            campBtn.innerHTML = "🔥 СНЯТЬ ЛАГЕРЬ";
+            addTechnicalLog("🏕️ Лагерь установлен!");
+        } else {
+            campBtn.classList.remove("active");
+            campBtn.innerHTML = "🏕️ ЛАГЕРЬ";
+            addTechnicalLog("🔥 Лагерь свёрнут.");
+        }
+        updateUI();
+    }
+    
+    function stopAuto() {
+        if (autoInterval) clearTimeout(autoInterval);
+        autoActive = false;
+        autoType = null;
+        updateAutoPanel("⚔️ АВТОБОЙ", "Остановлен", 0);
+        updateActionButtons();
+        addTechnicalLog(`⏹️ Автодействие остановлено.`);
+    }
+    
+    // ======================== ЧАТ И ГИЛЬДИЯ ========================
+    let guild = null;
+    
+    function sendChatMessage() {
+        const input = document.getElementById("chatInput");
+        const msg = input.value.trim();
+        if (msg) {
+            addSocialMessage("Игрок", msg);
+            input.value = "";
+        }
+    }
+    
+    function createGuild() {
+        const nameInput = document.getElementById("guildNameInput");
+        const name = nameInput.value.trim();
+        if (name) {
+            guild = { name: name, members: ["Игрок"] };
+            document.getElementById("guildStatus").innerHTML = `🏰 ${name} (основатель)`;
+            addTechnicalLog(`🏰 Вы создали гильдию "${name}"!`);
+            nameInput.value = "";
+        } else {
+            addTechnicalLog("❌ Введите название гильдии");
+        }
+    }
+
+    // ======================== SUPABASE (ОБЛАЧНОЕ СОХРАНЕНИЕ) ========================
+    const SUPABASE_URL = "https://wxrrxnlyyugmduvnciem.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind4cnJ4bmx5eXVnbWR1dm5jaWVtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAyMzIzNjgsImV4cCI6MjA5NTgwODM2OH0.6YfLDjAJ2sKu_C6q_UiXBI_GWJRvtE-m21GzB86zisU";
+    const PLAYER_USERNAME = "Игрок_1";
+
+    let supabaseClient = null;
+    let supabaseLoaded = false;
+
+    if (typeof supabase !== "undefined" && SUPABASE_URL && SUPABASE_ANON_KEY) {
+        supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        supabaseLoaded = true;
+
+        async function saveToCloud() {
+            try {
+                const payload = {
+                    username: PLAYER_USERNAME,
+                    level: player.level,
+                    exp: player.exp,
+                    hp: player.hp,
+                    max_hp: player.maxHp,
+                    str: player.str,
+                    def: player.def,
+                    gold: player.gold,
+                    wood: player.wood,
+                    ore: player.ore,
+                    skill_points: skillPoints,
+                    skill_power_strike: skills.powerStrike.level,
+                    skill_endurance: skills.endurance.level,
+                    skill_berserk: skills.berserk.level,
+                    updated_at: new Date().toISOString()
+                };
+
+                const { error } = await supabaseClient
+                    .from("players")
+                    .upsert(payload, { onConflict: "username" });
+
+                if (error) throw error;
+
+                addTechnicalLog("☁️ Прогресс сохранён в облако!");
+            } catch (error) {
+                console.error("❌ Ошибка сохранения в Supabase:", error);
+                addTechnicalLog(`❌ Ошибка сохранения: ${error.message}`);
+            }
+        }
+
+        async function loadFromCloud() {
+            try {
+                const { data, error } = await supabaseClient
+                    .from("players")
+                    .select("*")
+                    .eq("username", PLAYER_USERNAME)
+                    .maybeSingle();
+
+                if (error) throw error;
+
+                if (data) {
+                    player.level = data.level ?? player.level;
+                    player.exp = data.exp ?? player.exp;
+                    player.hp = data.hp ?? player.hp;
+                    player.maxHp = data.max_hp ?? player.maxHp;
+                    player.str = data.str ?? player.str;
+                    player.def = data.def ?? player.def;
+                    player.gold = data.gold ?? player.gold;
+                    player.wood = data.wood ?? player.wood;
+                    player.ore = data.ore ?? player.ore;
+                    skillPoints = data.skill_points ?? skillPoints;
+                    skills.powerStrike.level = data.skill_power_strike ?? 0;
+                    skills.endurance.level = data.skill_endurance ?? 0;
+                    skills.berserk.level = data.skill_berserk ?? 0;
+
+                    addTechnicalLog(`☁️ Загружен прогресс игрока ${data.username}!`);
+                    renderInventory();
+                    renderSkills();
+                    updateUI();
+                } else {
+                    addTechnicalLog("ℹ️ Прогресс не найден — сохраню его при первом автосейве.");
+                }
+            } catch (error) {
+                console.error("❌ Ошибка загрузки из Supabase:", error);
+                addTechnicalLog(`❌ Ошибка загрузки: ${error.message}`);
+            }
+        }
+
+        setInterval(saveToCloud, 30000);
+        setTimeout(loadFromCloud, 1000);
+    } else {
+        addTechnicalLog("⚠️ Supabase не настроен. Облачное сохранение не работает.");
+    }
+
+    // ======================== КНОПКИ ========================
+    document.getElementById("fightBtn").onclick = () => {
+        const tile = getCurrentTile();
+        if (tile.type === "safe") restHeal();
+        else startAutoCombat();
+    };
+    document.getElementById("gatherBtn").onclick = () => startAutoGather();
+    document.getElementById("campBtn").onclick = () => toggleCamp();
+    document.getElementById("stopAutoBtn").onclick = () => stopAuto();
+    document.getElementById("chatSendBtn").onclick = sendChatMessage;
+    document.getElementById("createGuildBtn").onclick = createGuild;
+    document.getElementById("sellAllCommonBtn").onclick = () => sellAllCommon();
+    document.getElementById("chatInput").addEventListener("keypress", (e) => {
+        if (e.key === "Enter") sendChatMessage();
+    });
+    
+    window.unequipItem = unequipItem;
+    
+    document.getElementById("soundBtn").onclick = () => {
+        soundEnabled = !soundEnabled;
+        document.getElementById("soundBtn").innerHTML = soundEnabled ? "🔊" : "🔇";
+    };
+    
+    document.querySelectorAll(".tab-btn").forEach(btn => {
+        btn.onclick = () => {
+            document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+            document.querySelectorAll(".tab-content").forEach(tc => tc.classList.remove("active"));
+            btn.classList.add("active");
+            document.getElementById(`tab-${btn.getAttribute("data-tab")}`).classList.add("active");
+        };
+    });
+    
+    // Включаем первую вкладку (чат)
+    if (document.querySelector(".tab-btn")) document.querySelector(".tab-btn").click();
+    
+    // ======================== ЗАПУСК ========================
+    generateMap();
+    setTimeout(() => {
+        updateTileDisplaySize();
+        drawMap();
+    }, 100);
+    updateActionButtons();
+    updateUI();
+    renderInventory();
+    renderSkills();
+    
+    loadAllTiles();
+    
+    addTechnicalLog("🗺️ КАРТА 20×20! Кликайте по клеткам для перемещения");
+    addTechnicalLog("🌀 Улучшайте умения во вкладке УМЕНИЯ");
+    addTechnicalLog("⚠️ Лагерь блокирует перемещение — сначала нужно его снять");
+    addTechnicalLog("🖱️ Окно автобоя можно перетаскивать мышкой");
+    addSocialMessage("Система", "Добро пожаловать в общий чат!");
+    
+    document.body.addEventListener('click', () => {
+        if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+    });
+</script>
+</body>
+</html>
