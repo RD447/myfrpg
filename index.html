@@ -676,13 +676,14 @@
 	character_class: 'Мечник'
     };
 	const characterClasses = {
-    'Мечник': { name: '🗡️ Мечник', baseStr: 14, baseDef: 6, baseHp: 75, 	skillBonus: 'powerStrike', icon: '🗡️' },
-    'Лучник': { name: '🏹 Лучник', baseStr: 12, baseDef: 5, baseHp: 70, 	skillBonus: 'berserk', icon: '🏹' },
-    'Послушник': { name: '🙏 Послушник', baseStr: 11, baseDef: 7, baseHp: 72, 	skillBonus: 'endurance', icon: '🙏' },
-    'Адепт': { name: '🔮 Адепт', baseStr: 13, baseDef: 5, baseHp: 68, 	skillBonus: 'powerStrike', icon: '🔮' },
-    'Вор': { name: '🗡️ Вор', baseStr: 13, baseDef: 5, baseHp: 70, skillBonus: 	'berserk', icon: '🗡️' 
-}
+    'Мечник': { name: '🗡️ Мечник', baseStr: 14, baseDef: 6, baseHp: 75, skillBonus: 'powerStrike', icon: '🗡️' },
+    'Лучник': { name: '🏹 Лучник', baseStr: 12, baseDef: 5, baseHp: 70, skillBonus: 'berserk', icon: '🏹' },
+    'Послушник': { name: '🙏 Послушник', baseStr: 11, baseDef: 7, baseHp: 72, skillBonus: 'endurance', icon: '🙏' },
+    'Адепт': { name: '🔮 Адепт', baseStr: 13, baseDef: 5, baseHp: 68, skillBonus: 'powerStrike', icon: '🔮' },
+    'Вор': { name: '🗡️ Вор', baseStr: 13, baseDef: 5, baseHp: 70, skillBonus: 'berserk', icon: '🗡️' }
 };
+
+// Функция смены класса — отдельно, не внутри объекта!
 async function changeClass(newClass) {
     if (!isLoggedIn) {
         addTechnicalLog("❌ Сначала войдите в аккаунт!");
