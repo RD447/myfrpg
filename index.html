@@ -628,86 +628,97 @@
     
     // ======================== АВТОРИЗАЦИЯ ========================
     async function loginPlayer(username) {
-        if (!supabaseClient) return;
-        
-        const { data, error } = await supabaseClient
-            .from("players")
-            .select("*")
-            .eq("username", username)
-            .maybeSingle();
-        
-        if (error) {
-            addTechnicalLog(`❌ Ошибка: ${error.message}`);
+        if (!supabaseClient) {
+            addTechnicalLog("❌ Supabase не подключён");
             return false;
         }
         
-        if (data) {
-            currentPlayer.id = data.id;
-            currentPlayer.username = data.username;
-            currentPlayer.level = data.level;
-            currentPlayer.exp = data.exp;
-            currentPlayer.hp = data.hp;
-            currentPlayer.maxHp = data.max_hp;
-            currentPlayer.str = data.str;
-            currentPlayer.def = data.def;
-            currentPlayer.gold = data.gold;
-            currentPlayer.wood = data.wood;
-            currentPlayer.ore = data.ore;
-            currentPlayer.skillPoints = data.skill_points;
-            currentPlayer.skill_power_strike = data.skill_power_strike || 0;
-            currentPlayer.skill_endurance = data.skill_endurance || 0;
-            currentPlayer.skill_berserk = data.skill_berserk || 0;
-            
-            playerExtraStr = data.extra_str || 0;
-            playerExtraDef = data.extra_def || 0;
-            playerExtraHp = data.extra_hp || 0;
-            
-            addTechnicalLog(`☁️ Загружен игрок ${username} (уровень ${currentPlayer.level})`);
-            updateUI();
-            renderInventory();
-            renderSkills();
-            return true;
-        } else {
-            const { data: newData, error: createError } = await supabaseClient
+        try {
+            // Ищем игрока
+            const { data, error } = await supabaseClient
                 .from("players")
-                .insert({
-                    username: username,
-                    level: 1, exp: 0, hp: 70, max_hp: 70,
-                    str: 12, def: 5, gold: 150, wood: 0, ore: 0,
-                    skill_points: 2,
-                    extra_str: 0, extra_def: 0, extra_hp: 0
-                })
-                .select()
-                .single();
+                .select("*")
+                .eq("username", username)
+                .maybeSingle();
             
-            if (createError) {
-                addTechnicalLog(`❌ Ошибка создания: ${createError.message}`);
+            if (error) {
+                addTechnicalLog(`❌ Ошибка поиска: ${error.message}`);
                 return false;
             }
             
-            if (newData) {
-                currentPlayer.id = newData.id;
-                currentPlayer.username = newData.username;
-                currentPlayer.level = newData.level;
-                currentPlayer.exp = newData.exp;
-                currentPlayer.hp = newData.hp;
-                currentPlayer.maxHp = newData.max_hp;
-                currentPlayer.str = newData.str;
-                currentPlayer.def = newData.def;
-                currentPlayer.gold = newData.gold;
-                currentPlayer.wood = newData.wood;
-                currentPlayer.ore = newData.ore;
-                currentPlayer.skillPoints = newData.skill_points;
-                playerExtraStr = newData.extra_str || 0;
-                playerExtraDef = newData.extra_def || 0;
-                playerExtraHp = newData.extra_hp || 0;
+            if (data) {
+                // Загружаем существующего
+                currentPlayer.id = data.id;
+                currentPlayer.username = data.username;
+                currentPlayer.level = data.level;
+                currentPlayer.exp = data.exp;
+                currentPlayer.hp = data.hp;
+                currentPlayer.maxHp = data.max_hp;
+                currentPlayer.str = data.str;
+                currentPlayer.def = data.def;
+                currentPlayer.gold = data.gold;
+                currentPlayer.wood = data.wood;
+                currentPlayer.ore = data.ore;
+                currentPlayer.skillPoints = data.skill_points;
+                currentPlayer.skill_power_strike = data.skill_power_strike || 0;
+                currentPlayer.skill_endurance = data.skill_endurance || 0;
+                currentPlayer.skill_berserk = data.skill_berserk || 0;
                 
-                addTechnicalLog(`✨ Создан новый игрок ${username}!`);
+                playerExtraStr = data.extra_str || 0;
+                playerExtraDef = data.extra_def || 0;
+                playerExtraHp = data.extra_hp || 0;
+                
+                addTechnicalLog(`☁️ Загружен игрок ${username} (уровень ${currentPlayer.level})`);
                 updateUI();
                 renderInventory();
                 renderSkills();
                 return true;
+            } else {
+                // Создаём нового
+                const { data: newData, error: createError } = await supabaseClient
+                    .from("players")
+                    .insert({
+                        username: username,
+                        level: 1, exp: 0, hp: 70, max_hp: 70,
+                        str: 12, def: 5, gold: 150, wood: 0, ore: 0,
+                        skill_points: 2,
+                        extra_str: 0, extra_def: 0, extra_hp: 0
+                    })
+                    .select()
+                    .single();
+                
+                if (createError) {
+                    addTechnicalLog(`❌ Ошибка создания: ${createError.message}`);
+                    return false;
+                }
+                
+                if (newData) {
+                    currentPlayer.id = newData.id;
+                    currentPlayer.username = newData.username;
+                    currentPlayer.level = newData.level;
+                    currentPlayer.exp = newData.exp;
+                    currentPlayer.hp = newData.hp;
+                    currentPlayer.maxHp = newData.max_hp;
+                    currentPlayer.str = newData.str;
+                    currentPlayer.def = newData.def;
+                    currentPlayer.gold = newData.gold;
+                    currentPlayer.wood = newData.wood;
+                    currentPlayer.ore = newData.ore;
+                    currentPlayer.skillPoints = newData.skill_points;
+                    playerExtraStr = newData.extra_str || 0;
+                    playerExtraDef = newData.extra_def || 0;
+                    playerExtraHp = newData.extra_hp || 0;
+                    
+                    addTechnicalLog(`✨ Создан новый игрок ${username}!`);
+                    updateUI();
+                    renderInventory();
+                    renderSkills();
+                    return true;
+                }
             }
+        } catch (err) {
+            addTechnicalLog(`❌ Ошибка: ${err.message}`);
+            return false;
         }
         return false;
     }
@@ -715,9 +726,7 @@
     async function savePlayerToCloud() {
         if (!supabaseClient || !currentPlayer.id) return;
         
-        const totalStr = currentPlayer.str + playerExtraStr * 2;
-        const totalDef = currentPlayer.def + playerExtraDef * 2;
-        const totalMaxHp = currentPlayer.maxHp + playerExtraHp * 10;
+        const stats = recalcStats();
         
         await supabaseClient
             .from("players")
@@ -725,9 +734,9 @@
                 level: currentPlayer.level,
                 exp: currentPlayer.exp,
                 hp: currentPlayer.hp,
-                max_hp: totalMaxHp,
-                str: totalStr,
-                def: totalDef,
+                max_hp: stats.maxHp,
+                str: stats.str,
+                def: stats.def,
                 gold: currentPlayer.gold,
                 wood: currentPlayer.wood,
                 ore: currentPlayer.ore,
@@ -769,7 +778,7 @@
         savePlayerToCloud();
     }
     
-    // ======================== ОБЩИЙ ЧАТ ========================
+    // ======================== ЧАТ ========================
     async function sendChatMessage() {
         const input = document.getElementById("chatInput");
         const msg = input.value.trim();
@@ -839,7 +848,7 @@
         });
     }
     
-    // ======================== ОНЛАЙН ИГРОКИ ========================
+    // ======================== ОНЛАЙН ========================
     async function loadOnlinePlayers() {
         if (!supabaseClient) return;
         
@@ -1293,7 +1302,7 @@
         const totalStr = currentPlayer.str + playerExtraStr * 2 + bonusAtk;
         const totalDef = currentPlayer.def + playerExtraDef * 2 + bonusDef;
         const totalMaxHp = currentPlayer.maxHp + playerExtraHp * 10;
-        return { atk: totalStr, def: totalDef, maxHp: totalMaxHp };
+        return { str: totalStr, def: totalDef, maxHp: totalMaxHp };
     }
     
     function addTechnicalLog(msg) {
@@ -1315,7 +1324,7 @@
         document.getElementById("heroExp").innerText = currentPlayer.exp;
         document.getElementById("heroExpNeed").innerText = expNeeded;
         document.getElementById("heroGold").innerText = currentPlayer.gold;
-        document.getElementById("heroStr").innerHTML = `${stats.atk} <span style="color:#4caf50;">(+${playerExtraStr * 2 + (equipment.weapon?.atk || 0)})</span>`;
+        document.getElementById("heroStr").innerHTML = `${stats.str} <span style="color:#4caf50;">(+${playerExtraStr * 2 + (equipment.weapon?.atk || 0)})</span>`;
         document.getElementById("heroDef").innerHTML = `${stats.def} <span style="color:#4caf50;">(+${playerExtraDef * 2 + (equipment.armor?.def || 0) + (equipment.ring?.def || 0)})</span>`;
         document.getElementById("heroWood").innerText = currentPlayer.wood;
         document.getElementById("heroOre").innerText = currentPlayer.ore;
@@ -1355,7 +1364,7 @@
     
     function getCurrentStats() {
         const stats = recalcStats();
-        return { str: stats.atk, def: stats.def };
+        return { str: stats.str, def: stats.def };
     }
     
     function triggerRandomEvent() {
@@ -1552,6 +1561,10 @@
     }
     
     function toggleCamp() {
+        if (isMoving) {
+            addTechnicalLog("❌ Нельзя ставить лагерь во время перемещения!");
+            return;
+        }
         const tile = getCurrentTile();
         if (tile.type !== "combat" && tile.type !== "empty") {
             addTechnicalLog("❌ Лагерь можно ставить в лесу, горах, пещере, пустошах!");
