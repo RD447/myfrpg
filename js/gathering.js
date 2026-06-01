@@ -92,8 +92,9 @@ function campCook() {
     addTechnicalLog(`🍲 Вы приготовили еду на костре! +${heal} HP. -2 древесины`);
     updateUI();
     savePlayerToCloud();
+}
 
- function toggleCamp() {
+function toggleCamp() {
     if (!isLoggedIn) {
         addTechnicalLog("❌ Сначала войдите в аккаунт!");
         return;
@@ -120,6 +121,4 @@ function campCook() {
     }
     updateActionButtons();
     updateUI();
-}
-    
 }
