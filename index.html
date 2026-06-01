@@ -10,282 +10,165 @@
             padding: 0;
             box-sizing: border-box;
             user-select: none;
-            -webkit-tap-highlight-color: transparent;
         }
 
         body {
-            background: #1a1208;
-            font-family: 'Segoe UI', 'Georgia', serif;
-            padding: 20px;
+            background: radial-gradient(circle at 30% 20%, #1a2a1a, #0a120a);
+            font-family: 'Georgia', 'Times New Roman', serif;
+            padding: 15px;
             min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background-image: radial-gradient(circle at 20% 30%, #3d2a1a 0%, #1a0f05 100%);
         }
 
-        /* Главный контейнер */
-        .game {
+        /* ГЛАВНАЯ СЕТКА */
+        .game-container {
             max-width: 1500px;
-            width: 100%;
-            background: #dac292;
-            background: linear-gradient(145deg, #c9aa6f, #b8925a);
-            border-radius: 16px;
-            padding: 16px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,200,0.4);
-            border: 1px solid #e8d5a8;
+            margin: 0 auto;
         }
 
-        .main-area {
+        /* ========== ВЕРХНЯЯ ПАНЕЛЬ ========== */
+        .top-bar {
             display: flex;
-            gap: 16px;
-            flex-wrap: wrap;
+            justify-content: space-between;
+            background: rgba(20, 15, 10, 0.85);
+            border-radius: 12px;
+            padding: 8px 20px;
+            margin-bottom: 15px;
+            backdrop-filter: blur(4px);
+            border-bottom: 2px solid #c9a86a;
         }
-
-        /* Левая колонка */
-        .left-column {
-            width: 280px;
+        .top-bar-left, .top-bar-right {
             display: flex;
-            flex-direction: column;
-            gap: 16px;
+            gap: 20px;
         }
-
-        /* Стили карточек */
-        .hero-card, .inventory-card, .stats-card {
-            background: #2c2118dd;
-            background: linear-gradient(145deg, #3a2a1a, #241a10);
-            border-radius: 20px;
-            padding: 14px;
-            border: 1px solid #aa8c54;
-            box-shadow: inset 0 1px 0 #5a3a28, 0 4px 10px rgba(0,0,0,0.4);
-        }
-
-        .hero-avatar {
-            text-align: center;
-            font-size: 56px;
-            background: #1a1008;
-            border-radius: 50%;
-            width: 90px;
-            height: 90px;
-            line-height: 90px;
-            margin: 0 auto 12px;
-            border: 2px solid #c9a86a;
-            box-shadow: inset 0 0 0 3px #4a2a18;
-        }
-
-        /* Форма входа */
-        .login-section {
-            background: #1a1008cc;
-            border-radius: 20px;
-            padding: 12px;
-            margin-bottom: 12px;
-        }
-        .login-input {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            margin-bottom: 8px;
-        }
-        .login-input input {
-            background: #2c1a0e;
-            border: 1px solid #aa8c54;
-            border-radius: 30px;
-            padding: 8px 12px;
+        .top-icon {
             color: #f0dba0;
-        }
-        .login-input button, .small-btn {
-            background: #5a3a20;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 30px;
-            color: #f7e0b0;
             cursor: pointer;
-            font-weight: bold;
+            font-size: 1.2rem;
+            padding: 4px 8px;
+            border-radius: 8px;
         }
-        .logout-btn {
-            background: #8b3a3a;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 30px;
-            color: white;
-            cursor: pointer;
-            width: 100%;
-            margin-top: 8px;
-        }
-        .current-player {
-            text-align: center;
-            margin-top: 8px;
-            padding: 6px;
-            background: #5a3a20;
-            border-radius: 30px;
-            font-weight: bold;
-            color: #f7e0b0;
+        .top-icon:hover {
+            background: #c9a86a;
+            color: #1a0f05;
         }
 
-        /* Статы персонажа */
-        .hero-stats div {
+        /* ========== ОСНОВНАЯ СЕТКА ========== */
+        .main-grid {
+            display: grid;
+            grid-template-columns: 280px 1fr 300px;
+            gap: 15px;
+        }
+
+        /* ========== ПАНЕЛИ ========== */
+        .panel {
+            background: rgba(30, 20, 12, 0.85);
+            backdrop-filter: blur(4px);
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 1px solid #8b6e3a;
+            box-shadow: inset 0 0 0 1px rgba(200, 170, 100, 0.3), 0 4px 8px rgba(0,0,0,0.3);
+        }
+        .panel-title {
+            color: #f7c56e;
+            font-size: 1rem;
+            font-weight: bold;
+            border-bottom: 1px solid #8b6e3a;
+            padding-bottom: 5px;
+            margin-bottom: 10px;
+        }
+        .stat-row {
             display: flex;
             justify-content: space-between;
             margin: 8px 0;
-            font-size: 0.8rem;
             color: #f0dba0;
+            font-size: 0.85rem;
         }
-        .stat-value { color: #f7c56e; font-weight: bold; }
-
-        /* Инвентарь */
-        .inventory-header, .stats-header {
-            display: flex;
-            justify-content: space-between;
-            cursor: pointer;
+        .stat-value {
             color: #f7c56e;
             font-weight: bold;
-            margin-bottom: 12px;
         }
-        .inventory-content, .stats-content {
-            display: block;
-        }
-        .inventory-content.collapsed, .stats-content.collapsed {
-            display: none;
-        }
-        .inventory-grid {
-            max-height: 250px;
-            overflow-y: auto;
-        }
-        .item-card {
-            background: #2c1a0eaa;
-            border-radius: 16px;
-            padding: 6px 10px;
-            margin: 5px 0;
+        .resource-bar {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-left: 4px solid;
-            font-size: 0.7rem;
-            color: #f0dba0;
+            gap: 15px;
+            justify-content: space-around;
         }
-        .rarity-common { border-left-color: #9e9e9e; }
-        .rarity-rare { border-left-color: #4caf50; background: #1e3a2eaa; }
-        .rarity-epic { border-left-color: #d500f9; background: #2a1e4aaa; }
-        
-        .equipment-slot {
-            background: #2c1a0eaa;
-            border-radius: 16px;
-            padding: 6px 10px;
-            margin: 5px 0;
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.7rem;
-            color: #f0dba0;
+        .resource-item {
+            background: #1a0f05;
+            padding: 5px 12px;
+            border-radius: 25px;
+            color: #f7c56e;
         }
-        .sell-btn { background: #8b3a3a; }
-        .resource-row {
-            display: flex;
-            justify-content: space-between;
-            margin: 6px 0;
-            font-size: 0.75rem;
-            color: #f0dba0;
+        progress {
+            width: 100px;
+            height: 8px;
+            border-radius: 10px;
+            overflow: hidden;
         }
+        progress::-webkit-progress-bar { background-color: #3d2a1a; border-radius: 10px; }
+        progress::-webkit-progress-value { background-color: #f7c56e; border-radius: 10px; }
 
-        .stat-upgrade-item {
-            background: #2c1a0eaa;
-            border-radius: 16px;
-            padding: 8px;
-            margin: 8px 0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .stat-name { font-weight: bold; color: #f7c56e; }
-
-        /* Карта */
-        .map-area {
-            flex: 1;
-            min-width: 550px;
-        }
-        canvas {
+        /* ========== КАРТА ========== */
+        .map-area canvas {
             width: 100%;
             height: auto;
             background: #2a3a2a;
             border-radius: 16px;
-            border: 3px solid #aa8c54;
+            border: 3px solid #c9a86a;
             cursor: pointer;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.4);
         }
         .map-hint {
             text-align: center;
             font-size: 0.65rem;
-            color: #d0ba7a;
+            color: #c9a86a;
             margin-top: 6px;
         }
 
-        /* Правая панель */
-        .social-panel {
-            width: 320px;
-            background: #2c2118dd;
-            background: linear-gradient(145deg, #3a2a1a, #241a10);
-            border-radius: 20px;
-            padding: 14px;
-            border: 1px solid #aa8c54;
-        }
+        /* ========== ВКЛАДКИ ========== */
         .tabs {
             display: flex;
-            gap: 6px;
-            border-bottom: 1px solid #aa8c54;
-            padding-bottom: 8px;
+            gap: 5px;
+            margin-bottom: 12px;
             flex-wrap: wrap;
         }
         .tab-btn {
-            background: #3a2518;
+            background: #3d2a1a;
             border: none;
-            padding: 6px 12px;
+            padding: 8px 14px;
             border-radius: 25px;
             color: #c0a86a;
             cursor: pointer;
-            font-weight: bold;
-            font-size: 0.7rem;
+            font-size: 0.8rem;
+            font-family: 'Georgia', serif;
         }
         .tab-btn.active {
             background: #8b6e3a;
             color: #fff0c0;
         }
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
-        
-        .quest-item {
-            display: flex;
-            justify-content: space-between;
-            margin: 8px 0;
-            font-size: 0.8rem;
-            color: #f0dba0;
+        .tab-content {
+            display: none;
+            max-height: 350px;
+            overflow-y: auto;
         }
-        .skill-item {
-            background: #2c1a0eaa;
-            border-radius: 16px;
-            padding: 8px;
-            margin: 8px 0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            color: #f0dba0;
+        .tab-content.active {
+            display: block;
         }
-        .skill-name { font-weight: bold; color: #f7c56e; }
 
-        /* Чат */
+        /* ========== ЧАТ ========== */
         .chat-box {
-            background: #1a1008cc;
-            border-radius: 16px;
+            background: #1a0f05cc;
+            border-radius: 12px;
             padding: 10px;
-            height: 220px;
+            height: 280px;
             overflow-y: auto;
             font-size: 0.7rem;
-            color: #d0ba7a;
+            color: #f0dba0;
         }
         .chat-message {
             margin: 5px 0;
             padding: 4px 8px;
-            border-radius: 16px;
-            background: #2c1a0e66;
-            word-break: break-word;
+            background: #2c1a0e99;
+            border-radius: 15px;
         }
         .chat-message strong { color: #f7c56e; }
         .chat-input {
@@ -296,7 +179,7 @@
         .chat-input input {
             flex: 1;
             background: #2c1a0e;
-            border: 1px solid #aa8c54;
+            border: 1px solid #8b6e3a;
             border-radius: 30px;
             padding: 8px;
             color: #f0dba0;
@@ -304,25 +187,63 @@
         .chat-input button {
             background: #5a3a20;
             border: none;
-            padding: 8px 12px;
+            padding: 8px 15px;
             border-radius: 30px;
             color: white;
             cursor: pointer;
         }
-        .guild-info {
+
+        /* ========== ИНВЕНТАРЬ ========== */
+        .inventory-grid {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .item-card {
             background: #2c1a0eaa;
-            border-radius: 16px;
-            padding: 10px;
-            font-size: 0.8rem;
+            border-radius: 12px;
+            padding: 6px 10px;
+            margin: 5px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.7rem;
+            color: #f0dba0;
+            border-left: 3px solid;
+        }
+        .rarity-common { border-left-color: #9e9e9e; }
+        .rarity-rare { border-left-color: #4caf50; }
+        .rarity-epic { border-left-color: #d500f9; }
+        .equipment-slot {
+            background: #2c1a0eaa;
+            border-radius: 12px;
+            padding: 6px 10px;
+            margin: 5px 0;
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.7rem;
             color: #f0dba0;
         }
-        .online-list {
+        .skill-item {
             background: #2c1a0eaa;
-            border-radius: 16px;
+            border-radius: 12px;
             padding: 8px;
-            font-size: 0.7rem;
-            max-height: 100px;
-            overflow-y: auto;
+            margin: 8px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #f0dba0;
+        }
+        .quest-item {
+            display: flex;
+            justify-content: space-between;
+            margin: 8px 0;
+            color: #f0dba0;
+        }
+        .guild-info, .online-list {
+            background: #2c1a0eaa;
+            border-radius: 12px;
+            padding: 10px;
+            color: #f0dba0;
         }
         .online-list span {
             display: inline-block;
@@ -332,45 +253,50 @@
             margin: 2px;
         }
 
-        /* Панель действий */
-        .action-bar {
-            background: #1a1008cc;
-            border-radius: 20px;
-            padding: 12px;
-            backdrop-filter: blur(4px);
+        /* ========== НИЖНЯЯ ПАНЕЛЬ ========== */
+        .bottom-bar {
+            margin-top: 15px;
             display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
+            gap: 15px;
             justify-content: center;
-            margin-top: 16px;
-            border: 1px solid #aa8c54;
+            flex-wrap: wrap;
+            background: rgba(20, 15, 10, 0.85);
+            backdrop-filter: blur(4px);
+            border-radius: 50px;
+            padding: 12px 25px;
+            border: 1px solid #8b6e3a;
         }
-        .btn {
+        .action-btn {
             background: #5a3a20;
             border: none;
-            padding: 10px 20px;
+            padding: 8px 22px;
             border-radius: 40px;
             color: #f7e0b0;
             font-weight: bold;
             cursor: pointer;
-            font-size: 0.85rem;
+            font-size: 1rem;
+            font-family: 'Georgia', serif;
+            box-shadow: inset 0 1px 0 #9a7a4a, 0 3px 5px black;
         }
-        .btn-danger { background: #8b3a3a; }
-        .btn-success { background: #2a6e5a; }
-        .btn-camp { background: #8b6e3a; }
-        .btn-camp.active { background: #d4a017; color: #1a0f05; }
-        .btn-stop { background: #aa4444; }
+        .action-btn:active { transform: translateY(2px); }
+        .action-btn-danger { background: #8b3a3a; }
+        .action-btn-success { background: #2a6e5a; }
+        .action-btn-camp { background: #8b6e3a; }
+        .action-btn-camp.active { background: #d4a017; color: #1a0f05; }
+        .action-btn-stop { background: #aa4444; }
 
-        /* Лог */
+        /* ========== ЛОГ ========== */
         .log-area {
-            background: #1a1008cc;
-            border-radius: 16px;
+            background: rgba(20, 15, 10, 0.85);
+            backdrop-filter: blur(4px);
+            border-radius: 12px;
             padding: 10px;
+            margin-top: 15px;
+            border: 1px solid #8b6e3a;
+            color: #f0dba0;
+            font-size: 0.7rem;
             height: 100px;
             overflow-y: auto;
-            font-size: 0.7rem;
-            color: #d0ba7a;
-            margin-top: 16px;
         }
         .log-entry {
             margin: 4px 0;
@@ -378,18 +304,72 @@
             padding-left: 8px;
         }
 
-        /* Авто-панель */
+        /* ========== ОБЩИЕ ЭЛЕМЕНТЫ ========== */
+        .small-btn {
+            background: #5a3a20;
+            border: none;
+            padding: 4px 12px;
+            border-radius: 20px;
+            color: #f0dba0;
+            cursor: pointer;
+            font-family: 'Georgia', serif;
+        }
+        input, #guildNameInput {
+            background: #2c1a0e;
+            border: 1px solid #8b6e3a;
+            border-radius: 30px;
+            padding: 6px 12px;
+            color: #f0dba0;
+        }
+        .login-section {
+            background: #2c1a0ecc;
+            border-radius: 16px;
+            padding: 12px;
+            margin-bottom: 12px;
+        }
+        .login-input {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+        .current-player {
+            text-align: center;
+            margin-top: 8px;
+            padding: 6px;
+            background: #5a3a20;
+            border-radius: 30px;
+            color: #f7e0b0;
+        }
+        .hero-avatar {
+            text-align: center;
+            font-size: 48px;
+            background: #1a0f05;
+            border-radius: 50%;
+            width: 80px;
+            height: 80px;
+            line-height: 80px;
+            margin: 0 auto 12px;
+            border: 2px solid #c9a86a;
+        }
+        .hero-class {
+            text-align: center;
+            font-size: 1rem;
+            margin: 8px 0;
+            color: #f7c56e;
+        }
+
+        /* ========== АВТО-ПАНЕЛЬ ========== */
         .auto-panel {
             position: fixed;
             bottom: 20px;
             left: 20px;
             width: 260px;
-            background: #2c2118e6;
+            background: #2c1a0ee6;
             border-radius: 16px;
-            border: 2px solid #aa8c54;
+            border: 2px solid #c9a86a;
             z-index: 200;
             cursor: grab;
-            color: #f0dba0;
         }
         .auto-header {
             background: #5a3a20;
@@ -399,25 +379,26 @@
             display: flex;
             justify-content: space-between;
             font-weight: bold;
+            color: #f7e0b0;
         }
         .auto-content {
             padding: 12px;
             display: none;
+            color: #f0dba0;
         }
         .auto-content.visible { display: block; }
         .auto-progress {
-            background: #1a1008;
+            background: #1a0f05;
             border-radius: 10px;
             height: 6px;
             margin: 10px 0;
-            overflow: hidden;
         }
         .auto-progress-fill {
             background: #f7c56e;
             width: 0%;
             height: 100%;
+            border-radius: 10px;
         }
-
         .sound-btn {
             position: fixed;
             bottom: 20px;
@@ -431,164 +412,151 @@
             justify-content: center;
             font-size: 24px;
             cursor: pointer;
-            z-index: 100;
-            border: 1px solid #aa8c54;
-        }
-        .hero-class {
-            text-align: center;
-            font-size: 1rem;
-            margin: 8px 0;
-            color: #f7c56e;
-            font-weight: bold;
+            border: 2px solid #c9a86a;
         }
     </style>
 </head>
 <body>
-<div class="game">
-    <div class="main-area">
-        <div class="left-column">
-            <div class="hero-card">
+<div class="game-container">
+    <!-- Верхняя панель -->
+    <div class="top-bar">
+        <div class="top-bar-left">
+            <div class="top-icon" id="jewelsBtn">👑</div>
+            <div class="top-icon" id="highscoreBtn">🏆</div>
+            <div class="top-icon" id="tutorialBtn">📖</div>
+            <div class="top-icon" id="handbookBtn">📜</div>
+            <div class="top-icon" id="forumBtn">💬</div>
+            <div class="top-icon" id="settingsBtn">⚙️</div>
+        </div>
+        <div class="top-bar-right">
+            <div class="top-icon" id="logoutBtnTop">🚪</div>
+        </div>
+    </div>
+
+    <!-- Основная сетка -->
+    <div class="main-grid">
+        <!-- ЛЕВАЯ КОЛОНКА -->
+        <div class="left-col">
+            <div class="panel">
+                <div class="panel-title">🏰 Город</div>
+                <div class="stat-row">Следующий раунд: <span id="nextRound">3:465</span></div>
+                <div class="stat-row">Население: <span id="population">10/80</span></div>
+            </div>
+            <div class="panel">
+                <div class="panel-title">📊 Ресурсы</div>
+                <div class="resource-bar">
+                    <div class="resource-item">🌲 <span id="heroWood">0</span></div>
+                    <div class="resource-item">⛏️ <span id="heroOre">0</span></div>
+                    <div class="resource-item">💰 <span id="heroGold">150</span></div>
+                </div>
+            </div>
+            <div class="panel">
+                <div class="panel-title">⚔️ Персонаж</div>
                 <div class="hero-avatar">⚔️</div>
-                <div class="login-section">
-                    <div class="login-input" id="loginForm">
-                        <input type="text" id="loginUsername" placeholder="Логин">
-                        <input type="password" id="loginPassword" placeholder="Пароль">
-                    </div>
-                    <div style="display: flex; gap: 8px;">
-                        <button id="loginBtn" class="small-btn" style="flex:1;">Войти</button>
-                        <button id="registerBtn" class="small-btn" style="flex:1;">Регистрация</button>
-                    </div>
-                    <div id="playerInfo" style="display: none;">
-                        <div class="current-player" id="currentPlayerName">Игрок</div>
-                        <button id="logoutBtn" class="logout-btn">Выйти</button>
-                    </div>
-                </div>
                 <div id="heroClassDisplay" class="hero-class">🗡️ Мечник</div>
-                <div class="hero-stats">
-                    <div><span>❤️ Здоровье</span><span class="stat-value" id="heroHp">70</span>/<span id="heroMaxHp">70</span></div>
-                    <div><span>⭐ Уровень</span><span class="stat-value" id="heroLvl">1</span></div>
-                    <div><span>📊 Опыт</span><span class="stat-value" id="heroExp">0</span>/<span id="heroExpNeed">150</span></div>
-                    <div><span>💰 Монеты</span><span class="stat-value" id="heroGold">150</span></div>
-                    <div><span>⚔️ Сила</span><span class="stat-value" id="heroStr">12</span></div>
-                    <div><span>🛡️ Защита</span><span class="stat-value" id="heroDef">5</span></div>
-                    <div><span>🌀 Очки умений</span><span class="stat-value" id="heroSkillPoints">2</span></div>
-                    <div><span>📈 Очки статов</span><span class="stat-value" id="heroUpgradePoints">2</span></div>
-                </div>
+                <div class="stat-row">❤️ Здоровье: <progress id="hpProgress" value="70" max="70"></progress> <span class="stat-value" id="heroHp">70</span>/<span id="heroMaxHp">70</span></div>
+                <div class="stat-row">⭐ Уровень: <span class="stat-value" id="heroLvl">1</span></div>
+                <div class="stat-row">📊 Опыт: <progress id="expProgress" value="0" max="150"></progress> <span class="stat-value" id="heroExp">0</span>/<span id="heroExpNeed">150</span></div>
+                <div class="stat-row">⚔️ Сила: <span class="stat-value" id="heroStr">12</span></div>
+                <div class="stat-row">🛡️ Защита: <span class="stat-value" id="heroDef">5</span></div>
+                <div class="stat-row">🌀 Очки умений: <span class="stat-value" id="heroSkillPoints">2</span></div>
+                <div class="stat-row">📈 Очки статов: <span class="stat-value" id="heroUpgradePoints">2</span></div>
             </div>
-            
-            <div class="inventory-card">
-                <div class="inventory-header" id="inventoryHeader">
-                    <h3>🎒 Инвентарь</h3>
-                    <span>▼</span>
-                </div>
-                <div class="inventory-content" id="inventoryContent">
-                    <div class="resource-row"><span>🌲 Древесина:</span><span class="stat-value" id="heroWood">0</span></div>
-                    <div class="resource-row"><span>⛏️ Руда:</span><span class="stat-value" id="heroOre">0</span></div>
-                    <div><strong>⚔️ Экипировка</strong></div>
-                    <div id="equipmentSlots"></div>
-                    <div style="margin-top: 12px;"><strong>🎒 Сумка</strong></div>
-                    <div class="inventory-grid" id="inventoryList"></div>
-                    <button id="sellAllCommonBtn" class="small-btn" style="margin-top: 8px; width:100%;">💰 Продать всё обычное</button>
-                </div>
-            </div>
-            
-            <div class="stats-card">
-                <div class="stats-header" id="statsHeader">
-                    <h3>📈 Статы</h3>
-                    <span>▼</span>
-                </div>
-                <div class="stats-content" id="statsContent">
-                    <div class="stat-upgrade-item">
-                        <div class="stat-name">⚔️ Сила (+2 атаки за уровень)</div>
-                        <button class="small-btn upgrade-stat" data-stat="str">Улучшить</button>
-                    </div>
-                    <div class="stat-upgrade-item">
-                        <div class="stat-name">🛡️ Защита (+2 защиты за уровень)</div>
-                        <button class="small-btn upgrade-stat" data-stat="def">Улучшить</button>
-                    </div>
-                    <div class="stat-upgrade-item">
-                        <div class="stat-name">❤️ Выносливость (+10 HP за уровень)</div>
-                        <button class="small-btn upgrade-stat" data-stat="hp">Улучшить</button>
-                    </div>
-                </div>
+            <div class="panel">
+                <div class="panel-title">🏕️ Лагерь</div>
+                <div class="stat-row">Статус: <span id="campStatus">Нет</span></div>
+                <button class="small-btn upgrade-stat" data-stat="str" style="width:100%; margin-top:5px;">⚔️ Улучшить силу</button>
+                <button class="small-btn upgrade-stat" data-stat="def" style="width:100%; margin-top:5px;">🛡️ Улучшить защиту</button>
+                <button class="small-btn upgrade-stat" data-stat="hp" style="width:100%; margin-top:5px;">❤️ Улучшить выносливость</button>
             </div>
         </div>
 
+        <!-- ЦЕНТР - КАРТА -->
         <div class="map-area">
             <canvas id="worldMap" width="800" height="800"></canvas>
-            <div class="map-hint">🖱️ Клик по карте — перемещение (3 сек на клетку)</div>
+            <div class="map-hint">🖱️ Клик по карте — перемещение</div>
         </div>
 
-        <div class="social-panel">
+        <!-- ПРАВАЯ КОЛОНКА -->
+        <div class="right-col">
             <div class="tabs">
                 <button class="tab-btn active" data-tab="chat">💬 ЧАТ</button>
-                <button class="tab-btn" data-tab="quests">📜 КВЕСТЫ</button>
+                <button class="tab-btn" data-tab="inventory">🎒 ИНВЕНТАРЬ</button>
                 <button class="tab-btn" data-tab="skills">🌀 УМЕНИЯ</button>
+                <button class="tab-btn" data-tab="quests">📜 КВЕСТЫ</button>
                 <button class="tab-btn" data-tab="guild">🏰 ГИЛЬДИЯ</button>
                 <button class="tab-btn" data-tab="online">👥 ОНЛАЙН</button>
             </div>
-            
+
             <div id="tab-chat" class="tab-content active">
-                <div class="chat-box" id="socialChat">
-                    <div class="chat-message"><strong>Система:</strong> Добро пожаловать в общий чат!</div>
-                </div>
-                <div class="chat-input">
-                    <input type="text" id="chatInput" placeholder="Сообщение...">
-                    <button id="chatSendBtn">📨</button>
-                </div>
+                <div class="chat-box" id="socialChat"><div class="chat-message"><strong>Система:</strong> Чат работает</div></div>
+                <div class="chat-input"><input type="text" id="chatInput" placeholder="Сообщение..."><button id="chatSendBtn">📨</button></div>
             </div>
-            
+
+            <div id="tab-inventory" class="tab-content">
+                <div><strong>⚔️ Экипировка</strong></div>
+                <div id="equipmentSlots"></div>
+                <div style="margin-top: 10px;"><strong>🎒 Сумка</strong></div>
+                <div class="inventory-grid" id="inventoryList"></div>
+                <button id="sellAllCommonBtn" class="small-btn" style="width:100%; margin-top:8px;">💰 Продать всё обычное</button>
+            </div>
+
+            <div id="tab-skills" class="tab-content"><div id="skillsList"></div></div>
+
             <div id="tab-quests" class="tab-content">
                 <div class="quest-item"><span>⚔️ Убить гоблинов</span><span id="questGoblins">0/5</span></div>
                 <div class="quest-item"><span>⛏️ Собрать руду</span><span id="questOre">0/10</span></div>
                 <div class="quest-item"><span>🌲 Собрать древесину</span><span id="questWood">0/10</span></div>
-                <div class="quest-item" style="margin-top: 12px;"><span>🏕️ Лагерь</span><span id="campStatus">Нет</span></div>
             </div>
-            
-            <div id="tab-skills" class="tab-content">
-                <div id="skillsList"></div>
-            </div>
-            
+
             <div id="tab-guild" class="tab-content">
-                <div class="guild-info"><strong>🏰 ГИЛЬДИЯ</strong><br><span id="guildStatus">Не в гильдии</span></div>
-                <div style="margin-top: 12px;">
-                    <input type="text" id="guildNameInput" placeholder="Название гильдии" style="width:100%; background:#2c1a0e; border:1px solid #aa8c54; border-radius:30px; padding:8px; color:white;">
-                    <button id="createGuildBtn" class="small-btn" style="margin-top:8px; width:100%;">🏰 СОЗДАТЬ ГИЛЬДИЮ</button>
-                </div>
+                <div class="guild-info"><span id="guildStatus">Не в гильдии</span></div>
+                <input type="text" id="guildNameInput" placeholder="Название гильдии" style="width:100%; margin-top:8px;">
+                <button id="createGuildBtn" class="small-btn" style="margin-top:8px; width:100%;">🏰 СОЗДАТЬ</button>
             </div>
-            
-            <div id="tab-online" class="tab-content">
-                <div class="online-list" id="onlineList">Загрузка...</div>
-            </div>
+
+            <div id="tab-online" class="tab-content"><div class="online-list" id="onlineList">Загрузка...</div></div>
         </div>
     </div>
 
-    <div class="action-bar" id="actionBar">
-        <button class="btn btn-danger" id="fightBtn" style="display: none;">⚔️ Бой</button>
-        <button class="btn btn-success" id="gatherBtn" style="display: none;">🌲 Сбор</button>
-        <button class="btn btn-camp" id="campBtn" style="display: none;">🏕️ Лагерь</button>
-        <button class="btn btn-stop" id="stopAutoBtn" style="display: none;">⏹️ Стоп</button>
-        <button class="btn btn-stop" id="stopMoveBtn">⏹️ Стоп движение</button>
+    <!-- Нижняя панель с кнопками действий -->
+    <div class="bottom-bar">
+        <button class="action-btn action-btn-danger" id="fightBtn" style="display: none;">⚔️ БОЙ</button>
+        <button class="action-btn action-btn-success" id="gatherBtn" style="display: none;">🌲 СБОР</button>
+        <button class="action-btn action-btn-camp" id="campBtn" style="display: none;">🏕️ ЛАГЕРЬ</button>
+        <button class="action-btn action-btn-stop" id="stopAutoBtn" style="display: none;">⏹️ СТОП</button>
+        <button class="action-btn action-btn-stop" id="stopMoveBtn">🚫 СТОП ДВИЖЕНИЕ</button>
     </div>
 
-    <div class="log-area" id="combatLog">
-        <div class="log-entry">✨ Добро пожаловать в игру!</div>
-    </div>
+    <!-- Лог событий -->
+    <div class="log-area" id="combatLog"><div class="log-entry">✨ Добро пожаловать в игру!</div></div>
 </div>
 
+<!-- Модальное окно логина -->
+<div id="loginModal" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #2c1a0e; border: 3px solid #c9a86a; border-radius: 20px; padding: 25px; z-index: 1000; width: 320px;">
+    <h3 style="color: #f7c56e;">🏰 ВХОД</h3>
+    <input type="text" id="loginUsername" placeholder="Логин" style="width:100%; margin:10px 0; padding:10px;">
+    <input type="password" id="loginPassword" placeholder="Пароль" style="width:100%; margin:10px 0; padding:10px;">
+    <button id="loginBtn" class="action-btn" style="width:100%; margin-bottom:8px;">Войти</button>
+    <button id="registerBtn" class="action-btn" style="width:100%;">Регистрация</button>
+    <button id="closeLoginModal" style="margin-top:12px; background:#8b3a3a; border:none; padding:8px; border-radius:30px; color:white; width:100%; cursor:pointer;">Закрыть</button>
+</div>
+<div id="modalOverlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 999;"></div>
+
+<!-- Модальное окно выбора класса -->
+<div id="classModal" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #2c1a0e; border: 3px solid #c9a86a; border-radius: 20px; padding: 20px; z-index: 1000; width: 320px;">
+    <h3 style="color: #f7c56e;">🌀 ВЫБОР КЛАССА</h3>
+    <div id="classButtons"></div>
+    <button onclick="closeModal()" style="margin-top:16px; background:#8b3a3a; border:none; padding:10px; border-radius:30px; color:white; width:100%; cursor:pointer;">ЗАКРЫТЬ</button>
+</div>
+
+<!-- Авто-панель -->
 <div class="auto-panel" id="autoPanel">
     <div class="auto-header" id="autoHeader"><span id="autoTitle">⚔️ АВТОБОЙ</span><span>▼</span></div>
     <div class="auto-content" id="autoContent"><div id="autoText">Не активен</div><div class="auto-progress"><div class="auto-progress-fill" id="autoProgress"></div></div></div>
 </div>
 
 <div class="sound-btn" id="soundBtn">🔊</div>
-
-<div id="classModal" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #dac292; border: 3px solid #aa8c54; border-radius: 20px; padding: 20px; z-index: 1000; width: 320px;">
-    <h3 style="color: #3d2a1a;">🌀 ВЫБОР КЛАССА</h3>
-    <div id="classButtons"></div>
-    <button onclick="closeModal()" style="margin-top: 16px; background: #8b3a3a; border: none; padding: 10px; border-radius: 30px; color: white; width: 100%; cursor: pointer;">ЗАКРЫТЬ</button>
-</div>
-<div id="modalOverlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 999;" onclick="closeModal()"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/config.js"></script>
@@ -606,11 +574,40 @@
 <script src="js/main.js"></script>
 
 <script>
-function closeModal() {
-    document.getElementById('classModal').style.display = 'none';
-    document.getElementById('modalOverlay').style.display = 'none';
-}
-window.closeModal = closeModal;
+    // Модальные окна
+    function showLoginModal() { document.getElementById('loginModal').style.display = 'block'; document.getElementById('modalOverlay').style.display = 'block'; }
+    function closeLoginModal() { document.getElementById('loginModal').style.display = 'none'; document.getElementById('modalOverlay').style.display = 'none'; }
+    function closeModal() { document.getElementById('classModal').style.display = 'none'; document.getElementById('modalOverlay').style.display = 'none'; }
+    
+    document.getElementById('closeLoginModal').onclick = closeLoginModal;
+    document.getElementById('modalOverlay').onclick = closeLoginModal;
+    window.closeModal = closeModal;
+    
+    // Обновление прогресс-баров в UI
+    function updateUIWithProgress() {
+        let hpPercent = (currentPlayer.hp / recalcStats().maxHp) * 100;
+        let expPercent = (currentPlayer.exp / (currentPlayer.level * 150)) * 100;
+        let hpProgress = document.getElementById('hpProgress');
+        let expProgress = document.getElementById('expProgress');
+        if (hpProgress) { hpProgress.value = currentPlayer.hp; hpProgress.max = recalcStats().maxHp; }
+        if (expProgress) { expProgress.value = currentPlayer.exp; expProgress.max = currentPlayer.level * 150; }
+    }
+    
+    // Сохраняем оригинальную updateUI и добавляем прогресс-бары
+    const originalUpdateUI = updateUI;
+    updateUI = function() {
+        originalUpdateUI();
+        updateUIWithProgress();
+    };
+    
+    // Показ модалки логина если не залогинены
+    if (!isLoggedIn) showLoginModal();
+    
+    // Кнопки в топ-баре
+    document.getElementById('logoutBtnTop').onclick = () => { if (typeof logoutPlayer === 'function') logoutPlayer(); showLoginModal(); };
+    document.getElementById('settingsBtn').onclick = () => addTechnicalLog("⚙️ Настройки в разработке");
+    document.getElementById('tutorialBtn').onclick = () => addTechnicalLog("📖 Обучение: кликайте по карте для перемещения, нажимайте Бой для сражения");
+    document.getElementById('handbookBtn').onclick = () => addTechnicalLog("📜 Справочник: улучшайте статы и умения, собирайте ресурсы");
 </script>
 </body>
 </html>
