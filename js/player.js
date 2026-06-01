@@ -201,11 +201,11 @@ function updateUI() {
     document.getElementById("heroSkillPoints").innerText = currentPlayer.skillPoints;
     document.getElementById("heroUpgradePoints").innerText = currentPlayer.upgradePoints;
 
-    
-if (typeof quests !== 'undefined') {
-    document.getElementById("questGoblins").innerHTML = `${quests.goblins}/5`;
-    document.getElementById("questOre").innerHTML = `${quests.ore}/10`;
-    document.getElementById("questWood").innerHTML = `${quests.wood}/10`;
+    if (typeof quests !== 'undefined') {
+        document.getElementById("questGoblins").innerHTML = `${quests.goblins}/5`;
+        document.getElementById("questOre").innerHTML = `${quests.ore}/10`;
+        document.getElementById("questWood").innerHTML = `${quests.wood}/10`;
+    }
     
     document.getElementById("campStatus").innerHTML = campActive ? "🔥 Активен" : "Нет";
     
