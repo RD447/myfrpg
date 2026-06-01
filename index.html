@@ -104,7 +104,14 @@
     <div class="auto-content" id="autoContent"><div id="autoText">Не активен</div><div class="auto-progress"><div class="auto-progress-fill" id="autoProgress"></div></div></div>
 </div>
 <div class="sound-btn" id="soundBtn">🔊</div>
-<div id="classModal" style="display:none;"><div id="classButtons"></div><button onclick="closeModal()">Закрыть</button></div>
+
+<div id="classModal" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #0e1625; border: 2px solid #ffd966; border-radius: 28px; padding: 20px; z-index: 1000; width: 320px;">
+    <h3 style="color: #ffd966; margin-bottom: 16px; text-align: center;">🌀 ВЫБОР КЛАССА</h3>
+    <div id="classButtons"></div>
+    <button onclick="closeModal()" style="margin-top: 16px; background: #8b3a3a; border: none; padding: 10px; border-radius: 30px; color: white; width: 100%; cursor: pointer;">ЗАКРЫТЬ</button>
+</div>
+<div id="modalOverlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 999;" onclick="closeModal()"></div>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/config.js"></script>
 <script src="js/utils.js"></script>
