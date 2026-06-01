@@ -72,6 +72,7 @@ async function savePlayerToCloud() {
             wood: currentPlayer.wood,
             ore: currentPlayer.ore,
             skill_points: currentPlayer.skillPoints,
+            upgrade_points: currentPlayer.upgradePoints,
             skill_power_strike: currentPlayer.skill_power_strike,
             skill_endurance: currentPlayer.skill_endurance,
             skill_berserk: currentPlayer.skill_berserk,
@@ -79,7 +80,8 @@ async function savePlayerToCloud() {
             extra_str: playerExtraStr,
             extra_def: playerExtraDef,
             extra_hp: playerExtraHp,
-            upgrade_points: currentPlayer.upgradePoints,
+            player_x: playerPos.x,
+            player_y: playerPos.y,
             updated_at: new Date().toISOString()
         })
         .eq("id", currentPlayer.id);

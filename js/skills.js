@@ -1,9 +1,47 @@
-// ======================== УМЕНИЯ ========================
+// ======================== УМЕНИЯ С СОХРАНЕНИЕМ ========================
 let skills = {
     powerStrike: { level: 0, maxLevel: 5, name: "💥 Мощный удар", desc: "Каждые 5 ударов наносит 100% дополнительного урона" },
     endurance: { level: 0, maxLevel: 5, name: "🛡️ Стойкость", desc: "Пассивно увеличивает защиту на +2 за уровень" },
     berserk: { level: 0, maxLevel: 5, name: "⚔️ Берсерк", desc: "Каждые 10 секунд увеличивает атаку на 30% на 3 секунды" }
 };
+
+// Сохранение умений в БД
+async function saveSkillsToCloud() {
+    if (!supabaseClient || !currentPlayer.id || !isLoggedIn) return;
+    
+    const skillsData = {
+        powerStrike: skills.powerStrike.level,
+        endurance: skills.endurance.level,
+        berserk: skills.berserk.level
+    };
+    
+    try {
+        await supabaseClient
+            .from("players")
+            .update({
+                skills_data: JSON.stringify(skillsData),
+                updated_at: new Date().toISOString()
+            })
+            .eq("id", currentPlayer.id);
+    } catch (e) {
+        console.error("Ошибка сохранения умений:", e);
+    }
+}
+
+// Загрузка умений из БД
+function loadSkillsFromCloud(skillsData) {
+    try {
+        if (skillsData && skillsData !== '{}') {
+            const data = JSON.parse(skillsData);
+            skills.powerStrike.level = data.powerStrike || 0;
+            skills.endurance.level = data.endurance || 0;
+            skills.berserk.level = data.berserk || 0;
+        }
+        renderSkills();
+    } catch (e) {
+        console.error("Ошибка загрузки умений:", e);
+    }
+}
 
 function renderSkills() {
     const container = document.getElementById("skillsList");
@@ -60,6 +98,7 @@ function upgradeSkill(skillName) {
     renderSkills();
     updateUI();
     savePlayerToCloud();
+    saveSkillsToCloud();
 }
 
 function getSkillBonuses() {

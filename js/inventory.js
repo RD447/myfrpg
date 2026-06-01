@@ -122,22 +122,86 @@ function renderInventory() {
     });
 }
 
-// Сохранение инвентаря в БД (добавим позже)
+// ======================== СОХРАНЕНИЕ И ЗАГРУЗКА ИНВЕНТАРЯ ========================
+
+// Сохранение инвентаря в БД
 async function saveInventoryToCloud() {
     if (!supabaseClient || !currentPlayer.id || !isLoggedIn) return;
     
-    await supabaseClient
-        .from("players")
-        .update({
-            inventory_data: JSON.stringify(inventory),
-            equipment_data: JSON.stringify(equipment)
-        })
-        .eq("id", currentPlayer.id);
+    try {
+        await supabaseClient
+            .from("players")
+            .update({
+                inventory_data: JSON.stringify(inventory),
+                equipment_data: JSON.stringify(equipment),
+                updated_at: new Date().toISOString()
+            })
+            .eq("id", currentPlayer.id);
+    } catch (e) {
+        console.error("Ошибка сохранения инвентаря:", e);
+    }
 }
 
-// Загрузка инвентаря из БД (добавим позже)
+// Загрузка инвентаря из БД
 function loadInventoryFromCloud(inventoryData, equipmentData) {
-    if (inventoryData) inventory = JSON.parse(inventoryData);
-    if (equipmentData) equipment = JSON.parse(equipmentData);
-    renderInventory();
+    try {
+        if (inventoryData && inventoryData !== '[]') {
+            inventory = JSON.parse(inventoryData);
+        } else {
+            inventory = [];
+        }
+        
+        if (equipmentData && equipmentData !== '{"weapon":null,"armor":null,"ring":null}') {
+            equipment = JSON.parse(equipmentData);
+        } else {
+            equipment = { weapon: null, armor: null, ring: null };
+        }
+        
+        renderInventory();
+        updateUI(); // обновляем статы (бонусы от экипировки)
+    } catch (e) {
+        console.error("Ошибка загрузки инвентаря:", e);
+        inventory = [];
+        equipment = { weapon: null, armor: null, ring: null };
+    }
 }
+
+// Добавляем автоматическое сохранение при изменении инвентаря
+// Переопределяем функции, которые изменяют инвентарь
+const originalAddItem = addItemToInventory;
+const originalEquipItem = equipItem;
+const originalUnequipItem = unequipItem;
+const originalSellItem = sellItem;
+const originalSellAllCommon = sellAllCommon;
+
+window.addItemToInventory = function(item) {
+    originalAddItem(item);
+    saveInventoryToCloud();
+};
+
+window.equipItem = function(item) {
+    originalEquipItem(item);
+    saveInventoryToCloud();
+};
+
+window.unequipItem = function(type) {
+    originalUnequipItem(type);
+    saveInventoryToCloud();
+};
+
+window.sellItem = function(index) {
+    originalSellItem(index);
+    saveInventoryToCloud();
+};
+
+window.sellAllCommon = function() {
+    originalSellAllCommon();
+    saveInventoryToCloud();
+};
+
+// Обновляем глобальные ссылки
+addItemToInventory = window.addItemToInventory;
+equipItem = window.equipItem;
+unequipItem = window.unequipItem;
+sellItem = window.sellItem;
+sellAllCommon = window.sellAllCommon;

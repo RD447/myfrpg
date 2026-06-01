@@ -56,9 +56,19 @@ async function loginPlayer(username, password) {
                 playerPos = { x: 10, y: 10 };
             }
             
+            // ======================== ЗАГРУЗКА ДАННЫХ ИЗ БД ========================
+            // Загружаем инвентарь
+            loadInventoryFromCloud(data.inventory_data, data.equipment_data);
+            
+            // Загружаем квесты
+            loadQuestsFromCloud(data.quest_data);
+            
+            // Загружаем умения
+            loadSkillsFromCloud(data.skills_data);
+            // ================================================================
+            
             addTechnicalLog(`☁️ Добро пожаловать, ${username}! (уровень ${currentPlayer.level})`);
             isLoggedIn = true;
-            startChatUpdates();
             saveSession(username, password);
             updateUI();
             renderInventory();
@@ -111,9 +121,14 @@ async function registerPlayer(username, password) {
                 level: 1, exp: 0, hp: 70, max_hp: 70,
                 str: 12, def: 5, gold: 150, wood: 0, ore: 0,
                 skill_points: 2,
+                upgrade_points: 2,
                 character_class: 'Мечник',
                 extra_str: 0, extra_def: 0, extra_hp: 0,
-                player_x: 10, player_y: 10
+                player_x: 10, player_y: 10,
+                inventory_data: '[]',
+                equipment_data: '{"weapon":null,"armor":null,"ring":null}',
+                quest_data: '{"goblins":0,"ore":0,"wood":0}',
+                skills_data: '{"powerStrike":0,"endurance":0,"berserk":0}'
             })
             .select()
             .single();
@@ -134,7 +149,6 @@ async function registerPlayer(username, password) {
 }
 
 function logoutPlayer() {
-    cleanupChat();
     clearSession();
     currentPlayer = {
         id: null, username: null, level: 1, exp: 0, hp: 70, maxHp: 70,
@@ -151,6 +165,7 @@ function logoutPlayer() {
     document.getElementById("loginForm").style.display = "flex";
     document.getElementById("playerInfo").style.display = "none";
     document.getElementById("loginUsername").value = "";
+    document.getElementById("loginPassword").value = "";
     
     addTechnicalLog("👋 Вы вышли из аккаунта");
     updateUI();
