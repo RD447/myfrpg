@@ -96,6 +96,16 @@
             width: 100%;
             margin-top: 8px;
         }
+        .stop-move-btn {
+            background: #aa4444;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 30px;
+            color: white;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 8px;
+        }
         .current-player {
             text-align: center;
             margin-top: 8px;
@@ -437,18 +447,6 @@
             z-index: 100;
             box-shadow: 0 4px 12px rgba(0,0,0,0.3);
         }
-        
-        .stop-move-btn {
-            background: #aa4444;
-            border: none;
-            padding: 4px 12px;
-            border-radius: 30px;
-            color: white;
-            cursor: pointer;
-            font-size: 0.7rem;
-            margin-top: 8px;
-            width: 100%;
-        }
     </style>
 </head>
 <body>
@@ -466,7 +464,7 @@
                     <div id="playerInfo" style="display: none;">
                         <div class="current-player" id="currentPlayerName">Игрок</div>
                         <button id="logoutBtn" class="logout-btn">🚪 ВЫЙТИ</button>
-                        <button id="stopMoveBtn" class="stop-move-btn">⏹️ ОСТАНОВИТЬ ПЕРЕМЕЩЕНИЕ</button>
+                        <button id="stopMoveBtn" class="stop-move-btn" style="margin-top: 5px; background: #aa4444; border: none; padding: 6px 12px; border-radius: 30px; color: white; cursor: pointer; width: 100%;">⏹️ ОСТАНОВИТЬ ПЕРЕМЕЩЕНИЕ</button>
                     </div>
                 </div>
                 <div id="heroClassDisplay" style="text-align: center; font-size: 1rem; margin: 8px 0; color: #ffd966;">🗡️ Мечник</div>
@@ -726,44 +724,6 @@ function escapeHtml(str) {
     });
 }
 
-// ======================== СОХРАНЕНИЕ ПОЗИЦИИ ========================
-async function savePlayerPosition() {
-    if (!supabaseClient || !isLoggedIn || !currentPlayer.id) return;
-    
-    try {
-        await supabaseClient
-            .from("players")
-            .update({
-                player_x: playerPos.x,
-                player_y: playerPos.y,
-                updated_at: new Date().toISOString()
-            })
-            .eq("id", currentPlayer.id);
-        console.log(`📍 Позиция сохранена: (${playerPos.x}, ${playerPos.y})`);
-    } catch (e) {
-        console.error("Ошибка сохранения позиции:", e);
-    }
-}
-
-// ======================== ОСТАНОВКА ПЕРЕМЕЩЕНИЯ ========================
-function stopMoving() {
-    if (isMoving) {
-        if (moveInterval) {
-            clearInterval(moveInterval);
-            moveInterval = null;
-        }
-        isMoving = false;
-        moveFrom = null;
-        moveTo = null;
-        moveProgress = 0;
-        drawMap();
-        addTechnicalLog("⏹️ Перемещение остановлено!");
-        updateActionButtons();
-    } else {
-        addTechnicalLog("❌ Вы никуда не двигаетесь!");
-    }
-}
-
 // ======================== АВТОРИЗАЦИЯ ========================
 async function loginPlayer(username) {
     if (!supabaseClient) {
@@ -805,19 +765,11 @@ async function loginPlayer(username) {
             playerExtraDef = data.extra_def || 0;
             playerExtraHp = data.extra_hp || 0;
             
-            // Загружаем сохранённую позицию
-            if (data.player_x !== undefined && data.player_x !== null) {
-                playerPos = { x: data.player_x, y: data.player_y };
-            } else {
-                playerPos = { x: 10, y: 10 };
-            }
-            
             addTechnicalLog(`☁️ Добро пожаловать, ${username}! (уровень ${currentPlayer.level})`);
             isLoggedIn = true;
             updateUI();
             renderInventory();
             renderSkills();
-            drawMap();
             return true;
         } else {
             const { data: newData, error: createError } = await supabaseClient
@@ -828,13 +780,18 @@ async function loginPlayer(username) {
                     str: 12, def: 5, gold: 150, wood: 0, ore: 0,
                     skill_points: 2,
                     character_class: 'Мечник',
-                    extra_str: 0, extra_def: 0, extra_hp: 0,
-                    player_x: 10,
-                    player_y: 10
+                    extra_str: 0, extra_def: 0, extra_hp: 0
                 })
                 .select()
                 .single();
             
+                // Загружаем сохранённую позицию, если есть
+            if (data.player_x !== undefined && data.player_y !== undefined) {
+                playerPos = { x: data.player_x, y: data.player_y };
+            } else {
+                playerPos = { x: 10, y: 10 }; // стартовая позиция по умолчанию
+            }
+
             if (createError) {
                 addTechnicalLog(`❌ Ошибка создания: ${createError.message}`);
                 return false;
@@ -857,14 +814,12 @@ async function loginPlayer(username) {
                 playerExtraStr = newData.extra_str || 0;
                 playerExtraDef = newData.extra_def || 0;
                 playerExtraHp = newData.extra_hp || 0;
-                playerPos = { x: 10, y: 10 };
                 
                 addTechnicalLog(`✨ Создан новый персонаж ${username}!`);
                 isLoggedIn = true;
                 updateUI();
                 renderInventory();
                 renderSkills();
-                drawMap();
                 return true;
             }
         }
@@ -876,13 +831,6 @@ async function loginPlayer(username) {
 }
 
 function logoutPlayer() {
-    // Останавливаем движение если было
-    if (isMoving) {
-        if (moveInterval) clearInterval(moveInterval);
-        isMoving = false;
-        moveInterval = null;
-    }
-    
     currentPlayer = {
         id: null, username: null, level: 1, exp: 0, hp: 70, maxHp: 70,
         str: 12, def: 5, gold: 150, wood: 0, ore: 0, skillPoints: 2,
@@ -900,7 +848,6 @@ function logoutPlayer() {
     
     addTechnicalLog("👋 Вы вышли из аккаунта");
     updateUI();
-    drawMap();
 }
 
 function updateLoginUI() {
@@ -1314,8 +1261,6 @@ function generateMap() {
     }
 }
 
-let moveInterval = null;
-
 function drawMap() {
     if (!canvas || !ctx) return;
     updateTileDisplaySize();
@@ -1342,8 +1287,8 @@ function drawMap() {
                 ctx.strokeRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
             }
         }
+        drawOtherPlayers();
     }
-    drawOtherPlayers();
     
     if (!playerPos) return;
     let drawX = playerPos.x * TILE_SIZE;
@@ -1369,9 +1314,12 @@ let moveTo = null;
 let moveStartTime = 0;
 let moveDuration = 0;
 
+let moveInterval = null;
+
 function animateMove() {
     if (!isMoving) return;
     
+    // Очищаем предыдущий интервал, если есть
     if (moveInterval) clearInterval(moveInterval);
     
     moveInterval = setInterval(() => {
@@ -1395,40 +1343,56 @@ function animateMove() {
             updateActionButtons();
             addTechnicalLog(`✅ Вы прибыли в ${getCurrentTile().name}`);
             if (Math.random() < 0.15) triggerRandomEvent();
-            
-            // Сохраняем позицию после перемещения
             savePlayerPosition();
         }
     }, 50);
 }
 
+// Сохранение позиции игрока в БД
+async function savePlayerPosition() {
+    if (!supabaseClient || !isLoggedIn || !currentPlayer.id) return;
+    
+    try {
+        await supabaseClient
+            .from("players")
+            .update({
+                player_x: playerPos.x,
+                player_y: playerPos.y,
+                updated_at: new Date().toISOString()
+            })
+            .eq("id", currentPlayer.id);
+    } catch (e) {
+        console.error("Ошибка сохранения позиции:", e);
+    }
+}
+
+function stopMoving() {
+    if (moveInterval) {
+        clearInterval(moveInterval);
+        moveInterval = null;
+    }
+    if (isMoving) {
+        isMoving = false;
+        moveFrom = null;
+        moveTo = null;
+        moveProgress = 0;
+        drawMap();
+        addTechnicalLog("⏹️ Перемещение остановлено!");
+        updateActionButtons();
+    } else {
+        addTechnicalLog("❌ Вы никуда не двигаетесь!");
+    }
+}
+
 function startMoveTo(tx, ty) {
-    if (isMoving) { 
-        addTechnicalLog("❌ Вы уже в пути! Нажмите 'ОСТАНОВИТЬ ПЕРЕМЕЩЕНИЕ' чтобы прервать.");
-        return; 
-    }
-    if (autoActive) { 
-        addTechnicalLog("❌ Нельзя перемещаться во время автодействия! Остановите его."); 
-        return; 
-    }
-    if (campActive) { 
-        addTechnicalLog("❌ Сначала нужно снять лагерь!"); 
-        return; 
-    }
-    if (!isLoggedIn) { 
-        addTechnicalLog("❌ Сначала войдите в аккаунт!"); 
-        return; 
-    }
+    if (isMoving) { addTechnicalLog("❌ Вы уже в пути!"); return; }
+    if (autoActive) { addTechnicalLog("❌ Нельзя перемещаться во время автодействия! Остановите его."); return; }
+    if (campActive) { addTechnicalLog("❌ Сначала нужно снять лагерь!"); return; }
+    if (!isLoggedIn) { addTechnicalLog("❌ Сначала войдите в аккаунт!"); return; }
     
     const tile = mapTiles[ty][tx];
-    if (!tile || !tile.walkable) { 
-        addTechnicalLog(`❌ Нельзя пройти в ${tile?.name || "эту клетку"}`); 
-        return; 
-    }
-    if (tx === playerPos.x && ty === playerPos.y) { 
-        addTechnicalLog(`📍 Вы уже здесь`); 
-        return; 
-    }
+    if (!tile || !tile.walkable) { addTechnicalLog(`❌ Нельзя пройти в ${tile?.name || "эту клетку"}`); return; }
+    if (tx === playerPos.x && ty === playerPos.y) { addTechnicalLog(`📍 Вы уже здесь`); return; }
     
     const distance = Math.abs(tx - playerPos.x) + Math.abs(ty - playerPos.y);
     moveDuration = distance * 3000;
@@ -2012,54 +1976,6 @@ function createGuild() {
     }
 }
 
-// ======================== ЗАГРУЗКА ДРУГИХ ИГРОКОВ ========================
-async function loadOtherPlayers() {
-    if (!supabaseClient || !isLoggedIn) return;
-    
-    const { data, error } = await supabaseClient
-        .from("players")
-        .select("username, player_x, player_y, character_class")
-        .neq("username", currentPlayer.username)
-        .limit(20);
-    
-    if (error) {
-        console.error("Ошибка загрузки игроков:", error);
-        return;
-    }
-    
-    otherPlayers = data || [];
-    drawMap();
-}
-
-function drawOtherPlayers() {
-    if (!ctx || !otherPlayers.length) return;
-    
-    for (const player of otherPlayers) {
-        if (player.player_x === undefined || player.player_y === null || player.player_x === null) continue;
-        const x = player.player_x * TILE_SIZE;
-        const y = player.player_y * TILE_SIZE;
-        
-        // Зелёная рамка
-        ctx.save();
-        ctx.shadowBlur = 0;
-        ctx.strokeStyle = "#66ff66";
-        ctx.lineWidth = 2;
-        ctx.strokeRect(x, y, TILE_SIZE, TILE_SIZE);
-        
-        // Иконка класса
-        const classData = characterClasses[player.character_class] || characterClasses['Мечник'];
-        ctx.font = `${TILE_SIZE * 0.45}px "Segoe UI Emoji"`;
-        ctx.fillStyle = "#aaffaa";
-        ctx.fillText(classData.icon || '⚔️', x + TILE_SIZE * 0.3, y + TILE_SIZE * 0.75);
-        
-        // Имя
-        ctx.font = `${TILE_SIZE * 0.2}px monospace`;
-        ctx.fillStyle = "#aaffaa";
-        ctx.fillText(player.username.substring(0, 8), x + TILE_SIZE * 0.15, y + TILE_SIZE * 0.55);
-        ctx.restore();
-    }
-}
-
 // ======================== ИНИЦИАЛИЗАЦИЯ ========================
 document.getElementById("fightBtn").onclick = () => {
     const tile = getCurrentTile();
@@ -2077,6 +1993,7 @@ document.getElementById("chatInput").addEventListener("keypress", (e) => {
     if (e.key === "Enter") sendChatMessageHandler();
 });
 
+
 document.getElementById("loginBtn").onclick = async () => {
     const input = document.getElementById("loginUsername");
     const name = input.value.trim();
@@ -2085,8 +2002,6 @@ document.getElementById("loginBtn").onclick = async () => {
         input.value = "";
         loadChatMessages();
         loadOnlinePlayers();
-        loadOtherPlayers();
-        drawMap();
     } else {
         addTechnicalLog("❌ Имя должно быть от 3 до 16 символов");
     }
@@ -2095,8 +2010,6 @@ document.getElementById("loginBtn").onclick = async () => {
 document.getElementById("logoutBtn").onclick = () => {
     logoutPlayer();
     loadChatMessages();
-    otherPlayers = [];
-    drawMap();
 };
 
 document.querySelectorAll('.upgrade-stat').forEach(btn => {
@@ -2145,7 +2058,7 @@ document.querySelectorAll(".tab-btn").forEach(btn => {
 if (document.querySelector(".tab-btn")) document.querySelector(".tab-btn").click();
 
 generateMap();
-loadAllTiles();
+loadAllTiles();  // Загружаем картинки для карты
 setTimeout(() => {
     updateTileDisplaySize();
     drawMap();
@@ -2159,7 +2072,6 @@ addTechnicalLog("🗺️ КАРТА 20×20! Кликайте по клеткам
 addTechnicalLog("🌀 Улучшайте умения и статы");
 addTechnicalLog("💬 Чат работает — войдите в аккаунт и общайтесь!");
 addTechnicalLog("👥 Вкладка ОНЛАЙН показывает активных игроков");
-addTechnicalLog("⏹️ Кнопка 'ОСТАНОВИТЬ ПЕРЕМЕЩЕНИЕ' прерывает движение");
 
 document.body.addEventListener('click', () => {
     if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
@@ -2169,9 +2081,56 @@ setInterval(() => {
     if (currentPlayer.id && isLoggedIn) savePlayerToCloud();
 }, 30000);
 setInterval(() => {
-    if (isLoggedIn) loadOtherPlayers();
+    loadOtherPlayers();
 }, 10000);
 setInterval(loadOnlinePlayers, 30000);
+
+async function loadOtherPlayers() {
+    if (!supabaseClient || !isLoggedIn) return;
+    
+    const { data, error } = await supabaseClient
+        .from("players")
+        .select("username, player_x, player_y, character_class")
+        .neq("username", currentPlayer.username)
+        .limit(20);
+    
+    if (error) {
+        console.error("Ошибка загрузки игроков:", error);
+        return;
+    }
+    
+    otherPlayers = data || [];
+}
+
+function drawOtherPlayers() {
+    if (!ctx || !otherPlayers.length) return;
+    
+    for (const player of otherPlayers) {
+        if (player.player_x === undefined || player.player_y === undefined) continue;
+        const x = player.player_x * TILE_SIZE;
+        const y = player.player_y * TILE_SIZE;
+        
+        // Зелёная рамка
+        ctx.save();
+        ctx.shadowBlur = 0;
+        ctx.strokeStyle = "#66ff66";
+        ctx.lineWidth = 2;
+        ctx.strokeRect(x, y, TILE_SIZE, TILE_SIZE);
+        
+        // Иконка класса
+        const classData = characterClasses[player.character_class] || characterClasses['Мечник'];
+        ctx.font = `${TILE_SIZE * 0.45}px "Segoe UI Emoji"`;
+        ctx.fillStyle = "#aaffaa";
+        ctx.fillText(classData.icon || '⚔️', x + TILE_SIZE * 0.3, y + TILE_SIZE * 0.75);
+        
+        // Имя
+        ctx.font = `${TILE_SIZE * 0.2}px monospace`;
+        ctx.fillStyle = "#aaffaa";
+        ctx.fillText(player.username.substring(0, 8), x + TILE_SIZE * 0.15, y + TILE_SIZE * 0.55);
+        ctx.restore();
+    }
+}
+
 </script>
 </body>
 </html>
