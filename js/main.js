@@ -199,7 +199,7 @@ function restHeal() {
     }
 }
 
-// === ПРИВЯЗКА КНОПОК (с проверкой существования элементов) ===
+// === ПРИВЯЗКА КНОПОК ===
 const fightBtn = document.getElementById("fightBtn");
 if (fightBtn) {
     fightBtn.onclick = () => {
@@ -251,7 +251,6 @@ if (loginBtn) {
         if (typeof loadOnlinePlayers === 'function') loadOnlinePlayers();
         if (typeof loadOtherPlayers === 'function') loadOtherPlayers();
         if (typeof drawMap === 'function') drawMap();
-        // Закрываем модальное окно после входа
         document.getElementById('loginModal').style.display = 'none';
         document.getElementById('modalOverlay').style.display = 'none';
     };
@@ -271,7 +270,6 @@ if (registerBtn) {
         if (typeof loadOnlinePlayers === 'function') loadOnlinePlayers();
         if (typeof loadOtherPlayers === 'function') loadOtherPlayers();
         if (typeof drawMap === 'function') drawMap();
-        // Закрываем модальное окно после регистрации и входа
         document.getElementById('loginModal').style.display = 'none';
         document.getElementById('modalOverlay').style.display = 'none';
     };
@@ -281,7 +279,6 @@ const logoutBtn = document.getElementById("logoutBtn");
 if (logoutBtn) logoutBtn.onclick = () => {
     logoutPlayer();
     if (typeof loadChatMessages === 'function') loadChatMessages();
-    // Показываем модальное окно после выхода
     document.getElementById('loginModal').style.display = 'flex';
     document.getElementById('modalOverlay').style.display = 'block';
 };
@@ -354,16 +351,18 @@ if (autoContent) {
 }
 
 // === ЗАПУСК ===
-if (typeof generateMap === 'function') generateMap();
-if (typeof loadAllTiles === 'function') loadAllTiles();
+// Функции generateMap, loadAllTiles, updateTileDisplaySize, drawMap находятся в map.js
 setTimeout(() => {
+    if (typeof generateMap === 'function') generateMap();
+    if (typeof loadAllTiles === 'function') loadAllTiles();
     if (typeof updateTileDisplaySize === 'function') updateTileDisplaySize();
     if (typeof drawMap === 'function') drawMap();
+    if (typeof updateActionButtons === 'function') updateActionButtons();
+    if (typeof updateUI === 'function') updateUI();
+    if (typeof renderInventory === 'function') renderInventory();
+    if (typeof renderSkills === 'function') renderSkills();
 }, 100);
-if (typeof updateActionButtons === 'function') updateActionButtons();
-if (typeof updateUI === 'function') updateUI();
-if (typeof renderInventory === 'function') renderInventory();
-if (typeof renderSkills === 'function') renderSkills();
+
 addTechnicalLog("🗺️ КАРТА 20×20! Кликайте по клеткам для перемещения");
 addTechnicalLog("🌀 Улучшайте умения и статы");
 addTechnicalLog("💬 Чат работает — войдите в аккаунт и общайтесь!");
@@ -389,9 +388,11 @@ setTimeout(() => {
         if (savedUser && savedPass && typeof loginPlayer === 'function') {
             console.log("Восстановление сессии:", savedUser);
             loginPlayer(savedUser, savedPass).then(() => {
-                document.getElementById('loginModal').style.display = 'none';
-                document.getElementById('modalOverlay').style.display = 'none';
-            });
+                const modal = document.getElementById('loginModal');
+                const overlay = document.getElementById('modalOverlay');
+                if (modal) modal.style.display = 'none';
+                if (overlay) overlay.style.display = 'none';
+            }).catch(() => {});
         }
     }
 }, 1000);
