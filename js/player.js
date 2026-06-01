@@ -71,3 +71,40 @@ function updateUI() {
     let cd = document.getElementById("heroClassDisplay");
     if (cd && currentPlayer.character_class) cd.innerHTML = `${characterClasses[currentPlayer.character_class]?.icon || '⚔️'} ${currentPlayer.character_class}`;
 }
+
+function showClassSelector() {
+    const modal = document.getElementById("classModal");
+    const overlay = document.getElementById("modalOverlay");
+    const container = document.getElementById("classButtons");
+    
+    if (!modal || !overlay || !container) {
+        addTechnicalLog("❌ Ошибка: модальное окно не найдено");
+        return;
+    }
+    
+    container.innerHTML = "";
+    for (const [key, data] of Object.entries(characterClasses)) {
+        const btn = document.createElement("button");
+        btn.className = "small-btn";
+        btn.style.margin = "6px";
+        btn.style.padding = "10px";
+        btn.style.width = "calc(100% - 12px)";
+        btn.innerHTML = `${data.icon || data.name} ${data.name}<br><span style="font-size:0.6rem;">⚔️${data.baseStr} 🛡️${data.baseDef} ❤️${data.baseHp}</span>`;
+        btn.onclick = () => {
+            changeClass(key);
+            modal.style.display = "none";
+            overlay.style.display = "none";
+        };
+        container.appendChild(btn);
+    }
+    
+    modal.style.display = "block";
+    overlay.style.display = "block";
+}
+
+function closeModal() {
+    const modal = document.getElementById("classModal");
+    const overlay = document.getElementById("modalOverlay");
+    if (modal) modal.style.display = "none";
+    if (overlay) overlay.style.display = "none";
+}

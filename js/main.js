@@ -34,6 +34,34 @@ document.addEventListener("mouseup", () => {
     autoPanel.style.cursor = "grab";
 });
 
+// Перетаскивание модального окна
+const modalHeader = document.querySelector("#classModal h3");
+let isDraggingModal = false, modalStartX = 0, modalStartY = 0;
+
+if (modalHeader) {
+    modalHeader.style.cursor = "grab";
+    modalHeader.addEventListener("mousedown", (e) => {
+        const modal = document.getElementById("classModal");
+        if (modal.style.display !== "block") return;
+        isDraggingModal = true;
+        modalStartX = e.clientX - modal.offsetLeft;
+        modalStartY = e.clientY - modal.offsetTop;
+        modalHeader.style.cursor = "grabbing";
+        e.preventDefault();
+    });
+}
+document.addEventListener("mousemove", (e) => {
+    if (!isDraggingModal) return;
+    const modal = document.getElementById("classModal");
+    modal.style.left = (e.clientX - modalStartX) + "px";
+    modal.style.top = (e.clientY - modalStartY) + "px";
+    modal.style.transform = "none";
+});
+document.addEventListener("mouseup", () => {
+    isDraggingModal = false;
+    if (modalHeader) modalHeader.style.cursor = "grab";
+});
+
 // === ФУНКЦИИ UI ===
 function updateActionButtons() {
     const tile = getCurrentTile();
@@ -45,7 +73,6 @@ function updateActionButtons() {
     gatherBtn.style.display = "none";
     campBtn.style.display = "block";
     
-    // Удаляем старую кнопку смены класса, если есть
     const oldClassBtn = document.getElementById("changeClassBtn");
     if (oldClassBtn) oldClassBtn.remove();
     
@@ -64,7 +91,6 @@ function updateActionButtons() {
         fightBtn.innerHTML = "💊 ОТДОХНУТЬ (+10 HP за 5 монет)";
         campBtn.style.display = "block";
         
-        // Кнопка смены класса
         const newClassBtn = document.createElement("button");
         newClassBtn.id = "changeClassBtn";
         newClassBtn.className = "btn btn-camp";
@@ -91,7 +117,7 @@ function updateActionButtons() {
             const healCampBtn = document.createElement("button");
             healCampBtn.id = "campHealBtn";
             healCampBtn.className = "btn btn-success";
-            healCampBtn.innerHTML = "💊 ЛЕЧЕНИЕ В ЛАГЕРЕ (5✨)";
+            healCampBtn.innerHTML = "💊 ЛЕЧЕНИЕ (5✨)";
             healCampBtn.onclick = () => campHeal();
             document.getElementById("actionBar").appendChild(healCampBtn);
         }
@@ -99,7 +125,7 @@ function updateActionButtons() {
             const cookCampBtn = document.createElement("button");
             cookCampBtn.id = "campCookBtn";
             cookCampBtn.className = "btn btn-camp";
-            cookCampBtn.innerHTML = "🍲 ПРИГОТОВИТЬ ЕДУ (2🌲)";
+            cookCampBtn.innerHTML = "🍲 ГОТОВКА (2🌲)";
             cookCampBtn.onclick = () => campCook();
             document.getElementById("actionBar").appendChild(cookCampBtn);
         }
@@ -306,6 +332,15 @@ setInterval(loadOnlinePlayers, 30000);
 // Восстановление сессии
 loadSession();
 
+// Принудительное сохранение сессии при перезагрузке
+window.addEventListener("beforeunload", () => {
+    if (isLoggedIn && currentPlayer.username) {
+        localStorage.setItem('rpg_username', currentPlayer.username);
+        const passInput = document.getElementById("loginPassword");
+        if (passInput) localStorage.setItem('rpg_password', passInput.value);
+    }
+});
+
 // Активация звука при клике
 document.body.addEventListener('click', () => {
     if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
@@ -313,3 +348,4 @@ document.body.addEventListener('click', () => {
 
 window.unequipItem = unequipItem;
 window.showClassSelector = showClassSelector;
+window.closeModal = closeModal;
