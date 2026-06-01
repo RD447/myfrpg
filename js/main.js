@@ -7,7 +7,6 @@ if (typeof supabase !== "undefined" && SUPABASE_URL && SUPABASE_ANON_KEY) {
 
 // === ПЕРЕМЕННЫЕ ===
 let campActive = false;
-let quests = { goblins: 0, ore: 0, wood: 0 };
 let autoActive = false;
 let autoType = null;
 let autoInterval = null;
@@ -111,72 +110,9 @@ function restHeal() {
 }
 
 // === ЛАГЕРЬ ===
-function toggleCamp() {
-    if (!isLoggedIn) {
-        addTechnicalLog("❌ Сначала войдите в аккаунт!");
-        return;
-    }
-    if (isMoving) {
-        addTechnicalLog("❌ Нельзя ставить лагерь во время перемещения!");
-        return;
-    }
-    const tile = getCurrentTile();
-    if (tile.type !== "combat" && tile.type !== "empty") {
-        addTechnicalLog("❌ Лагерь можно ставить в лесу, горах, пещере, пустошах!");
-        return;
-    }
-    campActive = !campActive;
-    const campBtn = document.getElementById("campBtn");
-    if (campActive) {
-        campBtn.classList.add("active");
-        campBtn.innerHTML = "🔥 СНЯТЬ ЛАГЕРЬ";
-        addTechnicalLog("🏕️ Лагерь установлен! Можно лечиться (5 монет) и готовить еду (2 дерева)");
-    } else {
-        campBtn.classList.remove("active");
-        campBtn.innerHTML = "🏕️ ЛАГЕРЬ";
-        addTechnicalLog("🔥 Лагерь свёрнут.");
-    }
-    updateActionButtons();
-    updateUI();
-}
+// Удален из данного файла
 
-function campHeal() {
-    if (!campActive) {
-        addTechnicalLog("❌ Нет активного лагеря!");
-        return;
-    }
-    const stats = recalcStats();
-    if (currentPlayer.gold >= 5 && currentPlayer.hp < stats.maxHp) {
-        currentPlayer.gold -= 5;
-        let heal = 15 + Math.floor(Math.random() * 15);
-        currentPlayer.hp = Math.min(stats.maxHp, currentPlayer.hp + heal);
-        addTechnicalLog(`💊 Вы отдохнули в лагере и восстановили ${heal} HP. -5 монет`);
-        updateUI();
-        savePlayerToCloud();
-    } else if (currentPlayer.hp >= stats.maxHp) {
-        addTechnicalLog("💚 Вы уже полностью здоровы!");
-    } else {
-        addTechnicalLog("❌ Не хватает монет (нужно 5)");
-    }
-}
 
-function campCook() {
-    if (!campActive) {
-        addTechnicalLog("❌ Нет активного лагеря!");
-        return;
-    }
-    if (currentPlayer.wood < 2) {
-        addTechnicalLog("❌ Не хватает древесины! Нужно 2");
-        return;
-    }
-    currentPlayer.wood -= 2;
-    let heal = 20 + Math.floor(Math.random() * 15);
-    const stats = recalcStats();
-    currentPlayer.hp = Math.min(stats.maxHp, currentPlayer.hp + heal);
-    addTechnicalLog(`🍲 Вы приготовили еду на костре! +${heal} HP. -2 древесины`);
-    updateUI();
-    savePlayerToCloud();
-}
 
 // === ЗАГРУЗКА КАРТИНОК ===
 const tileFiles = {

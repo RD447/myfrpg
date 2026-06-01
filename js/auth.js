@@ -69,6 +69,7 @@ async function loginPlayer(username, password) {
             
             addTechnicalLog(`☁️ Добро пожаловать, ${username}! (уровень ${currentPlayer.level})`);
             isLoggedIn = true;
+            startChatUpdates();
             saveSession(username, password);
             updateUI();
             renderInventory();

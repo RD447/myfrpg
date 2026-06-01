@@ -10,7 +10,7 @@ function startAutoGather() {
     autoType = "gather";
     updateActionButtons();
     const resource = tile.resource;
-    addTechnicalLog(`⏳ Начат БЕСКОНЕЧНЫЙ автосбор ${resource === "wood" ? "древесины" : "руды"} в ${tile.name}`);
+    addTechnicalLog(`⏳ Начат автосбор ${resource === "wood" ? "древесины" : "руды"} в ${tile.name}`);
     
     function gatherLoop() {
         if (!autoActive || autoType !== "gather") return;
@@ -52,6 +52,44 @@ function triggerRandomEvent() {
     if (event.heal) currentPlayer.hp = Math.min(recalcStats().maxHp, currentPlayer.hp + event.heal);
     if (event.damage) currentPlayer.hp = Math.max(1, currentPlayer.hp - event.damage);
     addTechnicalLog(`✨ ${event.text}`);
+    updateUI();
+    savePlayerToCloud();
+}
+// ======================== ЛАГЕРЬ ========================
+function campHeal() {
+    if (!campActive) {
+        addTechnicalLog("❌ Нет активного лагеря!");
+        return;
+    }
+    const stats = recalcStats();
+    if (currentPlayer.gold >= 5 && currentPlayer.hp < stats.maxHp) {
+        currentPlayer.gold -= 5;
+        let heal = 15 + Math.floor(Math.random() * 15);
+        currentPlayer.hp = Math.min(stats.maxHp, currentPlayer.hp + heal);
+        addTechnicalLog(`💊 Вы отдохнули в лагере и восстановили ${heal} HP. -5 монет`);
+        updateUI();
+        savePlayerToCloud();
+    } else if (currentPlayer.hp >= stats.maxHp) {
+        addTechnicalLog("💚 Вы уже полностью здоровы!");
+    } else {
+        addTechnicalLog("❌ Не хватает монет (нужно 5)");
+    }
+}
+
+function campCook() {
+    if (!campActive) {
+        addTechnicalLog("❌ Нет активного лагеря!");
+        return;
+    }
+    if (currentPlayer.wood < 2) {
+        addTechnicalLog("❌ Не хватает древесины! Нужно 2");
+        return;
+    }
+    currentPlayer.wood -= 2;
+    let heal = 20 + Math.floor(Math.random() * 15);
+    const stats = recalcStats();
+    currentPlayer.hp = Math.min(stats.maxHp, currentPlayer.hp + heal);
+    addTechnicalLog(`🍲 Вы приготовили еду на костре! +${heal} HP. -2 древесины`);
     updateUI();
     savePlayerToCloud();
 }
