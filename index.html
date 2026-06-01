@@ -437,6 +437,18 @@
             z-index: 100;
             box-shadow: 0 4px 12px rgba(0,0,0,0.3);
         }
+        
+        .stop-move-btn {
+            background: #aa4444;
+            border: none;
+            padding: 4px 12px;
+            border-radius: 30px;
+            color: white;
+            cursor: pointer;
+            font-size: 0.7rem;
+            margin-top: 8px;
+            width: 100%;
+        }
     </style>
 </head>
 <body>
@@ -454,6 +466,7 @@
                     <div id="playerInfo" style="display: none;">
                         <div class="current-player" id="currentPlayerName">Игрок</div>
                         <button id="logoutBtn" class="logout-btn">🚪 ВЫЙТИ</button>
+                        <button id="stopMoveBtn" class="stop-move-btn">⏹️ ОСТАНОВИТЬ ПЕРЕМЕЩЕНИЕ</button>
                     </div>
                 </div>
                 <div id="heroClassDisplay" style="text-align: center; font-size: 1rem; margin: 8px 0; color: #ffd966;">🗡️ Мечник</div>
@@ -732,6 +745,25 @@ async function savePlayerPosition() {
     }
 }
 
+// ======================== ОСТАНОВКА ПЕРЕМЕЩЕНИЯ ========================
+function stopMoving() {
+    if (isMoving) {
+        if (moveInterval) {
+            clearInterval(moveInterval);
+            moveInterval = null;
+        }
+        isMoving = false;
+        moveFrom = null;
+        moveTo = null;
+        moveProgress = 0;
+        drawMap();
+        addTechnicalLog("⏹️ Перемещение остановлено!");
+        updateActionButtons();
+    } else {
+        addTechnicalLog("❌ Вы никуда не двигаетесь!");
+    }
+}
+
 // ======================== АВТОРИЗАЦИЯ ========================
 async function loginPlayer(username) {
     if (!supabaseClient) {
@@ -844,6 +876,13 @@ async function loginPlayer(username) {
 }
 
 function logoutPlayer() {
+    // Останавливаем движение если было
+    if (isMoving) {
+        if (moveInterval) clearInterval(moveInterval);
+        isMoving = false;
+        moveInterval = null;
+    }
+    
     currentPlayer = {
         id: null, username: null, level: 1, exp: 0, hp: 70, maxHp: 70,
         str: 12, def: 5, gold: 150, wood: 0, ore: 0, skillPoints: 2,
@@ -861,6 +900,7 @@ function logoutPlayer() {
     
     addTechnicalLog("👋 Вы вышли из аккаунта");
     updateUI();
+    drawMap();
 }
 
 function updateLoginUI() {
@@ -1274,6 +1314,8 @@ function generateMap() {
     }
 }
 
+let moveInterval = null;
+
 function drawMap() {
     if (!canvas || !ctx) return;
     updateTileDisplaySize();
@@ -1329,33 +1371,64 @@ let moveDuration = 0;
 
 function animateMove() {
     if (!isMoving) return;
-    const now = Date.now();
-    moveProgress = Math.min(1, (now - moveStartTime) / moveDuration);
-    drawMap();
-    if (moveProgress >= 1) {
-        isMoving = false;
-        playerPos = { x: moveTo.x, y: moveTo.y };
-        moveFrom = null;
-        moveTo = null;
-        drawMap();
-        updateActionButtons();
-        addTechnicalLog(`✅ Вы прибыли в ${getCurrentTile().name}`);
-        if (Math.random() < 0.15) triggerRandomEvent();
+    
+    if (moveInterval) clearInterval(moveInterval);
+    
+    moveInterval = setInterval(() => {
+        if (!isMoving) {
+            if (moveInterval) clearInterval(moveInterval);
+            return;
+        }
         
-        // Сохраняем позицию после перемещения
-        savePlayerPosition();
-    }
+        const now = Date.now();
+        moveProgress = Math.min(1, (now - moveStartTime) / moveDuration);
+        drawMap();
+        
+        if (moveProgress >= 1) {
+            if (moveInterval) clearInterval(moveInterval);
+            moveInterval = null;
+            isMoving = false;
+            playerPos = { x: moveTo.x, y: moveTo.y };
+            moveFrom = null;
+            moveTo = null;
+            drawMap();
+            updateActionButtons();
+            addTechnicalLog(`✅ Вы прибыли в ${getCurrentTile().name}`);
+            if (Math.random() < 0.15) triggerRandomEvent();
+            
+            // Сохраняем позицию после перемещения
+            savePlayerPosition();
+        }
+    }, 50);
 }
 
 function startMoveTo(tx, ty) {
-    if (isMoving) { addTechnicalLog("❌ Вы уже в пути!"); return; }
-    if (autoActive) { addTechnicalLog("❌ Нельзя перемещаться во время автодействия! Остановите его."); return; }
-    if (campActive) { addTechnicalLog("❌ Сначала нужно снять лагерь!"); return; }
-    if (!isLoggedIn) { addTechnicalLog("❌ Сначала войдите в аккаунт!"); return; }
+    if (isMoving) { 
+        addTechnicalLog("❌ Вы уже в пути! Нажмите 'ОСТАНОВИТЬ ПЕРЕМЕЩЕНИЕ' чтобы прервать.");
+        return; 
+    }
+    if (autoActive) { 
+        addTechnicalLog("❌ Нельзя перемещаться во время автодействия! Остановите его."); 
+        return; 
+    }
+    if (campActive) { 
+        addTechnicalLog("❌ Сначала нужно снять лагерь!"); 
+        return; 
+    }
+    if (!isLoggedIn) { 
+        addTechnicalLog("❌ Сначала войдите в аккаунт!"); 
+        return; 
+    }
     
     const tile = mapTiles[ty][tx];
-    if (!tile || !tile.walkable) { addTechnicalLog(`❌ Нельзя пройти в ${tile?.name || "эту клетку"}`); return; }
-    if (tx === playerPos.x && ty === playerPos.y) { addTechnicalLog(`📍 Вы уже здесь`); return; }
+    if (!tile || !tile.walkable) { 
+        addTechnicalLog(`❌ Нельзя пройти в ${tile?.name || "эту клетку"}`); 
+        return; 
+    }
+    if (tx === playerPos.x && ty === playerPos.y) { 
+        addTechnicalLog(`📍 Вы уже здесь`); 
+        return; 
+    }
     
     const distance = Math.abs(tx - playerPos.x) + Math.abs(ty - playerPos.y);
     moveDuration = distance * 3000;
@@ -1999,6 +2072,7 @@ document.getElementById("stopAutoBtn").onclick = () => stopAuto();
 document.getElementById("chatSendBtn").onclick = sendChatMessageHandler;
 document.getElementById("createGuildBtn").onclick = createGuild;
 document.getElementById("sellAllCommonBtn").onclick = () => sellAllCommon();
+document.getElementById("stopMoveBtn").onclick = () => stopMoving();
 document.getElementById("chatInput").addEventListener("keypress", (e) => {
     if (e.key === "Enter") sendChatMessageHandler();
 });
@@ -2085,6 +2159,7 @@ addTechnicalLog("🗺️ КАРТА 20×20! Кликайте по клеткам
 addTechnicalLog("🌀 Улучшайте умения и статы");
 addTechnicalLog("💬 Чат работает — войдите в аккаунт и общайтесь!");
 addTechnicalLog("👥 Вкладка ОНЛАЙН показывает активных игроков");
+addTechnicalLog("⏹️ Кнопка 'ОСТАНОВИТЬ ПЕРЕМЕЩЕНИЕ' прерывает движение");
 
 document.body.addEventListener('click', () => {
     if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
