@@ -93,45 +93,56 @@ function updateActionButtons() {
     const gatherBtn = document.getElementById("gatherBtn");
     const campBtn = document.getElementById("campBtn");
     
-    fightBtn.style.display = "none";
-    gatherBtn.style.display = "none";
-    campBtn.style.display = "block";
+    if (fightBtn) fightBtn.style.display = "none";
+    if (gatherBtn) gatherBtn.style.display = "none";
+    if (campBtn) campBtn.style.display = "block";
     
     const oldClassBtn = document.getElementById("changeClassBtn");
     if (oldClassBtn) oldClassBtn.remove();
     
     if (tile && tile.type === "combat") {
-        fightBtn.style.display = "block";
-        fightBtn.innerHTML = `⚔️ АВТОБОЙ (${tile.enemy === 'goblin' ? 'Гоблин' : tile.enemy === 'troll' ? 'Тролль' : 'Разбойник'})`;
-        if (tile.resource) {
+        if (fightBtn) {
+            fightBtn.style.display = "block";
+            fightBtn.innerHTML = `⚔️ АВТОБОЙ (${tile.enemy === 'goblin' ? 'Гоблин' : tile.enemy === 'troll' ? 'Тролль' : 'Разбойник'})`;
+        }
+        if (tile.resource && gatherBtn) {
             gatherBtn.style.display = "block";
             gatherBtn.innerHTML = tile.resource === "wood" ? "🌲 АВТОСБОР ДРЕВЕСИНЫ" : "⛏️ АВТОСБОР РУДЫ";
         }
-        if (window.campActive) campBtn.classList.add("active");
-        else campBtn.classList.remove("active");
+        if (campBtn) {
+            if (window.campActive) campBtn.classList.add("active");
+            else campBtn.classList.remove("active");
+        }
         
     } else if (tile && tile.type === "safe") {
-        fightBtn.style.display = "block";
-        fightBtn.innerHTML = "💊 ОТДОХНУТЬ (+10 HP за 5 монет)";
-        campBtn.style.display = "block";
+        if (fightBtn) {
+            fightBtn.style.display = "block";
+            fightBtn.innerHTML = "💊 ОТДОХНУТЬ (+10 HP за 5 монет)";
+        }
+        if (campBtn) campBtn.style.display = "block";
         
         const newClassBtn = document.createElement("button");
         newClassBtn.id = "changeClassBtn";
         newClassBtn.className = "btn btn-camp";
         newClassBtn.innerHTML = "🔄 СМЕНИТЬ КЛАСС (100✨)";
         newClassBtn.onclick = () => showClassSelector();
-        document.getElementById("actionBar").appendChild(newClassBtn);
+        const actionBar = document.getElementById("actionBar");
+        if (actionBar) actionBar.appendChild(newClassBtn);
         
-        if (window.campActive) campBtn.classList.add("active");
-        else campBtn.classList.remove("active");
+        if (campBtn) {
+            if (window.campActive) campBtn.classList.add("active");
+            else campBtn.classList.remove("active");
+        }
         
     } else {
-        if (window.campActive) campBtn.classList.add("active");
-        else campBtn.classList.remove("active");
+        if (campBtn) {
+            if (window.campActive) campBtn.classList.add("active");
+            else campBtn.classList.remove("active");
+        }
     }
     
     const stopBtn = document.getElementById("stopAutoBtn");
-    stopBtn.style.display = autoActive ? "block" : "none";
+    if (stopBtn) stopBtn.style.display = autoActive ? "block" : "none";
     
     let existingHealBtn = document.getElementById("campHealBtn");
     let existingCookBtn = document.getElementById("campCookBtn");
@@ -143,7 +154,8 @@ function updateActionButtons() {
             healCampBtn.className = "btn btn-success";
             healCampBtn.innerHTML = "💊 ЛЕЧЕНИЕ (5✨)";
             healCampBtn.onclick = () => campHeal();
-            document.getElementById("actionBar").appendChild(healCampBtn);
+            const actionBar = document.getElementById("actionBar");
+            if (actionBar) actionBar.appendChild(healCampBtn);
         }
         if (!existingCookBtn) {
             const cookCampBtn = document.createElement("button");
@@ -151,7 +163,8 @@ function updateActionButtons() {
             cookCampBtn.className = "btn btn-camp";
             cookCampBtn.innerHTML = "🍲 ГОТОВКА (2🌲)";
             cookCampBtn.onclick = () => campCook();
-            document.getElementById("actionBar").appendChild(cookCampBtn);
+            const actionBar = document.getElementById("actionBar");
+            if (actionBar) actionBar.appendChild(cookCampBtn);
         }
     } else {
         if (existingHealBtn) existingHealBtn.remove();
@@ -160,10 +173,13 @@ function updateActionButtons() {
 }
 
 function updateAutoPanel(title, text, progress) {
-    document.getElementById("autoTitle").innerHTML = title;
-    document.getElementById("autoText").innerHTML = text;
-    if (progress !== undefined) document.getElementById("autoProgress").style.width = (progress * 100) + "%";
-    if (!autoContent.classList.contains("visible")) autoContent.classList.add("visible");
+    const autoTitle = document.getElementById("autoTitle");
+    const autoText = document.getElementById("autoText");
+    const autoProgress = document.getElementById("autoProgress");
+    if (autoTitle) autoTitle.innerHTML = title;
+    if (autoText) autoText.innerHTML = text;
+    if (progress !== undefined && autoProgress) autoProgress.style.width = (progress * 100) + "%";
+    if (autoContent && !autoContent.classList.contains("visible")) autoContent.classList.add("visible");
 }
 
 function restHeal() {
@@ -190,6 +206,7 @@ const tileFiles = {
     BANDIT: 'bandit.png', WASTELAND: 'wasteland.png'
 };
 
+let loadedTiles = {};
 let imagesLoaded = 0;
 const imagesToLoad = Object.keys(tileFiles).length;
 
@@ -220,69 +237,81 @@ function loadAllTiles() {
 }
 
 // === ПРИВЯЗКА КНОПОК ===
-document.getElementById("fightBtn").onclick = () => {
+const fightBtn = document.getElementById("fightBtn");
+const gatherBtn = document.getElementById("gatherBtn");
+const campBtn = document.getElementById("campBtn");
+const stopAutoBtn = document.getElementById("stopAutoBtn");
+const stopMoveBtn = document.getElementById("stopMoveBtn");
+const sellAllCommonBtn = document.getElementById("sellAllCommonBtn");
+const createGuildBtn = document.getElementById("createGuildBtn");
+const chatSendBtn = document.getElementById("chatSendBtn");
+const chatInput = document.getElementById("chatInput");
+const loginBtn = document.getElementById("loginBtn");
+const registerBtn = document.getElementById("registerBtn");
+const logoutBtn = document.getElementById("logoutBtn");
+const soundBtn = document.getElementById("soundBtn");
+
+if (fightBtn) fightBtn.onclick = () => {
     const tile = getCurrentTile();
     if (tile && tile.type === "safe") restHeal();
     else startAutoCombat();
 };
-document.getElementById("gatherBtn").onclick = () => startAutoGather();
-document.getElementById("campBtn").onclick = () => toggleCamp();
-document.getElementById("stopAutoBtn").onclick = () => stopAuto();
-document.getElementById("stopMoveBtn").onclick = () => stopMoving();
-document.getElementById("sellAllCommonBtn").onclick = () => sellAllCommon();
-document.getElementById("createGuildBtn").onclick = () => createGuild();
-
-// Чат
-document.getElementById("chatSendBtn").onclick = () => sendChatMessage();
-document.getElementById("chatInput").addEventListener("keypress", (e) => {
+if (gatherBtn) gatherBtn.onclick = () => startAutoGather();
+if (campBtn) campBtn.onclick = () => toggleCamp();
+if (stopAutoBtn) stopAutoBtn.onclick = () => stopAuto();
+if (stopMoveBtn) stopMoveBtn.onclick = () => stopMoving();
+if (sellAllCommonBtn) sellAllCommonBtn.onclick = () => sellAllCommon();
+if (createGuildBtn) createGuildBtn.onclick = () => createGuild();
+if (chatSendBtn) chatSendBtn.onclick = () => sendChatMessage();
+if (chatInput) chatInput.addEventListener("keypress", (e) => {
     if (e.key === "Enter") sendChatMessage();
 });
-
-// Авторизация
-document.getElementById("loginBtn").onclick = async () => {
-    const username = document.getElementById("loginUsername").value.trim();
-    const password = document.getElementById("loginPassword").value;
-    if (!username || !password) {
-        addTechnicalLog("❌ Введите логин и пароль");
-        return;
-    }
-    await loginPlayer(username, password);
-    loadChatMessages();
-    loadOnlinePlayers();
-    loadOtherPlayers();
-    drawMap();
-};
-
-document.getElementById("registerBtn").onclick = async () => {
-    const username = document.getElementById("loginUsername").value.trim();
-    const password = document.getElementById("loginPassword").value;
-    if (!username || !password) {
-        addTechnicalLog("❌ Введите логин и пароль");
-        return;
-    }
-    await registerPlayer(username, password);
-    loadChatMessages();
-    loadOnlinePlayers();
-    loadOtherPlayers();
-    drawMap();
-};
-
-document.getElementById("logoutBtn").onclick = () => {
+if (loginBtn) {
+    loginBtn.onclick = async () => {
+        const username = document.getElementById("loginUsername")?.value.trim();
+        const password = document.getElementById("loginPassword")?.value;
+        if (!username || !password) {
+            addTechnicalLog("❌ Введите логин и пароль");
+            return;
+        }
+        await loginPlayer(username, password);
+        loadChatMessages();
+        loadOnlinePlayers();
+        loadOtherPlayers();
+        drawMap();
+    };
+}
+if (registerBtn) {
+    registerBtn.onclick = async () => {
+        const username = document.getElementById("loginUsername")?.value.trim();
+        const password = document.getElementById("loginPassword")?.value;
+        if (!username || !password) {
+            addTechnicalLog("❌ Введите логин и пароль");
+            return;
+        }
+        await registerPlayer(username, password);
+        loadChatMessages();
+        loadOnlinePlayers();
+        loadOtherPlayers();
+        drawMap();
+    };
+}
+if (logoutBtn) logoutBtn.onclick = () => {
     logoutPlayer();
     loadChatMessages();
 };
+if (soundBtn) {
+    soundBtn.onclick = () => {
+        soundEnabled = !soundEnabled;
+        soundBtn.innerHTML = soundEnabled ? "🔊" : "🔇";
+        playSound("levelup");
+    };
+}
 
 // Прокачка статов
 document.querySelectorAll('.upgrade-stat').forEach(btn => {
     btn.onclick = () => upgradeStat(btn.getAttribute('data-stat'));
 });
-
-// Звук
-document.getElementById("soundBtn").onclick = () => {
-    soundEnabled = !soundEnabled;
-    document.getElementById("soundBtn").innerHTML = soundEnabled ? "🔊" : "🔇";
-    playSound("levelup");
-};
 
 // Сворачивание инвентаря
 const inventoryHeader = document.getElementById("inventoryHeader");
@@ -291,8 +320,9 @@ let inventoryCollapsed = false;
 if (inventoryHeader) {
     inventoryHeader.onclick = () => {
         inventoryCollapsed = !inventoryCollapsed;
-        inventoryContent.classList.toggle("collapsed");
-        inventoryHeader.querySelector("span").innerHTML = inventoryCollapsed ? "▶" : "▼";
+        if (inventoryContent) inventoryContent.classList.toggle("collapsed");
+        const span = inventoryHeader.querySelector("span");
+        if (span) span.innerHTML = inventoryCollapsed ? "▶" : "▼";
     };
 }
 
@@ -303,8 +333,9 @@ let statsCollapsed = false;
 if (statsHeader) {
     statsHeader.onclick = () => {
         statsCollapsed = !statsCollapsed;
-        statsContent.classList.toggle("collapsed");
-        statsHeader.querySelector("span").innerHTML = statsCollapsed ? "▶" : "▼";
+        if (statsContent) statsContent.classList.toggle("collapsed");
+        const span = statsHeader.querySelector("span");
+        if (span) span.innerHTML = statsCollapsed ? "▶" : "▼";
     };
 }
 
@@ -314,19 +345,26 @@ document.querySelectorAll(".tab-btn").forEach(btn => {
         document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
         document.querySelectorAll(".tab-content").forEach(tc => tc.classList.remove("active"));
         btn.classList.add("active");
-        document.getElementById(`tab-${btn.getAttribute("data-tab")}`).classList.add("active");
+        const tabId = btn.getAttribute("data-tab");
+        const tabContent = document.getElementById(`tab-${tabId}`);
+        if (tabContent) tabContent.classList.add("active");
         
-        if (btn.getAttribute("data-tab") === "online") loadOnlinePlayers();
-        if (btn.getAttribute("data-tab") === "chat" && isLoggedIn) loadChatMessages();
+        if (tabId === "online") loadOnlinePlayers();
+        if (tabId === "chat" && isLoggedIn) loadChatMessages();
     };
 });
 
 if (document.querySelector(".tab-btn")) document.querySelector(".tab-btn").click();
 
 // Авто-панель
-document.getElementById("autoHeader").onclick = () => {
-    autoContent.classList.toggle("visible");
-};
+if (autoContent) {
+    const autoHeader = document.getElementById("autoHeader");
+    if (autoHeader) {
+        autoHeader.onclick = () => {
+            autoContent.classList.toggle("visible");
+        };
+    }
+}
 
 // === ЗАПУСК ===
 generateMap();
@@ -367,15 +405,6 @@ setTimeout(() => {
         }
     }
 }, 1000);
-
-// Принудительное сохранение сессии при перезагрузке
-window.addEventListener("beforeunload", () => {
-    if (isLoggedIn && currentPlayer.username) {
-        localStorage.setItem('rpg_username', currentPlayer.username);
-        const passInput = document.getElementById("loginPassword");
-        if (passInput && passInput.value) localStorage.setItem('rpg_password', passInput.value);
-    }
-});
 
 // Активация звука при клике
 document.body.addEventListener('click', () => {
