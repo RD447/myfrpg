@@ -458,13 +458,14 @@
                 
                 <div class="login-section">
                     <div class="login-input" id="loginForm">
-                        <input type="text" id="loginUsername" placeholder="Имя персонажа (3-16 букв)">
-                        <button id="loginBtn">ВОЙТИ / РЕГИСТРАЦИЯ</button>
+                        <input type="text" id="loginUsername" placeholder="Логин (3-16 букв)">
+                        <input type="password" id="loginPassword" placeholder="Пароль">
+                        <button id="loginBtn">Войти</button>
+                        <button id="registerBtn" class="small-btn" style="margin-top:5px;">📝 Регистрация</button>
                     </div>
                     <div id="playerInfo" style="display: none;">
                         <div class="current-player" id="currentPlayerName">Игрок</div>
-                        <button id="logoutBtn" class="logout-btn">🚪 ВЫЙТИ</button>
-                        <button id="stopMoveBtn" class="stop-move-btn" style="margin-top: 5px; background: #aa4444; border: none; padding: 6px 12px; border-radius: 30px; color: white; cursor: pointer; width: 100%;">⏹️ ОСТАНОВИТЬ ПЕРЕМЕЩЕНИЕ</button>
+                        <button id="logoutBtn" class="logout-btn">🚪 Выйти</button>
                     </div>
                 </div>
                 <div id="heroClassDisplay" style="text-align: center; font-size: 1rem; margin: 8px 0; color: #ffd966;">🗡️ Мечник</div>
@@ -476,12 +477,13 @@
                     <div><span>⚔️ Сила</span><span class="stat-value" id="heroStr">12</span></div>
                     <div><span>🛡️ Защита</span><span class="stat-value" id="heroDef">5</span></div>
                     <div><span>🌀 Очки умений</span><span class="stat-value" id="heroSkillPoints">2</span></div>
+                    <div><span>📈 Очки статов</span><span class="stat-value" id="heroUpgradePoints">2</span></div>
                 </div>
             </div>
             
             <div class="inventory-card">
                 <div class="inventory-header" id="inventoryHeader">
-                    <h3>🎒 ИНВЕНТАРЬ</h3>
+                    <h3>🎒 Инвентарь</h3>
                     <span>▼</span>
                 </div>
                 <div class="inventory-content" id="inventoryContent">
@@ -489,17 +491,17 @@
                         <div class="resource-row"><span>🌲 Древесина:</span><span class="stat-value" id="heroWood">0</span></div>
                         <div class="resource-row"><span>⛏️ Руда:</span><span class="stat-value" id="heroOre">0</span></div>
                     </div>
-                    <div><strong>⚔️ ЭКИПИРОВКА</strong></div>
+                    <div><strong>⚔️ Экипировка</strong></div>
                     <div id="equipmentSlots"></div>
-                    <div style="margin-top: 12px;"><strong>🎒 СУМКА</strong></div>
+                    <div style="margin-top: 12px;"><strong>🎒 Сумка</strong></div>
                     <div class="inventory-grid" id="inventoryList"></div>
-                    <button id="sellAllCommonBtn" class="small-btn" style="margin-top: 8px; width:100%;">💰 ПРОДАТЬ ВСЁ ОБЫЧНОЕ</button>
+                    <button id="sellAllCommonBtn" class="small-btn" style="margin-top: 8px; width:100%;">💰 Продать все обычное</button>
                 </div>
             </div>
             
             <div class="stats-card">
                 <div class="stats-header" id="statsHeader">
-                    <h3>📈 ПРОКАЧКА СТАТОВ</h3>
+                    <h3>📈 Статы</h3>
                     <span>▼</span>
                 </div>
                 <div class="stats-content" id="statsContent">
@@ -583,10 +585,11 @@
     </div>
 
     <div class="action-bar" id="actionBar">
-        <button class="btn btn-danger" id="fightBtn" style="display: none;">⚔️ АВТОБОЙ</button>
-        <button class="btn btn-success" id="gatherBtn" style="display: none;">🌲 АВТОСБОР</button>
-        <button class="btn btn-camp" id="campBtn" style="display: none;">🏕️ ЛАГЕРЬ</button>
+        <button class="btn btn-danger" id="fightBtn" style="display: none;">⚔️ Бой</button>
+        <button class="btn btn-success" id="gatherBtn" style="display: none;">🌲 Сбор</button>
+        <button class="btn btn-camp" id="campBtn" style="display: none;">🏕️ Развернуть лагерь</button>
         <button class="btn btn-stop" id="stopAutoBtn" style="display: none;">⏹️ ОСТАНОВИТЬ</button>
+        <button class="btn btn-stop" id="stopMoveBtn" style="display: block;">⏹️ Остановиться</button>
     </div>
 
     <div class="log-area" id="combatLog">
@@ -683,14 +686,48 @@ let currentPlayer = {
     gold: 150, wood: 0, ore: 0, skillPoints: 2,
     skill_power_strike: 0, skill_endurance: 0, skill_berserk: 0,
     character_class: 'Мечник'
+    skillPoints: 2,    // очки для УМЕНИЙ
+    upgradePoints: 2,  // очки для СТАТОВ
 };
 
+// ============ КЛАССЫ ============= //
+
 const characterClasses = {
-    'Мечник': { name: '🗡️ Мечник', baseStr: 14, baseDef: 6, baseHp: 75, skillBonus: 'powerStrike', icon: '🗡️' },
-    'Лучник': { name: '🏹 Лучник', baseStr: 12, baseDef: 5, baseHp: 70, skillBonus: 'berserk', icon: '🏹' },
-    'Послушник': { name: '🙏 Послушник', baseStr: 11, baseDef: 7, baseHp: 72, skillBonus: 'endurance', icon: '🙏' },
-    'Адепт': { name: '🔮 Адепт', baseStr: 13, baseDef: 5, baseHp: 68, skillBonus: 'powerStrike', icon: '🔮' },
-    'Вор': { name: '🗡️ Вор', baseStr: 13, baseDef: 5, baseHp: 70, skillBonus: 'berserk', icon: '🗡️' }
+    'Мечник': { 
+        name: '🗡️ Мечник', 
+        baseStr: 16, baseDef: 8, baseHp: 80,
+        skillBonus: 'powerStrike',
+        icon: '🗡️',
+        desc: 'Мастер ближнего боя, высокий урон и защита'
+    },
+    'Лучник': { 
+        name: '🏹 Лучник', 
+        baseStr: 14, baseDef: 6, baseHp: 75,
+        skillBonus: 'berserk',
+        icon: '🏹',
+        desc: 'Дальний бой, высокий критический урон'
+    },
+    'Послушник': { 
+        name: '🙏 Послушник', 
+        baseStr: 13, baseDef: 9, baseHp: 55,
+        skillBonus: 'endurance',
+        icon: '🙏',
+        desc: 'Поддкржка и лечение'
+    },
+    'Адепт': { 
+        name: '🔮 Адепт', 
+        baseStr: 18, baseDef: 4, baseHp: 65,
+        skillBonus: 'powerStrike',
+        icon: '🔮',
+        desc: 'Мощные заклинания, но хрупкая защита'
+    },
+    'Воришка': { 
+        name: '🗡️ Воришка', 
+        baseStr: 15, baseDef: 7, baseHp: 70,
+        skillBonus: 'berserk',
+        icon: '🗡️',
+        desc: 'Скрытность и быстрые атаки'
+    }
 };
 
 let isLoggedIn = false;
@@ -725,9 +762,14 @@ function escapeHtml(str) {
 }
 
 // ======================== АВТОРИЗАЦИЯ ========================
-async function loginPlayer(username) {
+async function loginPlayer(username, password) {
     if (!supabaseClient) {
         addTechnicalLog("❌ Supabase не подключён");
+        return false;
+    }
+    
+    if (!password || password.length < 4) {
+        addTechnicalLog("❌ Пароль должен быть минимум 4 символа");
         return false;
     }
     
@@ -744,6 +786,11 @@ async function loginPlayer(username) {
         }
         
         if (data) {
+            if (data.password_hash !== btoa(password)) {
+                addTechnicalLog("❌ Неверный пароль!");
+                return false;
+            }
+            
             currentPlayer.id = data.id;
             currentPlayer.username = data.username;
             currentPlayer.level = data.level;
@@ -760,77 +807,96 @@ async function loginPlayer(username) {
             currentPlayer.skill_endurance = data.skill_endurance || 0;
             currentPlayer.skill_berserk = data.skill_berserk || 0;
             currentPlayer.character_class = data.character_class || 'Мечник';
+            currentPlayer.upgradePoints = data.upgrade_points || 2;  // НОВОЕ добавлено с переработкой классов 1
             
             playerExtraStr = data.extra_str || 0;
             playerExtraDef = data.extra_def || 0;
             playerExtraHp = data.extra_hp || 0;
             
+            if (data.player_x !== undefined && data.player_x !== null) {
+                playerPos = { x: data.player_x, y: data.player_y };
+            } else {
+                playerPos = { x: 10, y: 10 };
+            }
+            
             addTechnicalLog(`☁️ Добро пожаловать, ${username}! (уровень ${currentPlayer.level})`);
             isLoggedIn = true;
+            saveSession(username, password);
             updateUI();
             renderInventory();
             renderSkills();
+            drawMap();
             return true;
         } else {
-            const { data: newData, error: createError } = await supabaseClient
-                .from("players")
-                .insert({
-                    username: username,
-                    level: 1, exp: 0, hp: 70, max_hp: 70,
-                    str: 12, def: 5, gold: 150, wood: 0, ore: 0,
-                    skill_points: 2,
-                    character_class: 'Мечник',
-                    extra_str: 0, extra_def: 0, extra_hp: 0
-                })
-                .select()
-                .single();
-            
-                // Загружаем сохранённую позицию, если есть
-            if (data.player_x !== undefined && data.player_y !== undefined) {
-                playerPos = { x: data.player_x, y: data.player_y };
-            } else {
-                playerPos = { x: 10, y: 10 }; // стартовая позиция по умолчанию
-            }
-
-            if (createError) {
-                addTechnicalLog(`❌ Ошибка создания: ${createError.message}`);
-                return false;
-            }
-            
-            if (newData) {
-                currentPlayer.id = newData.id;
-                currentPlayer.username = newData.username;
-                currentPlayer.level = newData.level;
-                currentPlayer.exp = newData.exp;
-                currentPlayer.hp = newData.hp;
-                currentPlayer.maxHp = newData.max_hp;
-                currentPlayer.str = newData.str;
-                currentPlayer.def = newData.def;
-                currentPlayer.gold = newData.gold;
-                currentPlayer.wood = newData.wood;
-                currentPlayer.ore = newData.ore;
-                currentPlayer.skillPoints = newData.skill_points;
-                currentPlayer.character_class = newData.character_class || 'Мечник';
-                playerExtraStr = newData.extra_str || 0;
-                playerExtraDef = newData.extra_def || 0;
-                playerExtraHp = newData.extra_hp || 0;
-                
-                addTechnicalLog(`✨ Создан новый персонаж ${username}!`);
-                isLoggedIn = true;
-                updateUI();
-                renderInventory();
-                renderSkills();
-                return true;
-            }
+            addTechnicalLog("❌ Игрок не найден. Нажмите РЕГИСТРАЦИЯ");
+            return false;
         }
     } catch (err) {
         addTechnicalLog(`❌ Ошибка: ${err.message}`);
         return false;
     }
-    return false;
+}
+
+async function registerPlayer(username, password) {
+    if (!supabaseClient) {
+        addTechnicalLog("❌ Supabase не подключён");
+        return false;
+    }
+    
+    if (username.length < 3 || username.length > 16) {
+        addTechnicalLog("❌ Логин должен быть от 3 до 16 символов");
+        return false;
+    }
+    
+    if (password.length < 4) {
+        addTechnicalLog("❌ Пароль должен быть минимум 4 символа");
+        return false;
+    }
+    
+    try {
+        const { data: existing } = await supabaseClient
+            .from("players")
+            .select("username")
+            .eq("username", username)
+            .maybeSingle();
+        
+        if (existing) {
+            addTechnicalLog("❌ Игрок с таким логином уже существует!");
+            return false;
+        }
+        
+        const { data: newData, error: createError } = await supabaseClient
+            .from("players")
+            .insert({
+                username: username,
+                password_hash: btoa(password),
+                level: 1, exp: 0, hp: 70, max_hp: 70,
+                str: 12, def: 5, gold: 150, wood: 0, ore: 0,
+                skill_points: 2,
+                character_class: 'Мечник',
+                extra_str: 0, extra_def: 0, extra_hp: 0,
+                player_x: 10, player_y: 10
+            })
+            .select()
+            .single();
+        
+        if (createError) {
+            addTechnicalLog(`❌ Ошибка создания: ${createError.message}`);
+            return false;
+        }
+        
+        if (newData) {
+            addTechnicalLog(`✨ Персонаж "${username}" создан!`);
+            return await loginPlayer(username, password);
+        }
+    } catch (err) {
+        addTechnicalLog(`❌ Ошибка: ${err.message}`);
+        return false;
+    }
 }
 
 function logoutPlayer() {
+    clearSession();
     currentPlayer = {
         id: null, username: null, level: 1, exp: 0, hp: 70, maxHp: 70,
         str: 12, def: 5, gold: 150, wood: 0, ore: 0, skillPoints: 2,
@@ -886,6 +952,7 @@ async function savePlayerToCloud() {
             extra_str: playerExtraStr,
             extra_def: playerExtraDef,
             extra_hp: playerExtraHp,
+            upgrade_points: currentPlayer.upgradePoints, // НОВОЕ добавлено с переработкой классов 1
             updated_at: new Date().toISOString()
         })
         .eq("id", currentPlayer.id);
@@ -893,32 +960,30 @@ async function savePlayerToCloud() {
 
 // ======================== СМЕНА КЛАССА ========================
 async function changeClass(newClass) {
-    if (!isLoggedIn) {
-        addTechnicalLog("❌ Сначала войдите в аккаунт!");
-        return;
-    }
+    if (!isLoggedIn) return;
     const tile = getCurrentTile();
     if (tile.type !== "safe") {
         addTechnicalLog("❌ Сменить класс можно только в деревне!");
         return;
     }
-    if (currentPlayer.gold < 50) {
-        addTechnicalLog("❌ Смена класса стоит 50 монет!");
+    if (currentPlayer.gold < 100) {  // Увеличили стоимость
+        addTechnicalLog("❌ Смена класса стоит 100 монет!");
         return;
     }
     
     const classData = characterClasses[newClass];
     if (!classData) return;
     
-    currentPlayer.gold -= 50;
+    currentPlayer.gold -= 100;
     currentPlayer.character_class = newClass;
     
+    // НОВЫЕ БАЗОВЫЕ СТАТЫ
     currentPlayer.str = classData.baseStr;
     currentPlayer.def = classData.baseDef;
     currentPlayer.maxHp = classData.baseHp;
     currentPlayer.hp = classData.baseHp;
     
-    addTechnicalLog(`✨ Вы сменили класс на ${classData.name}! -50 монет`);
+    addTechnicalLog(`✨ Вы сменили класс на ${classData.name}! -100 монет`);
     updateUI();
     savePlayerToCloud();
 }
@@ -954,12 +1019,12 @@ function upgradeStat(stat) {
         addTechnicalLog("❌ Сначала войдите в аккаунт!");
         return;
     }
-    if (currentPlayer.skillPoints <= 0) {
-        addTechnicalLog("❌ Нет очков умений!");
+    if (currentPlayer.upgradePoints <= 0) {  // ИСПРАВЛЕНО
+        addTechnicalLog("❌ Нет очков улучшения статов!");
         return;
     }
     
-    currentPlayer.skillPoints--;
+    currentPlayer.upgradePoints--;  // ИСПРАВЛЕНО
     
     if (stat === 'str') {
         playerExtraStr++;
@@ -1366,6 +1431,27 @@ async function savePlayerPosition() {
     }
 }
 
+// ======================== СОХРАНЕНИЕ СЕССИИ ========================
+function saveSession(username, password) {
+    localStorage.setItem('rpg_username', username);
+    localStorage.setItem('rpg_password', password);
+}
+
+function loadSession() {
+    const savedUsername = localStorage.getItem('rpg_username');
+    const savedPassword = localStorage.getItem('rpg_password');
+    if (savedUsername && savedPassword) {
+        document.getElementById("loginUsername").value = savedUsername;
+        document.getElementById("loginPassword").value = savedPassword;
+        loginPlayer(savedUsername, savedPassword);
+    }
+}
+
+function clearSession() {
+    localStorage.removeItem('rpg_username');
+    localStorage.removeItem('rpg_password');
+}
+
 function stopMoving() {
     if (moveInterval) {
         clearInterval(moveInterval);
@@ -1464,7 +1550,7 @@ function upgradeSkill(skillName) {
         addTechnicalLog("❌ Сначала войдите в аккаунт!");
         return;
     }
-    if (currentPlayer.skillPoints <= 0) {
+    if (currentPlayer.skillPoints <= 0) {  // ОСТАЁТСЯ
         addTechnicalLog("❌ Нет очков умений!");
         return;
     }
@@ -1839,6 +1925,7 @@ function startAutoCombat() {
                     currentPlayer.str += 2;
                     currentPlayer.def += 1;
                     currentPlayer.skillPoints++;
+                    currentPlayer.upgradePoints++;
                     leveled = true;
                     renderSkills();
                 }
@@ -1995,16 +2082,33 @@ document.getElementById("chatInput").addEventListener("keypress", (e) => {
 
 
 document.getElementById("loginBtn").onclick = async () => {
-    const input = document.getElementById("loginUsername");
-    const name = input.value.trim();
-    if (name && name.length >= 3 && name.length <= 16) {
-        await loginPlayer(name);
-        input.value = "";
-        loadChatMessages();
-        loadOnlinePlayers();
-    } else {
-        addTechnicalLog("❌ Имя должно быть от 3 до 16 символов");
+    const username = document.getElementById("loginUsername").value.trim();
+    const password = document.getElementById("loginPassword").value;
+    
+    if (!username || !password) {
+        addTechnicalLog("❌ Введите логин и пароль");
+        return;
     }
+    await loginPlayer(username, password);
+    loadChatMessages();
+    loadOnlinePlayers();
+    loadOtherPlayers();
+    drawMap();
+};
+
+document.getElementById("registerBtn").onclick = async () => {
+    const username = document.getElementById("loginUsername").value.trim();
+    const password = document.getElementById("loginPassword").value;
+    
+    if (!username || !password) {
+        addTechnicalLog("❌ Введите логин и пароль");
+        return;
+    }
+    await registerPlayer(username, password);
+    loadChatMessages();
+    loadOnlinePlayers();
+    loadOtherPlayers();
+    drawMap();
 };
 
 document.getElementById("logoutBtn").onclick = () => {
@@ -2084,6 +2188,8 @@ setInterval(() => {
     loadOtherPlayers();
 }, 10000);
 setInterval(loadOnlinePlayers, 30000);
+
+loadSession();
 
 async function loadOtherPlayers() {
     if (!supabaseClient || !isLoggedIn) return;
