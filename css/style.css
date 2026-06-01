@@ -1,445 +1,63 @@
-<style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            user-select: none;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        body {
-            background: #0a0f1a;
-            font-family: 'Segoe UI', monospace;
-            padding: 20px;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .game {
-            max-width: 1400px;
-            width: 100%;
-            background: #0e1625;
-            border-radius: 32px;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-
-        .main-area {
-            display: flex;
-            gap: 20px;
-            flex-wrap: wrap;
-        }
-
-        .left-column {
-            width: 320px;
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
-
-        .hero-card {
-            background: linear-gradient(145deg, #0a1525, #050a15);
-            border-radius: 28px;
-            padding: 16px;
-            border: 1px solid #4a7a9e;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
-        }
-        .hero-avatar {
-            text-align: center;
-            font-size: 64px;
-            margin-bottom: 12px;
-        }
-        .login-section {
-            background: #010514cc;
-            border-radius: 28px;
-            padding: 12px;
-            margin-bottom: 16px;
-        }
-        .login-input {
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-        margin-bottom: 8px;
-        }
-        .login-input input {
-            width: 100%;
-            background: #1f2a3a;
-            border: 1px solid #4a7a9e;
-            border-radius: 30px;
-            padding: 8px 12px;
-            color: white;
-        }
-        .login-input button {
-            background: #2a6e5a;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 30px;
-            color: white;
-            cursor: pointer;
-        }
-        .logout-btn {
-            background: #8b3a3a;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 30px;
-            color: white;
-            cursor: pointer;
-            width: 100%;
-            margin-top: 8px;
-        }
-        .stop-move-btn {
-            background: #aa4444;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 30px;
-            color: white;
-            cursor: pointer;
-            width: 100%;
-            margin-top: 8px;
-        }
-        .current-player {
-            text-align: center;
-            margin-top: 8px;
-            padding: 6px;
-            background: #2a6e5a;
-            border-radius: 30px;
-            font-weight: bold;
-        }
-        .hero-stats div {
-            display: flex;
-            justify-content: space-between;
-            margin: 8px 0;
-            font-size: 0.8rem;
-            color: #ddd;
-        }
-        .stat-value { color: #ffd966; font-weight: bold; }
-
-        .inventory-card, .stats-card {
-            background: linear-gradient(145deg, #0a1525, #050a15);
-            border-radius: 28px;
-            padding: 16px;
-            border: 1px solid #4a7a9e;
-        }
-        .inventory-header, .stats-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            cursor: pointer;
-            color: #ffd966;
-            font-weight: bold;
-            margin-bottom: 12px;
-        }
-        .inventory-content, .stats-content {
-            display: block;
-        }
-        .inventory-content.collapsed, .stats-content.collapsed {
-            display: none;
-        }
-        .inventory-grid {
-            max-height: 300px;
-            overflow-y: auto;
-        }
-        .item-card {
-            background: #0a1022e0;
-            border-radius: 20px;
-            padding: 8px 12px;
-            margin: 6px 0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-left: 6px solid;
-            font-size: 0.7rem;
-            color: #ddd;
-        }
-        .rarity-common { border-left-color: #9e9e9e; }
-        .rarity-rare { border-left-color: #4caf50; background: #1e3a2e; }
-        .rarity-epic { border-left-color: #d500f9; background: #2a1e4a; }
-        
-        .equipment-slot {
-            background: #00000066;
-            border-radius: 20px;
-            padding: 8px;
-            margin: 6px 0;
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.75rem;
-            color: #ddd;
-        }
-        .small-btn {
-            background: #2d3e5a;
-            border: none;
-            padding: 4px 12px;
-            border-radius: 30px;
-            color: white;
-            cursor: pointer;
-            font-size: 0.7rem;
-        }
-        .sell-btn { background: #8b3a3a; }
-        .resource-row {
-            display: flex;
-            justify-content: space-between;
-            margin: 6px 0;
-            font-size: 0.75rem;
-            color: #ddd;
-        }
-
-        .stat-upgrade-item {
-            background: #0a1022e0;
-            border-radius: 20px;
-            padding: 10px;
-            margin: 8px 0;
-            color: #ddd;
-        }
-        .stat-name { font-weight: bold; color: #ffd966; }
-        .stat-desc { font-size: 0.7rem; color: #aaa; margin: 4px 0; }
-
-        .map-area {
-            flex: 1;
-            min-width: 500px;
-        }
-        canvas {
-            width: 100%;
-            height: auto;
-            background: #1a2a3a;
-            border-radius: 20px;
-            border: 2px solid #ffd966;
-            cursor: pointer;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
-        }
-        .map-hint {
-            text-align: center;
-            font-size: 0.65rem;
-            color: #aaa;
-            margin-top: 6px;
-        }
-
-        .social-panel {
-            width: 320px;
-            background: linear-gradient(145deg, #0a1525, #050a15);
-            border-radius: 28px;
-            padding: 16px;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            border: 1px solid #4a7a9e;
-        }
-        .tabs {
-            display: flex;
-            gap: 8px;
-            border-bottom: 1px solid #4a7a9e;
-            padding-bottom: 8px;
-            flex-wrap: wrap;
-        }
-        .tab-btn {
-            background: none;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 30px;
-            color: #cceeff;
-            cursor: pointer;
-            font-weight: bold;
-        }
-        .tab-btn.active {
-            background: #c97e2a;
-            color: #1a1208;
-        }
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
-        
-        .quest-item {
-            display: flex;
-            justify-content: space-between;
-            margin: 8px 0;
-            font-size: 0.8rem;
-            color: #ddd;
-        }
-        .skill-item {
-            background: #0a1022e0;
-            border-radius: 20px;
-            padding: 10px;
-            margin: 8px 0;
-            color: #ddd;
-        }
-        .skill-name { font-weight: bold; color: #ffd966; }
-        .skill-desc { font-size: 0.7rem; color: #aaa; margin: 4px 0; }
-        .skill-progress {
-            background: #1a1a2a;
-            border-radius: 20px;
-            height: 6px;
-            margin: 6px 0;
-            overflow: hidden;
-        }
-        .skill-progress-fill {
-            background: #ffd966;
-            width: 0%;
-            height: 100%;
-            transition: width 0.1s;
-        }
-
-        .chat-box {
-            background: #00000066;
-            border-radius: 20px;
-            padding: 12px;
-            height: 250px;
-            overflow-y: auto;
-            font-size: 0.7rem;
-            color: #ddd;
-        }
-        .chat-message {
-            margin: 6px 0;
-            padding: 4px 8px;
-            border-radius: 16px;
-            background: #0a152066;
-            word-break: break-word;
-        }
-        .chat-message strong { color: #ffd966; }
-        .chat-input {
-            display: flex;
-            gap: 8px;
-            margin-top: 8px;
-        }
-        .chat-input input {
-            flex: 1;
-            background: #1f2a3a;
-            border: 1px solid #4a7a9e;
-            border-radius: 30px;
-            padding: 8px;
-            color: white;
-        }
-        .chat-input button {
-            background: #2a5a7a;
-            border: none;
-            padding: 8px 12px;
-            border-radius: 30px;
-            color: white;
-            cursor: pointer;
-        }
-        .guild-info {
-            background: #00000066;
-            border-radius: 20px;
-            padding: 12px;
-            font-size: 0.8rem;
-            color: #ddd;
-        }
-        .online-list {
-            background: #00000066;
-            border-radius: 20px;
-            padding: 8px;
-            font-size: 0.7rem;
-            max-height: 100px;
-            overflow-y: auto;
-        }
-        .online-list span {
-            display: inline-block;
-            background: #2a6e5a;
-            border-radius: 20px;
-            padding: 2px 8px;
-            margin: 2px;
-        }
-
-        .action-bar {
-            background: #0a1520cc;
-            border-radius: 28px;
-            padding: 16px;
-            backdrop-filter: blur(4px);
-            display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
-            justify-content: center;
-            border: 1px solid #4a7a9e;
-        }
-        .btn {
-            background: #2a5a7a;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 40px;
-            color: white;
-            font-weight: bold;
-            cursor: pointer;
-            font-size: 0.85rem;
-        }
-        .btn:active { transform: scale(0.97); }
-        .btn-danger { background: #8b3a3a; }
-        .btn-success { background: #2a6e5a; }
-        .btn-camp { background: #8b6e3a; }
-        .btn-camp.active { background: #d4a017; }
-        .btn-stop { background: #aa4444; }
-
-        .log-area {
-            background: #00000088;
-            border-radius: 20px;
-            padding: 12px;
-            height: 120px;
-            overflow-y: auto;
-            font-size: 0.7rem;
-            color: #ddd;
-        }
-        .log-entry {
-            margin: 4px 0;
-            border-left: 2px solid #ffd966;
-            padding-left: 8px;
-        }
-
-        .auto-panel {
-            position: fixed;
-            bottom: 20px;
-            left: 20px;
-            width: 280px;
-            background: #1a1f30;
-            border-radius: 20px;
-            border: 2px solid #ffd966;
-            z-index: 200;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.5);
-            cursor: grab;
-            color: #ddd;
-        }
-        .auto-panel.dragging { cursor: grabbing; }
-        .auto-header {
-            background: #2a5a7a;
-            padding: 10px 16px;
-            border-radius: 18px 18px 0 0;
-            cursor: pointer;
-            display: flex;
-            justify-content: space-between;
-            font-weight: bold;
-        }
-        .auto-content {
-            padding: 16px;
-            display: none;
-        }
-        .auto-content.visible { display: block; }
-        .auto-progress {
-            background: #1a1a2a;
-            border-radius: 20px;
-            height: 8px;
-            margin: 10px 0;
-            overflow: hidden;
-        }
-        .auto-progress-fill {
-            background: #ffd966;
-            width: 0%;
-            height: 100%;
-            transition: width 0.1s;
-        }
-
-        .sound-btn {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: #2a5a7a;
-            width: 48px;
-            height: 48px;
-            border-radius: 30px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            cursor: pointer;
-            z-index: 100;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-        }
-    </style>
+* { margin: 0; padding: 0; box-sizing: border-box; user-select: none; }
+body { background: #0a0f1a; font-family: 'Segoe UI', monospace; padding: 20px; display: flex; justify-content: center; align-items: center; }
+.game { max-width: 1400px; width: 100%; background: #0e1625; border-radius: 32px; padding: 20px; display: flex; flex-direction: column; gap: 20px; }
+.main-area { display: flex; gap: 20px; flex-wrap: wrap; }
+.left-column { width: 320px; display: flex; flex-direction: column; gap: 16px; }
+.hero-card, .inventory-card, .stats-card { background: linear-gradient(145deg, #0a1525, #050a15); border-radius: 28px; padding: 16px; border: 1px solid #4a7a9e; }
+.hero-avatar { text-align: center; font-size: 64px; }
+.login-section { background: #010514cc; border-radius: 28px; padding: 12px; margin-bottom: 16px; }
+.login-input { display: flex; flex-direction: column; gap: 8px; margin-bottom: 8px; }
+.login-input input { background: #1f2a3a; border: 1px solid #4a7a9e; border-radius: 30px; padding: 8px 12px; color: white; }
+.logout-btn, .stop-move-btn { background: #8b3a3a; border: none; padding: 6px 12px; border-radius: 30px; color: white; cursor: pointer; width: 100%; margin-top: 8px; }
+.current-player { text-align: center; padding: 6px; background: #2a6e5a; border-radius: 30px; font-weight: bold; }
+.hero-stats div, .resource-row { display: flex; justify-content: space-between; margin: 8px 0; font-size: 0.8rem; color: #ddd; }
+.stat-value { color: #ffd966; font-weight: bold; }
+.inventory-header, .stats-header { display: flex; justify-content: space-between; cursor: pointer; color: #ffd966; font-weight: bold; margin-bottom: 12px; }
+.inventory-content.collapsed, .stats-content.collapsed { display: none; }
+.inventory-grid { max-height: 300px; overflow-y: auto; }
+.item-card { background: #0a1022e0; border-radius: 20px; padding: 8px 12px; margin: 6px 0; display: flex; justify-content: space-between; border-left: 6px solid; font-size: 0.7rem; color: #ddd; }
+.rarity-common { border-left-color: #9e9e9e; }
+.rarity-rare { border-left-color: #4caf50; background: #1e3a2e; }
+.rarity-epic { border-left-color: #d500f9; background: #2a1e4a; }
+.equipment-slot { background: #00000066; border-radius: 20px; padding: 8px; margin: 6px 0; display: flex; justify-content: space-between; font-size: 0.75rem; color: #ddd; }
+.small-btn { background: #2d3e5a; border: none; padding: 4px 12px; border-radius: 30px; color: white; cursor: pointer; font-size: 0.7rem; }
+.sell-btn { background: #8b3a3a; }
+.stat-upgrade-item { background: #0a1022e0; border-radius: 20px; padding: 10px; margin: 8px 0; display: flex; justify-content: space-between; align-items: center; }
+.stat-name { font-weight: bold; color: #ffd966; }
+.map-area { flex: 1; min-width: 500px; }
+canvas { width: 100%; height: auto; background: #1a2a3a; border-radius: 20px; border: 2px solid #ffd966; cursor: pointer; }
+.map-hint { text-align: center; font-size: 0.65rem; color: #aaa; margin-top: 6px; }
+.social-panel { width: 320px; background: linear-gradient(145deg, #0a1525, #050a15); border-radius: 28px; padding: 16px; border: 1px solid #4a7a9e; }
+.tabs { display: flex; gap: 8px; border-bottom: 1px solid #4a7a9e; flex-wrap: wrap; }
+.tab-btn { background: none; border: none; padding: 6px 12px; border-radius: 30px; color: #cceeff; cursor: pointer; font-weight: bold; }
+.tab-btn.active { background: #c97e2a; color: #1a1208; }
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+.quest-item { display: flex; justify-content: space-between; margin: 8px 0; font-size: 0.8rem; color: #ddd; }
+.skill-item { background: #0a1022e0; border-radius: 20px; padding: 10px; margin: 8px 0; display: flex; justify-content: space-between; align-items: center; }
+.skill-name { font-weight: bold; color: #ffd966; }
+.chat-box { background: #00000066; border-radius: 20px; padding: 12px; height: 250px; overflow-y: auto; font-size: 0.7rem; color: #ddd; }
+.chat-message { margin: 6px 0; padding: 4px 8px; background: #0a152066; word-break: break-word; }
+.chat-message strong { color: #ffd966; }
+.chat-input { display: flex; gap: 8px; margin-top: 8px; }
+.chat-input input { flex: 1; background: #1f2a3a; border: 1px solid #4a7a9e; border-radius: 30px; padding: 8px; color: white; }
+.chat-input button { background: #2a5a7a; border: none; padding: 8px 12px; border-radius: 30px; color: white; cursor: pointer; }
+.online-list { background: #00000066; border-radius: 20px; padding: 8px; max-height: 100px; overflow-y: auto; }
+.online-list span { display: inline-block; background: #2a6e5a; border-radius: 20px; padding: 2px 8px; margin: 2px; }
+.action-bar { background: #0a1520cc; border-radius: 28px; padding: 16px; display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; border: 1px solid #4a7a9e; }
+.btn { background: #2a5a7a; border: none; padding: 10px 20px; border-radius: 40px; color: white; font-weight: bold; cursor: pointer; }
+.btn-danger { background: #8b3a3a; }
+.btn-success { background: #2a6e5a; }
+.btn-camp { background: #8b6e3a; }
+.btn-camp.active { background: #d4a017; }
+.btn-stop { background: #aa4444; }
+.log-area { background: #00000088; border-radius: 20px; padding: 12px; height: 120px; overflow-y: auto; font-size: 0.7rem; color: #ddd; }
+.log-entry { margin: 4px 0; border-left: 2px solid #ffd966; padding-left: 8px; }
+.auto-panel { position: fixed; bottom: 20px; left: 20px; width: 280px; background: #1a1f30; border-radius: 20px; border: 2px solid #ffd966; z-index: 200; cursor: grab; }
+.auto-header { background: #2a5a7a; padding: 10px 16px; border-radius: 18px 18px 0 0; cursor: pointer; display: flex; justify-content: space-between; font-weight: bold; }
+.auto-content { padding: 16px; display: none; }
+.auto-content.visible { display: block; }
+.auto-progress { background: #1a1a2a; border-radius: 20px; height: 8px; margin: 10px 0; overflow: hidden; }
+.auto-progress-fill { background: #ffd966; width: 0%; height: 100%; }
+.sound-btn { position: fixed; bottom: 20px; right: 20px; background: #2a5a7a; width: 48px; height: 48px; border-radius: 30px; display: flex; align-items: center; justify-content: center; font-size: 24px; cursor: pointer; z-index: 100; }
+.hero-class { text-align: center; font-size: 1rem; margin: 8px 0; color: #ffd966; }
