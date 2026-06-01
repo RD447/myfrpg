@@ -1173,32 +1173,54 @@ async function sendChatMessage() {
     }
 }
 
+let lastChatLoad = 0;
+let chatMessagesCache = [];
+
 async function loadChatMessages() {
     if (!supabaseClient) return;
     
-    const { data, error } = await supabaseClient
-        .from("chat_messages")
-        .select("*")
-        .order("created_at", { ascending: false })
-        .limit(50);
-    
-    if (error) {
-        console.error("Ошибка загрузки чата:", error);
+    // Не загружаем чаще чем раз в 3 секунды
+    const now = Date.now();
+    if (now - lastChatLoad < 3000 && chatMessagesCache.length > 0) {
+        renderChatMessages(chatMessagesCache);
         return;
     }
+    lastChatLoad = now;
     
-    if (data) {
-        const chatDiv = document.getElementById("socialChat");
-        chatDiv.innerHTML = '<div class="chat-message"><strong>Система:</strong> Добро пожаловать в общий чат!</div>';
-        for (let i = data.length - 1; i >= 0; i--) {
-            const msg = data[i];
-            const div = document.createElement("div");
-            div.className = "chat-message";
-            div.innerHTML = `<strong>${escapeHtml(msg.username)}:</strong> ${escapeHtml(msg.message)}`;
-            chatDiv.appendChild(div);
+    try {
+        const { data, error } = await supabaseClient
+            .from("chat_messages")
+            .select("*")
+            .order("created_at", { ascending: false })
+            .limit(20);  // Уменьшил с 50 до 20 сообщений
+            
+        if (error) {
+            console.error("Ошибка загрузки чата:", error);
+            return;
         }
-        chatDiv.scrollTop = chatDiv.scrollHeight;
+        
+        if (data) {
+            chatMessagesCache = data.reverse();
+            renderChatMessages(chatMessagesCache);
+        }
+    } catch (e) {
+        console.error("Ошибка:", e);
     }
+}
+
+function renderChatMessages(messages) {
+    const chatDiv = document.getElementById("socialChat");
+    if (!chatDiv) return;
+    
+    chatDiv.innerHTML = '<div class="chat-message"><strong>Система:</strong> Добро пожаловать в общий чат!</div>';
+    
+    for (const msg of messages) {
+        const div = document.createElement("div");
+        div.className = "chat-message";
+        div.innerHTML = `<strong>${escapeHtml(msg.username)}:</strong> ${escapeHtml(msg.message)}`;
+        chatDiv.appendChild(div);
+    }
+    chatDiv.scrollTop = chatDiv.scrollHeight;
 }
 
 function addSocialMessage(sender, msg) {
