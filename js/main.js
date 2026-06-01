@@ -8,6 +8,30 @@ if (typeof supabase !== "undefined") {
 window.campActive = false;
 let autoContent = document.getElementById("autoContent");
 
+// Функция загрузки онлайн игроков
+async function loadOnlinePlayers() {
+    if (!supabaseClient) return;
+    try {
+        const { data, error } = await supabaseClient
+            .from("players")
+            .select("username")
+            .limit(30);
+        if (error) throw error;
+        const onlineDiv = document.getElementById("onlineList");
+        if (onlineDiv) {
+            if (data && data.length > 0) {
+                onlineDiv.innerHTML = data.map(p => `<span>${escapeHtml(p.username)}</span>`).join("");
+            } else {
+                onlineDiv.innerHTML = "<span>Нет игроков</span>";
+            }
+        }
+    } catch (e) {
+        console.error("Ошибка загрузки онлайн:", e);
+        const onlineDiv = document.getElementById("onlineList");
+        if (onlineDiv) onlineDiv.innerHTML = "<span>Ошибка загрузки</span>";
+    }
+}
+
 // Перетаскивание авто-панели
 const autoPanel = document.getElementById("autoPanel");
 const autoHeader = document.getElementById("autoHeader");
@@ -76,7 +100,7 @@ function updateActionButtons() {
     const oldClassBtn = document.getElementById("changeClassBtn");
     if (oldClassBtn) oldClassBtn.remove();
     
-    if (tile.type === "combat") {
+    if (tile && tile.type === "combat") {
         fightBtn.style.display = "block";
         fightBtn.innerHTML = `⚔️ АВТОБОЙ (${tile.enemy === 'goblin' ? 'Гоблин' : tile.enemy === 'troll' ? 'Тролль' : 'Разбойник'})`;
         if (tile.resource) {
@@ -86,7 +110,7 @@ function updateActionButtons() {
         if (window.campActive) campBtn.classList.add("active");
         else campBtn.classList.remove("active");
         
-    } else if (tile.type === "safe") {
+    } else if (tile && tile.type === "safe") {
         fightBtn.style.display = "block";
         fightBtn.innerHTML = "💊 ОТДОХНУТЬ (+10 HP за 5 монет)";
         campBtn.style.display = "block";
@@ -198,7 +222,7 @@ function loadAllTiles() {
 // === ПРИВЯЗКА КНОПОК ===
 document.getElementById("fightBtn").onclick = () => {
     const tile = getCurrentTile();
-    if (tile.type === "safe") restHeal();
+    if (tile && tile.type === "safe") restHeal();
     else startAutoCombat();
 };
 document.getElementById("gatherBtn").onclick = () => startAutoGather();
@@ -332,12 +356,24 @@ setInterval(loadOnlinePlayers, 30000);
 // Восстановление сессии
 loadSession();
 
+// Принудительная проверка сессии при загрузке
+setTimeout(() => {
+    if (!isLoggedIn) {
+        const savedUser = localStorage.getItem('rpg_username');
+        const savedPass = localStorage.getItem('rpg_password');
+        if (savedUser && savedPass) {
+            console.log("Восстановление сессии:", savedUser);
+            loginPlayer(savedUser, savedPass);
+        }
+    }
+}, 1000);
+
 // Принудительное сохранение сессии при перезагрузке
 window.addEventListener("beforeunload", () => {
     if (isLoggedIn && currentPlayer.username) {
         localStorage.setItem('rpg_username', currentPlayer.username);
         const passInput = document.getElementById("loginPassword");
-        if (passInput) localStorage.setItem('rpg_password', passInput.value);
+        if (passInput && passInput.value) localStorage.setItem('rpg_password', passInput.value);
     }
 });
 
