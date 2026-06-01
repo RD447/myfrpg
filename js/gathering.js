@@ -55,9 +55,45 @@ function triggerRandomEvent() {
     updateUI();
     savePlayerToCloud();
 }
+
 // ======================== ЛАГЕРЬ ========================
+function toggleCamp() {
+    if (!isLoggedIn) {
+        addTechnicalLog("❌ Сначала войдите в аккаунт!");
+        return;
+    }
+    if (isMoving) {
+        addTechnicalLog("❌ Нельзя ставить лагерь во время перемещения!");
+        return;
+    }
+    const tile = getCurrentTile();
+    if (tile.type !== "combat" && tile.type !== "empty") {
+        addTechnicalLog("❌ Лагерь можно ставить в лесу, горах, пещере, пустошах!");
+        return;
+    }
+    
+    // Используем window.campActive, так как переменная объявлена в main.js
+    if (typeof window.campActive === 'undefined') {
+        window.campActive = false;
+    }
+    window.campActive = !window.campActive;
+    
+    const campBtn = document.getElementById("campBtn");
+    if (window.campActive) {
+        campBtn.classList.add("active");
+        campBtn.innerHTML = "🔥 СНЯТЬ ЛАГЕРЬ";
+        addTechnicalLog("🏕️ Лагерь установлен! Можно лечиться (5 монет) и готовить еду (2 дерева)");
+    } else {
+        campBtn.classList.remove("active");
+        campBtn.innerHTML = "🏕️ ЛАГЕРЬ";
+        addTechnicalLog("🔥 Лагерь свёрнут.");
+    }
+    updateActionButtons();
+    updateUI();
+}
+
 function campHeal() {
-    if (!campActive) {
+    if (!window.campActive) {
         addTechnicalLog("❌ Нет активного лагеря!");
         return;
     }
@@ -77,7 +113,7 @@ function campHeal() {
 }
 
 function campCook() {
-    if (!campActive) {
+    if (!window.campActive) {
         addTechnicalLog("❌ Нет активного лагеря!");
         return;
     }
@@ -92,33 +128,4 @@ function campCook() {
     addTechnicalLog(`🍲 Вы приготовили еду на костре! +${heal} HP. -2 древесины`);
     updateUI();
     savePlayerToCloud();
-}
-
-function toggleCamp() {
-    if (!isLoggedIn) {
-        addTechnicalLog("❌ Сначала войдите в аккаунт!");
-        return;
-    }
-    if (isMoving) {
-        addTechnicalLog("❌ Нельзя ставить лагерь во время перемещения!");
-        return;
-    }
-    const tile = getCurrentTile();
-    if (tile.type !== "combat" && tile.type !== "empty") {
-        addTechnicalLog("❌ Лагерь можно ставить в лесу, горах, пещере, пустошах!");
-        return;
-    }
-    campActive = !campActive;
-    const campBtn = document.getElementById("campBtn");
-    if (campActive) {
-        campBtn.classList.add("active");
-        campBtn.innerHTML = "🔥 СНЯТЬ ЛАГЕРЬ";
-        addTechnicalLog("🏕️ Лагерь установлен! Можно лечиться (5 монет) и готовить еду (2 дерева)");
-    } else {
-        campBtn.classList.remove("active");
-        campBtn.innerHTML = "🏕️ ЛАГЕРЬ";
-        addTechnicalLog("🔥 Лагерь свёрнут.");
-    }
-    updateActionButtons();
-    updateUI();
 }

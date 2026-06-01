@@ -6,7 +6,7 @@ if (typeof supabase !== "undefined" && SUPABASE_URL && SUPABASE_ANON_KEY) {
 }
 
 // === ПЕРЕМЕННЫЕ ===
-let campActive = false;
+window.campActive = false;
 let autoActive = false;
 let autoType = null;
 let autoInterval = null;
@@ -33,7 +33,7 @@ function updateActionButtons() {
             gatherBtn.style.display = "block";
             gatherBtn.innerHTML = tile.resource === "wood" ? "🌲 АВТОСБОР ДРЕВЕСИНЫ" : "⛏️ АВТОСБОР РУДЫ";
         }
-        if (campActive) campBtn.classList.add("active");
+        if (window.campActive) campBtn.classList.add("active");
         else campBtn.classList.remove("active");
         
     } else if (tile.type === "safe") {
