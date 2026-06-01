@@ -199,43 +199,6 @@ function restHeal() {
     }
 }
 
-// === ЗАГРУЗКА КАРТИНОК ===
-const tileFiles = {
-    GRASS: 'grass.png', FOREST: 'forest.png', MOUNTAIN: 'mountain.png',
-    VILLAGE: 'village.png', WATER: 'water.png', CAVE: 'cave.png',
-    BANDIT: 'bandit.png', WASTELAND: 'wasteland.png'
-};
-
-let loadedTiles = {};
-let imagesLoaded = 0;
-const imagesToLoad = Object.keys(tileFiles).length;
-
-function tryLoadImage(key, path) {
-    const img = new Image();
-    img.onload = () => {
-        loadedTiles[key] = img;
-        imagesLoaded++;
-        if (imagesLoaded === imagesToLoad) {
-            addTechnicalLog(`🎨 Загружено ${imagesLoaded} картинок для карты!`);
-            drawMap();
-        }
-    };
-    img.onerror = () => {
-        imagesLoaded++;
-        if (imagesLoaded === imagesToLoad) {
-            addTechnicalLog(`⚠️ Картинки не найдены. Используем цветные квадраты.`);
-            drawMap();
-        }
-    };
-    img.src = path;
-}
-
-function loadAllTiles() {
-    for (const [key, filename] of Object.entries(tileFiles)) {
-        tryLoadImage(key, `images/${filename}`);
-    }
-}
-
 // === ПРИВЯЗКА КНОПОК (с проверкой существования элементов) ===
 const fightBtn = document.getElementById("fightBtn");
 if (fightBtn) {
@@ -288,6 +251,9 @@ if (loginBtn) {
         if (typeof loadOnlinePlayers === 'function') loadOnlinePlayers();
         if (typeof loadOtherPlayers === 'function') loadOtherPlayers();
         if (typeof drawMap === 'function') drawMap();
+        // Закрываем модальное окно после входа
+        document.getElementById('loginModal').style.display = 'none';
+        document.getElementById('modalOverlay').style.display = 'none';
     };
 }
 
@@ -305,6 +271,9 @@ if (registerBtn) {
         if (typeof loadOnlinePlayers === 'function') loadOnlinePlayers();
         if (typeof loadOtherPlayers === 'function') loadOtherPlayers();
         if (typeof drawMap === 'function') drawMap();
+        // Закрываем модальное окно после регистрации и входа
+        document.getElementById('loginModal').style.display = 'none';
+        document.getElementById('modalOverlay').style.display = 'none';
     };
 }
 
@@ -312,6 +281,9 @@ const logoutBtn = document.getElementById("logoutBtn");
 if (logoutBtn) logoutBtn.onclick = () => {
     logoutPlayer();
     if (typeof loadChatMessages === 'function') loadChatMessages();
+    // Показываем модальное окно после выхода
+    document.getElementById('loginModal').style.display = 'flex';
+    document.getElementById('modalOverlay').style.display = 'block';
 };
 
 const soundBtn = document.getElementById("soundBtn");
@@ -416,7 +388,10 @@ setTimeout(() => {
         const savedPass = localStorage.getItem('rpg_password');
         if (savedUser && savedPass && typeof loginPlayer === 'function') {
             console.log("Восстановление сессии:", savedUser);
-            loginPlayer(savedUser, savedPass);
+            loginPlayer(savedUser, savedPass).then(() => {
+                document.getElementById('loginModal').style.display = 'none';
+                document.getElementById('modalOverlay').style.display = 'none';
+            });
         }
     }
 }, 1000);
