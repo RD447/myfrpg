@@ -19,13 +19,12 @@
             min-height: 100vh;
         }
 
-        /* ГЛАВНАЯ СЕТКА */
         .game-container {
             max-width: 1500px;
             margin: 0 auto;
         }
 
-        /* ========== ВЕРХНЯЯ ПАНЕЛЬ ========== */
+        /* Верхняя панель */
         .top-bar {
             display: flex;
             justify-content: space-between;
@@ -36,10 +35,7 @@
             backdrop-filter: blur(4px);
             border-bottom: 2px solid #c9a86a;
         }
-        .top-bar-left, .top-bar-right {
-            display: flex;
-            gap: 20px;
-        }
+        .top-bar-left, .top-bar-right { display: flex; gap: 20px; }
         .top-icon {
             color: #f0dba0;
             cursor: pointer;
@@ -47,19 +43,12 @@
             padding: 4px 8px;
             border-radius: 8px;
         }
-        .top-icon:hover {
-            background: #c9a86a;
-            color: #1a0f05;
-        }
+        .top-icon:hover { background: #c9a86a; color: #1a0f05; }
 
-        /* ========== ОСНОВНАЯ СЕТКА ========== */
-        .main-grid {
-            display: grid;
-            grid-template-columns: 280px 1fr 300px;
-            gap: 15px;
-        }
+        /* Основная сетка */
+        .main-grid { display: grid; grid-template-columns: 280px 1fr 300px; gap: 15px; }
 
-        /* ========== ПАНЕЛИ ========== */
+        /* Панели */
         .panel {
             background: rgba(30, 20, 12, 0.85);
             backdrop-filter: blur(4px);
@@ -84,15 +73,8 @@
             color: #f0dba0;
             font-size: 0.85rem;
         }
-        .stat-value {
-            color: #f7c56e;
-            font-weight: bold;
-        }
-        .resource-bar {
-            display: flex;
-            gap: 15px;
-            justify-content: space-around;
-        }
+        .stat-value { color: #f7c56e; font-weight: bold; }
+        .resource-bar { display: flex; gap: 15px; justify-content: space-around; }
         .resource-item {
             background: #1a0f05;
             padding: 5px 12px;
@@ -108,7 +90,7 @@
         progress::-webkit-progress-bar { background-color: #3d2a1a; border-radius: 10px; }
         progress::-webkit-progress-value { background-color: #f7c56e; border-radius: 10px; }
 
-        /* ========== КАРТА ========== */
+        /* Карта */
         .map-area canvas {
             width: 100%;
             height: auto;
@@ -117,20 +99,10 @@
             border: 3px solid #c9a86a;
             cursor: pointer;
         }
-        .map-hint {
-            text-align: center;
-            font-size: 0.65rem;
-            color: #c9a86a;
-            margin-top: 6px;
-        }
+        .map-hint { text-align: center; font-size: 0.65rem; color: #c9a86a; margin-top: 6px; }
 
-        /* ========== ВКЛАДКИ ========== */
-        .tabs {
-            display: flex;
-            gap: 5px;
-            margin-bottom: 12px;
-            flex-wrap: wrap;
-        }
+        /* Вкладки */
+        .tabs { display: flex; gap: 5px; margin-bottom: 12px; flex-wrap: wrap; }
         .tab-btn {
             background: #3d2a1a;
             border: none;
@@ -141,20 +113,11 @@
             font-size: 0.8rem;
             font-family: 'Georgia', serif;
         }
-        .tab-btn.active {
-            background: #8b6e3a;
-            color: #fff0c0;
-        }
-        .tab-content {
-            display: none;
-            max-height: 350px;
-            overflow-y: auto;
-        }
-        .tab-content.active {
-            display: block;
-        }
+        .tab-btn.active { background: #8b6e3a; color: #fff0c0; }
+        .tab-content { display: none; max-height: 350px; overflow-y: auto; }
+        .tab-content.active { display: block; }
 
-        /* ========== ЧАТ ========== */
+        /* Чат */
         .chat-box {
             background: #1a0f05cc;
             border-radius: 12px;
@@ -164,18 +127,9 @@
             font-size: 0.7rem;
             color: #f0dba0;
         }
-        .chat-message {
-            margin: 5px 0;
-            padding: 4px 8px;
-            background: #2c1a0e99;
-            border-radius: 15px;
-        }
+        .chat-message { margin: 5px 0; padding: 4px 8px; background: #2c1a0e99; border-radius: 15px; }
         .chat-message strong { color: #f7c56e; }
-        .chat-input {
-            display: flex;
-            gap: 8px;
-            margin-top: 8px;
-        }
+        .chat-input { display: flex; gap: 8px; margin-top: 8px; }
         .chat-input input {
             flex: 1;
             background: #2c1a0e;
@@ -193,11 +147,8 @@
             cursor: pointer;
         }
 
-        /* ========== ИНВЕНТАРЬ ========== */
-        .inventory-grid {
-            max-height: 200px;
-            overflow-y: auto;
-        }
+        /* Инвентарь */
+        .inventory-grid { max-height: 200px; overflow-y: auto; }
         .item-card {
             background: #2c1a0eaa;
             border-radius: 12px;
@@ -233,12 +184,7 @@
             align-items: center;
             color: #f0dba0;
         }
-        .quest-item {
-            display: flex;
-            justify-content: space-between;
-            margin: 8px 0;
-            color: #f0dba0;
-        }
+        .quest-item { display: flex; justify-content: space-between; margin: 8px 0; color: #f0dba0; }
         .guild-info, .online-list {
             background: #2c1a0eaa;
             border-radius: 12px;
@@ -253,7 +199,7 @@
             margin: 2px;
         }
 
-        /* ========== НИЖНЯЯ ПАНЕЛЬ ========== */
+        /* Нижняя панель */
         .bottom-bar {
             margin-top: 15px;
             display: flex;
@@ -285,7 +231,7 @@
         .action-btn-camp.active { background: #d4a017; color: #1a0f05; }
         .action-btn-stop { background: #aa4444; }
 
-        /* ========== ЛОГ ========== */
+        /* Лог */
         .log-area {
             background: rgba(20, 15, 10, 0.85);
             backdrop-filter: blur(4px);
@@ -298,13 +244,9 @@
             height: 100px;
             overflow-y: auto;
         }
-        .log-entry {
-            margin: 4px 0;
-            border-left: 2px solid #f7c56e;
-            padding-left: 8px;
-        }
+        .log-entry { margin: 4px 0; border-left: 2px solid #f7c56e; padding-left: 8px; }
 
-        /* ========== ОБЩИЕ ЭЛЕМЕНТЫ ========== */
+        /* Общие элементы */
         .small-btn {
             background: #5a3a20;
             border: none;
@@ -327,12 +269,7 @@
             padding: 12px;
             margin-bottom: 12px;
         }
-        .login-input {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            margin-bottom: 8px;
-        }
+        .login-input { display: flex; flex-direction: column; gap: 8px; margin-bottom: 8px; }
         .current-player {
             text-align: center;
             margin-top: 8px;
@@ -352,14 +289,9 @@
             margin: 0 auto 12px;
             border: 2px solid #c9a86a;
         }
-        .hero-class {
-            text-align: center;
-            font-size: 1rem;
-            margin: 8px 0;
-            color: #f7c56e;
-        }
+        .hero-class { text-align: center; font-size: 1rem; margin: 8px 0; color: #f7c56e; }
 
-        /* ========== АВТО-ПАНЕЛЬ ========== */
+        /* Авто-панель */
         .auto-panel {
             position: fixed;
             bottom: 20px;
@@ -381,24 +313,10 @@
             font-weight: bold;
             color: #f7e0b0;
         }
-        .auto-content {
-            padding: 12px;
-            display: none;
-            color: #f0dba0;
-        }
+        .auto-content { padding: 12px; display: none; color: #f0dba0; }
         .auto-content.visible { display: block; }
-        .auto-progress {
-            background: #1a0f05;
-            border-radius: 10px;
-            height: 6px;
-            margin: 10px 0;
-        }
-        .auto-progress-fill {
-            background: #f7c56e;
-            width: 0%;
-            height: 100%;
-            border-radius: 10px;
-        }
+        .auto-progress { background: #1a0f05; border-radius: 10px; height: 6px; margin: 10px 0; }
+        .auto-progress-fill { background: #f7c56e; width: 0%; height: 100%; border-radius: 10px; }
         .sound-btn {
             position: fixed;
             bottom: 20px;
@@ -439,8 +357,8 @@
         <div class="left-col">
             <div class="panel">
                 <div class="panel-title">🏰 Город</div>
-                <div class="stat-row">Следующий раунд: <span id="nextRound">3:465</span></div>
-                <div class="stat-row">Население: <span id="population">10/80</span></div>
+                <div class="stat-row">Следующий раунд: <span>3:465</span></div>
+                <div class="stat-row">Население: <span>10/80</span></div>
             </div>
             <div class="panel">
                 <div class="panel-title">📊 Ресурсы</div>
@@ -454,13 +372,13 @@
                 <div class="panel-title">⚔️ Персонаж</div>
                 <div class="hero-avatar">⚔️</div>
                 <div id="heroClassDisplay" class="hero-class">🗡️ Мечник</div>
-                <div class="stat-row">❤️ Здоровье: <progress id="hpProgress" value="70" max="70"></progress> <span class="stat-value" id="heroHp">70</span>/<span id="heroMaxHp">70</span></div>
-                <div class="stat-row">⭐ Уровень: <span class="stat-value" id="heroLvl">1</span></div>
-                <div class="stat-row">📊 Опыт: <progress id="expProgress" value="0" max="150"></progress> <span class="stat-value" id="heroExp">0</span>/<span id="heroExpNeed">150</span></div>
-                <div class="stat-row">⚔️ Сила: <span class="stat-value" id="heroStr">12</span></div>
-                <div class="stat-row">🛡️ Защита: <span class="stat-value" id="heroDef">5</span></div>
-                <div class="stat-row">🌀 Очки умений: <span class="stat-value" id="heroSkillPoints">2</span></div>
-                <div class="stat-row">📈 Очки статов: <span class="stat-value" id="heroUpgradePoints">2</span></div>
+                <div class="stat-row">❤️ Здоровье: <progress id="hpProgress" value="70" max="70"></progress> <span id="heroHp">70</span>/<span id="heroMaxHp">70</span></div>
+                <div class="stat-row">⭐ Уровень: <span id="heroLvl">1</span></div>
+                <div class="stat-row">📊 Опыт: <progress id="expProgress" value="0" max="150"></progress> <span id="heroExp">0</span>/<span id="heroExpNeed">150</span></div>
+                <div class="stat-row">⚔️ Сила: <span id="heroStr">12</span></div>
+                <div class="stat-row">🛡️ Защита: <span id="heroDef">5</span></div>
+                <div class="stat-row">🌀 Очки умений: <span id="heroSkillPoints">2</span></div>
+                <div class="stat-row">📈 Очки статов: <span id="heroUpgradePoints">2</span></div>
             </div>
             <div class="panel">
                 <div class="panel-title">🏕️ Лагерь</div>
@@ -583,31 +501,57 @@
     document.getElementById('modalOverlay').onclick = closeLoginModal;
     window.closeModal = closeModal;
     
-    // Обновление прогресс-баров в UI
-    function updateUIWithProgress() {
-        let hpPercent = (currentPlayer.hp / recalcStats().maxHp) * 100;
-        let expPercent = (currentPlayer.exp / (currentPlayer.level * 150)) * 100;
+    // Функция обновления прогресс-баров
+    function updateProgressBars() {
+        if (typeof currentPlayer === 'undefined') return;
+        let maxHp = 0;
+        let maxExp = 0;
+        try {
+            maxHp = recalcStats().maxHp;
+            maxExp = currentPlayer.level * 150;
+        } catch(e) { return; }
+        
         let hpProgress = document.getElementById('hpProgress');
         let expProgress = document.getElementById('expProgress');
-        if (hpProgress) { hpProgress.value = currentPlayer.hp; hpProgress.max = recalcStats().maxHp; }
-        if (expProgress) { expProgress.value = currentPlayer.exp; expProgress.max = currentPlayer.level * 150; }
+        if (hpProgress) { hpProgress.value = currentPlayer.hp; hpProgress.max = maxHp; }
+        if (expProgress) { expProgress.value = currentPlayer.exp; expProgress.max = maxExp; }
     }
     
-    // Сохраняем оригинальную updateUI и добавляем прогресс-бары
-    const originalUpdateUI = updateUI;
-    updateUI = function() {
-        originalUpdateUI();
-        updateUIWithProgress();
-    };
-    
-    // Показ модалки логина если не залогинены
-    if (!isLoggedIn) showLoginModal();
+    // Переопределяем updateUI для прогресс-баров
+    if (typeof updateUI === 'function') {
+        const originalUpdateUI = updateUI;
+        updateUI = function() {
+            originalUpdateUI();
+            updateProgressBars();
+        };
+    }
     
     // Кнопки в топ-баре
     document.getElementById('logoutBtnTop').onclick = () => { if (typeof logoutPlayer === 'function') logoutPlayer(); showLoginModal(); };
     document.getElementById('settingsBtn').onclick = () => addTechnicalLog("⚙️ Настройки в разработке");
-    document.getElementById('tutorialBtn').onclick = () => addTechnicalLog("📖 Обучение: кликайте по карте для перемещения, нажимайте Бой для сражения");
-    document.getElementById('handbookBtn').onclick = () => addTechnicalLog("📜 Справочник: улучшайте статы и умения, собирайте ресурсы");
+    document.getElementById('tutorialBtn').onclick = () => addTechnicalLog("📖 Обучение: кликайте по карте для перемещения");
+    document.getElementById('handbookBtn').onclick = () => addTechnicalLog("📜 Справочник: улучшайте статы и умения");
+    document.getElementById('jewelsBtn').onclick = () => addTechnicalLog("👑 Рейтинг игроков в разработке");
+    document.getElementById('highscoreBtn').onclick = () => addTechnicalLog("🏆 Таблица лидеров в разработке");
+    document.getElementById('forumBtn').onclick = () => addTechnicalLog("💬 Форум временно недоступен");
+    
+    // Показ модалки логина если не залогинены
+    setTimeout(() => {
+        if (typeof isLoggedIn !== 'undefined' && !isLoggedIn) showLoginModal();
+    }, 500);
+    
+    // Обновляем ресурсы в топ-баре раз в секунду
+    setInterval(() => {
+        if (typeof currentPlayer !== 'undefined' && currentPlayer) {
+            let woodEl = document.getElementById('heroWood');
+            let oreEl = document.getElementById('heroOre');
+            let goldEl = document.getElementById('heroGold');
+            if (woodEl) woodEl.innerText = currentPlayer.wood || 0;
+            if (oreEl) oreEl.innerText = currentPlayer.ore || 0;
+            if (goldEl) goldEl.innerText = currentPlayer.gold || 0;
+        }
+        updateProgressBars();
+    }, 1000);
 </script>
 </body>
 </html>
