@@ -236,36 +236,45 @@ function loadAllTiles() {
     }
 }
 
-// === ПРИВЯЗКА КНОПОК ===
+// === ПРИВЯЗКА КНОПОК (с проверкой существования элементов) ===
 const fightBtn = document.getElementById("fightBtn");
-const gatherBtn = document.getElementById("gatherBtn");
-const campBtn = document.getElementById("campBtn");
-const stopAutoBtn = document.getElementById("stopAutoBtn");
-const stopMoveBtn = document.getElementById("stopMoveBtn");
-const sellAllCommonBtn = document.getElementById("sellAllCommonBtn");
-const createGuildBtn = document.getElementById("createGuildBtn");
-const chatSendBtn = document.getElementById("chatSendBtn");
-const chatInput = document.getElementById("chatInput");
-const loginBtn = document.getElementById("loginBtn");
-const registerBtn = document.getElementById("registerBtn");
-const logoutBtn = document.getElementById("logoutBtn");
-const soundBtn = document.getElementById("soundBtn");
+if (fightBtn) {
+    fightBtn.onclick = () => {
+        const tile = getCurrentTile();
+        if (tile && tile.type === "safe") restHeal();
+        else startAutoCombat();
+    };
+}
 
-if (fightBtn) fightBtn.onclick = () => {
-    const tile = getCurrentTile();
-    if (tile && tile.type === "safe") restHeal();
-    else startAutoCombat();
-};
+const gatherBtn = document.getElementById("gatherBtn");
 if (gatherBtn) gatherBtn.onclick = () => startAutoGather();
+
+const campBtn = document.getElementById("campBtn");
 if (campBtn) campBtn.onclick = () => toggleCamp();
+
+const stopAutoBtn = document.getElementById("stopAutoBtn");
 if (stopAutoBtn) stopAutoBtn.onclick = () => stopAuto();
+
+const stopMoveBtn = document.getElementById("stopMoveBtn");
 if (stopMoveBtn) stopMoveBtn.onclick = () => stopMoving();
+
+const sellAllCommonBtn = document.getElementById("sellAllCommonBtn");
 if (sellAllCommonBtn) sellAllCommonBtn.onclick = () => sellAllCommon();
+
+const createGuildBtn = document.getElementById("createGuildBtn");
 if (createGuildBtn) createGuildBtn.onclick = () => createGuild();
+
+const chatSendBtn = document.getElementById("chatSendBtn");
 if (chatSendBtn) chatSendBtn.onclick = () => sendChatMessage();
-if (chatInput) chatInput.addEventListener("keypress", (e) => {
-    if (e.key === "Enter") sendChatMessage();
-});
+
+const chatInput = document.getElementById("chatInput");
+if (chatInput) {
+    chatInput.addEventListener("keypress", (e) => {
+        if (e.key === "Enter") sendChatMessage();
+    });
+}
+
+const loginBtn = document.getElementById("loginBtn");
 if (loginBtn) {
     loginBtn.onclick = async () => {
         const username = document.getElementById("loginUsername")?.value.trim();
@@ -275,12 +284,14 @@ if (loginBtn) {
             return;
         }
         await loginPlayer(username, password);
-        loadChatMessages();
-        loadOnlinePlayers();
-        loadOtherPlayers();
-        drawMap();
+        if (typeof loadChatMessages === 'function') loadChatMessages();
+        if (typeof loadOnlinePlayers === 'function') loadOnlinePlayers();
+        if (typeof loadOtherPlayers === 'function') loadOtherPlayers();
+        if (typeof drawMap === 'function') drawMap();
     };
 }
+
+const registerBtn = document.getElementById("registerBtn");
 if (registerBtn) {
     registerBtn.onclick = async () => {
         const username = document.getElementById("loginUsername")?.value.trim();
@@ -290,21 +301,25 @@ if (registerBtn) {
             return;
         }
         await registerPlayer(username, password);
-        loadChatMessages();
-        loadOnlinePlayers();
-        loadOtherPlayers();
-        drawMap();
+        if (typeof loadChatMessages === 'function') loadChatMessages();
+        if (typeof loadOnlinePlayers === 'function') loadOnlinePlayers();
+        if (typeof loadOtherPlayers === 'function') loadOtherPlayers();
+        if (typeof drawMap === 'function') drawMap();
     };
 }
+
+const logoutBtn = document.getElementById("logoutBtn");
 if (logoutBtn) logoutBtn.onclick = () => {
     logoutPlayer();
-    loadChatMessages();
+    if (typeof loadChatMessages === 'function') loadChatMessages();
 };
+
+const soundBtn = document.getElementById("soundBtn");
 if (soundBtn) {
     soundBtn.onclick = () => {
         soundEnabled = !soundEnabled;
         soundBtn.innerHTML = soundEnabled ? "🔊" : "🔇";
-        playSound("levelup");
+        if (typeof playSound === 'function') playSound("levelup");
     };
 }
 
@@ -349,8 +364,8 @@ document.querySelectorAll(".tab-btn").forEach(btn => {
         const tabContent = document.getElementById(`tab-${tabId}`);
         if (tabContent) tabContent.classList.add("active");
         
-        if (tabId === "online") loadOnlinePlayers();
-        if (tabId === "chat" && isLoggedIn) loadChatMessages();
+        if (tabId === "online" && typeof loadOnlinePlayers === 'function') loadOnlinePlayers();
+        if (tabId === "chat" && isLoggedIn && typeof loadChatMessages === 'function') loadChatMessages();
     };
 });
 
@@ -358,25 +373,25 @@ if (document.querySelector(".tab-btn")) document.querySelector(".tab-btn").click
 
 // Авто-панель
 if (autoContent) {
-    const autoHeader = document.getElementById("autoHeader");
-    if (autoHeader) {
-        autoHeader.onclick = () => {
+    const autoHeaderEl = document.getElementById("autoHeader");
+    if (autoHeaderEl) {
+        autoHeaderEl.onclick = () => {
             autoContent.classList.toggle("visible");
         };
     }
 }
 
 // === ЗАПУСК ===
-generateMap();
-loadAllTiles();
+if (typeof generateMap === 'function') generateMap();
+if (typeof loadAllTiles === 'function') loadAllTiles();
 setTimeout(() => {
-    updateTileDisplaySize();
-    drawMap();
+    if (typeof updateTileDisplaySize === 'function') updateTileDisplaySize();
+    if (typeof drawMap === 'function') drawMap();
 }, 100);
-updateActionButtons();
-updateUI();
-renderInventory();
-renderSkills();
+if (typeof updateActionButtons === 'function') updateActionButtons();
+if (typeof updateUI === 'function') updateUI();
+if (typeof renderInventory === 'function') renderInventory();
+if (typeof renderSkills === 'function') renderSkills();
 addTechnicalLog("🗺️ КАРТА 20×20! Кликайте по клеткам для перемещения");
 addTechnicalLog("🌀 Улучшайте умения и статы");
 addTechnicalLog("💬 Чат работает — войдите в аккаунт и общайтесь!");
@@ -384,22 +399,22 @@ addTechnicalLog("👥 Вкладка ОНЛАЙН показывает акти�
 
 // Автосохранение
 setInterval(() => {
-    if (currentPlayer.id && isLoggedIn) savePlayerToCloud();
+    if (currentPlayer.id && isLoggedIn && typeof savePlayerToCloud === 'function') savePlayerToCloud();
 }, 30000);
 setInterval(() => {
-    if (isLoggedIn) loadOtherPlayers();
+    if (isLoggedIn && typeof loadOtherPlayers === 'function') loadOtherPlayers();
 }, 10000);
-setInterval(loadOnlinePlayers, 30000);
+if (typeof loadOnlinePlayers === 'function') setInterval(loadOnlinePlayers, 30000);
 
 // Восстановление сессии
-loadSession();
+if (typeof loadSession === 'function') loadSession();
 
 // Принудительная проверка сессии при загрузке
 setTimeout(() => {
     if (!isLoggedIn) {
         const savedUser = localStorage.getItem('rpg_username');
         const savedPass = localStorage.getItem('rpg_password');
-        if (savedUser && savedPass) {
+        if (savedUser && savedPass && typeof loginPlayer === 'function') {
             console.log("Восстановление сессии:", savedUser);
             loginPlayer(savedUser, savedPass);
         }
@@ -411,6 +426,7 @@ document.body.addEventListener('click', () => {
     if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
 });
 
-window.unequipItem = unequipItem;
-window.showClassSelector = showClassSelector;
-window.closeModal = closeModal;
+// Глобальные функции
+window.unequipItem = typeof unequipItem === 'function' ? unequipItem : function() {};
+window.showClassSelector = typeof showClassSelector === 'function' ? showClassSelector : function() {};
+window.closeModal = typeof closeModal === 'function' ? closeModal : function() {};
