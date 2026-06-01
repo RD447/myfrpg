@@ -66,12 +66,13 @@
             margin-bottom: 16px;
         }
         .login-input {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 8px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        margin-bottom: 8px;
         }
         .login-input input {
-            flex: 1;
+            width: 100%;
             background: #1f2a3a;
             border: 1px solid #4a7a9e;
             border-radius: 30px;
@@ -590,8 +591,8 @@
         <button class="btn btn-danger" id="fightBtn" style="display: none;">⚔️ Бой</button>
         <button class="btn btn-success" id="gatherBtn" style="display: none;">🌲 Сбор</button>
         <button class="btn btn-camp" id="campBtn" style="display: none;">🏕️ Развернуть лагерь</button>
-        <button class="btn btn-stop" id="stopAutoBtn" style="display: none;">⏹️ ОСТАНОВИТЬ</button>
-        <button class="btn btn-stop" id="stopMoveBtn" style="display: block;">⏹️ Остановиться</button>
+        <button class="btn btn-stop" id="stopAutoBtn" style="display: none;">🚫 Остановить действие</button>
+        <button class="btn btn-stop" id="stopMoveBtn" style="display: block;">🚷 Остановить движение</button>
     </div>
 
     <div class="log-area" id="combatLog">
@@ -1021,12 +1022,12 @@ function upgradeStat(stat) {
         addTechnicalLog("❌ Сначала войдите в аккаунт!");
         return;
     }
-    if (currentPlayer.upgradePoints <= 0) {  // ИСПРАВЛЕНО
+    if (currentPlayer.upgradePoints <= 0) {
         addTechnicalLog("❌ Нет очков улучшения статов!");
         return;
     }
     
-    currentPlayer.upgradePoints--;  // ИСПРАВЛЕНО
+    currentPlayer.upgradePoints--;
     
     if (stat === 'str') {
         playerExtraStr++;
@@ -1152,15 +1153,20 @@ async function sendChatMessage() {
     }
     
     if (supabaseClient) {
-        await supabaseClient
+        const { error } = await supabaseClient
             .from("chat_messages")
             .insert({
                 username: currentPlayer.username,
-                message: msg,
+                message: msg.slice(0, 200),
                 created_at: new Date().toISOString()
             });
-        input.value = "";
-        loadChatMessages();
+        if (error) {
+            console.error("Ошибка отправки:", error);
+            addTechnicalLog("❌ Ошибка отправки сообщения");
+        } else {
+            input.value = "";
+            loadChatMessages();
+        }
     } else {
         addSocialMessage(currentPlayer.username, msg);
         input.value = "";
@@ -1447,7 +1453,10 @@ function loadSession() {
     if (savedUsername && savedPassword) {
         document.getElementById("loginUsername").value = savedUsername;
         document.getElementById("loginPassword").value = savedPassword;
-        loginPlayer(savedUsername, savedPassword);
+        // Не вызываем loginPlayer сразу, ждём загрузки Supabase
+        setTimeout(() => {
+            loginPlayer(savedUsername, savedPassword);
+        }, 500);
     }
 }
 
@@ -1723,7 +1732,8 @@ function updateUI() {
     document.getElementById("heroWood").innerText = currentPlayer.wood;
     document.getElementById("heroOre").innerText = currentPlayer.ore;
     document.getElementById("heroSkillPoints").innerText = currentPlayer.skillPoints;
-    
+    document.getElementById("heroUpgradePoints").innerText = currentPlayer.upgradePoints;
+
     document.getElementById("questGoblins").innerHTML = `${quests.goblins}/5`;
     document.getElementById("questOre").innerHTML = `${quests.ore}/10`;
     document.getElementById("questWood").innerHTML = `${quests.wood}/10`;
@@ -2076,7 +2086,7 @@ document.getElementById("fightBtn").onclick = () => {
 document.getElementById("gatherBtn").onclick = () => startAutoGather();
 document.getElementById("campBtn").onclick = () => toggleCamp();
 document.getElementById("stopAutoBtn").onclick = () => stopAuto();
-document.getElementById("chatSendBtn").onclick = sendChatMessageHandler;
+document.getElementById("chatSendBtn").onclick = () => sendChatMessage();
 document.getElementById("createGuildBtn").onclick = createGuild;
 document.getElementById("sellAllCommonBtn").onclick = () => sellAllCommon();
 document.getElementById("stopMoveBtn").onclick = () => stopMoving();
