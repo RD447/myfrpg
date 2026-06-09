@@ -5,19 +5,31 @@ const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 let supabaseClient = null;
 
 // ======================== ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ========================
-let isLoggedIn = false;
-let currentPlayer = null;
-let inventory = [];
-let equipment = { weapon: null, armor: null, ring: null };
-let skills = null;
-let quests = null;
-let playerPos = { x: 10, y: 10 };
-let otherPlayers = [];
-let campActive = false;
-let autoActive = false;
-let autoType = null;
-let autoInterval = null;
-let moveInterval = null;
+window.isLoggedIn = false;
+window.currentPlayer = {
+    id: null, username: null, level: 1, exp: 0, hp: 70, maxHp: 70,
+    str: 12, def: 5, gold: 150, wood: 0, ore: 0, skillPoints: 2,
+    upgradePoints: 2, skill_power_strike: 0, skill_endurance: 0,
+    skill_berserk: 0, character_class: 'Мечник'
+};
+window.inventory = [];
+window.equipment = { weapon: null, armor: null, ring: null };
+window.skills = {
+    powerStrike: { level: 0, maxLevel: 5 },
+    endurance: { level: 0, maxLevel: 5 },
+    berserk: { level: 0, maxLevel: 5 }
+};
+window.quests = { goblins: 0, ore: 0, wood: 0 };
+window.playerPos = { x: 10, y: 10 };
+window.otherPlayers = [];
+window.campActive = false;
+window.autoActive = false;
+window.autoType = null;
+window.autoInterval = null;
+window.moveInterval = null;
+window.playerExtraStr = 0;
+window.playerExtraDef = 0;
+window.playerExtraHp = 0;
 
 // ======================== ЗВУК ========================
 let soundEnabled = true;

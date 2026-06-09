@@ -4,17 +4,7 @@ const ctx = canvas.getContext('2d');
 const MAP_SIZE = 20;
 let TILE_SIZE = 40;
 
-let playerPos = { x: 10, y: 10 };
-let isMoving = false;
-let moveProgress = 0;
-let moveFrom = null;
-let moveTo = null;
-let moveStartTime = 0;
-let moveDuration = 0;
-let moveInterval = null;
-
 let mapTiles = [];
-let otherPlayers = [];
 
 // Загруженные тайлы (картинки)
 let loadedTiles = {};
@@ -93,13 +83,13 @@ function drawMap() {
     
     drawOtherPlayers();
     
-    if (!playerPos) return;
-    let drawX = playerPos.x * TILE_SIZE;
-    let drawY = playerPos.y * TILE_SIZE;
-    if (isMoving && moveFrom && moveTo) {
-        const t = Math.min(1, moveProgress);
-        drawX = (moveFrom.x * TILE_SIZE) * (1 - t) + (moveTo.x * TILE_SIZE) * t;
-        drawY = (moveFrom.y * TILE_SIZE) * (1 - t) + (moveTo.y * TILE_SIZE) * t;
+    if (!window.playerPos) return;
+    let drawX = window.playerPos.x * TILE_SIZE;
+    let drawY = window.playerPos.y * TILE_SIZE;
+    if (window.isMoving && window.moveFrom && window.moveTo) {
+        const t = Math.min(1, window.moveProgress);
+        drawX = (window.moveFrom.x * TILE_SIZE) * (1 - t) + (window.moveTo.x * TILE_SIZE) * t;
+        drawY = (window.moveFrom.y * TILE_SIZE) * (1 - t) + (window.moveTo.y * TILE_SIZE) * t;
     }
     
     ctx.font = `${TILE_SIZE * 0.6}px "Segoe UI Emoji"`;
@@ -109,46 +99,46 @@ function drawMap() {
     ctx.shadowBlur = 0;
 }
 
-function getCurrentTile() { return mapTiles[playerPos.y]?.[playerPos.x] || mapTiles[0]?.[0]; }
+function getCurrentTile() { return mapTiles[window.playerPos.y]?.[window.playerPos.x] || mapTiles[0]?.[0]; }
 
 function startMoveTo(tx, ty) {
-    if (isMoving) { addTechnicalLog("❌ Вы уже в пути!"); return; }
-    if (autoActive) { addTechnicalLog("❌ Нельзя перемещаться во время автодействия!"); return; }
+    if (window.isMoving) { addTechnicalLog("❌ Вы уже в пути!"); return; }
+    if (window.autoActive) { addTechnicalLog("❌ Нельзя перемещаться во время автодействия!"); return; }
     if (window.campActive) { addTechnicalLog("❌ Сначала нужно снять лагерь!"); return; }
-    if (!isLoggedIn) { addTechnicalLog("❌ Сначала войдите в аккаунт!"); return; }
+    if (!window.isLoggedIn) { addTechnicalLog("❌ Сначала войдите в аккаунт!"); return; }
     
     const tile = mapTiles[ty]?.[tx];
     if (!tile || !tile.walkable) { addTechnicalLog(`❌ Нельзя пройти в ${tile?.name || "эту клетку"}`); return; }
-    if (tx === playerPos.x && ty === playerPos.y) { addTechnicalLog(`📍 Вы уже здесь`); return; }
+    if (tx === window.playerPos.x && ty === window.playerPos.y) { addTechnicalLog(`📍 Вы уже здесь`); return; }
     
-    const distance = Math.abs(tx - playerPos.x) + Math.abs(ty - playerPos.y);
-    moveDuration = distance * 3000;
+    const distance = Math.abs(tx - window.playerPos.x) + Math.abs(ty - window.playerPos.y);
+    window.moveDuration = distance * 3000;
     
-    moveFrom = { x: playerPos.x, y: playerPos.y };
-    moveTo = { x: tx, y: ty };
-    isMoving = true;
-    moveProgress = 0;
-    moveStartTime = Date.now();
-    addTechnicalLog(`🚶 Вы идёте в ${tile.name} (${distance} клеток, ${Math.floor(moveDuration/1000)} сек)`);
+    window.moveFrom = { x: window.playerPos.x, y: window.playerPos.y };
+    window.moveTo = { x: tx, y: ty };
+    window.isMoving = true;
+    window.moveProgress = 0;
+    window.moveStartTime = Date.now();
+    addTechnicalLog(`🚶 Вы идёте в ${tile.name} (${distance} клеток, ${Math.floor(window.moveDuration/1000)} сек)`);
     
-    if (moveInterval) clearInterval(moveInterval);
-    moveInterval = setInterval(() => {
-        if (!isMoving) {
-            if (moveInterval) clearInterval(moveInterval);
+    if (window.moveInterval) clearInterval(window.moveInterval);
+    window.moveInterval = setInterval(() => {
+        if (!window.isMoving) {
+            if (window.moveInterval) clearInterval(window.moveInterval);
             return;
         }
         const now = Date.now();
-        moveProgress = Math.min(1, (now - moveStartTime) / moveDuration);
+        window.moveProgress = Math.min(1, (now - window.moveStartTime) / window.moveDuration);
         drawMap();
-        if (moveProgress >= 1) {
-            if (moveInterval) clearInterval(moveInterval);
-            moveInterval = null;
-            isMoving = false;
-            playerPos = { x: moveTo.x, y: moveTo.y };
-            moveFrom = null;
-            moveTo = null;
+        if (window.moveProgress >= 1) {
+            if (window.moveInterval) clearInterval(window.moveInterval);
+            window.moveInterval = null;
+            window.isMoving = false;
+            window.playerPos = { x: window.moveTo.x, y: window.moveTo.y };
+            window.moveFrom = null;
+            window.moveTo = null;
             drawMap();
-            updateActionButtons();
+            if (typeof updateActionButtons === 'function') updateActionButtons();
             addTechnicalLog(`✅ Вы прибыли в ${getCurrentTile().name}`);
             if (Math.random() < 0.15 && typeof triggerRandomEvent === 'function') triggerRandomEvent();
             savePlayerPosition();
@@ -157,26 +147,26 @@ function startMoveTo(tx, ty) {
 }
 
 function stopMoving() {
-    if (moveInterval) {
-        clearInterval(moveInterval);
-        moveInterval = null;
+    if (window.moveInterval) {
+        clearInterval(window.moveInterval);
+        window.moveInterval = null;
     }
-    if (isMoving) {
-        isMoving = false;
-        moveFrom = null;
-        moveTo = null;
-        moveProgress = 0;
+    if (window.isMoving) {
+        window.isMoving = false;
+        window.moveFrom = null;
+        window.moveTo = null;
+        window.moveProgress = 0;
         drawMap();
         addTechnicalLog("⏹️ Перемещение остановлено!");
-        updateActionButtons();
+        if (typeof updateActionButtons === 'function') updateActionButtons();
     } else {
         addTechnicalLog("❌ Вы никуда не двигаетесь!");
     }
 }
 
 function drawOtherPlayers() {
-    if (!ctx || !otherPlayers.length) return;
-    for (const player of otherPlayers) {
+    if (!ctx || !window.otherPlayers.length) return;
+    for (const player of window.otherPlayers) {
         if (player.player_x === undefined || player.player_y === undefined) continue;
         const x = player.player_x * TILE_SIZE;
         const y = player.player_y * TILE_SIZE;
@@ -192,15 +182,15 @@ function drawOtherPlayers() {
 }
 
 async function loadOtherPlayers() {
-    if (!supabaseClient || !isLoggedIn) return;
-    const { data } = await supabaseClient.from("players").select("username, player_x, player_y").neq("username", currentPlayer.username).limit(20);
-    otherPlayers = data || [];
+    if (!supabaseClient || !window.isLoggedIn) return;
+    const { data } = await supabaseClient.from("players").select("username, player_x, player_y").neq("username", window.currentPlayer.username).limit(20);
+    window.otherPlayers = data || [];
     drawMap();
 }
 
 async function savePlayerPosition() {
-    if (!supabaseClient || !isLoggedIn || !currentPlayer.id) return;
-    await supabaseClient.from("players").update({ player_x: playerPos.x, player_y: playerPos.y }).eq("id", currentPlayer.id);
+    if (!supabaseClient || !window.isLoggedIn || !window.currentPlayer.id) return;
+    await supabaseClient.from("players").update({ player_x: window.playerPos.x, player_y: window.playerPos.y }).eq("id", window.currentPlayer.id);
 }
 
 canvas.addEventListener('click', (e) => {
@@ -211,3 +201,42 @@ canvas.addEventListener('click', (e) => {
     const tileY = Math.floor((e.clientY - rect.top) * scaleY / TILE_SIZE);
     if (tileX >= 0 && tileX < MAP_SIZE && tileY >= 0 && tileY < MAP_SIZE) startMoveTo(tileX, tileY);
 });
+
+// Экспорт функций для других файлов
+window.generateMap = generateMap;
+window.loadAllTiles = function() {
+    const tileFiles = {
+        GRASS: 'grass.png', FOREST: 'forest.png', MOUNTAIN: 'mountain.png',
+        VILLAGE: 'village.png', WATER: 'water.png', CAVE: 'cave.png',
+        BANDIT: 'bandit.png', WASTELAND: 'wasteland.png'
+    };
+    let imagesLoaded = 0;
+    const imagesToLoad = Object.keys(tileFiles).length;
+    function tryLoadImage(key, path) {
+        const img = new Image();
+        img.onload = () => {
+            loadedTiles[key] = img;
+            imagesLoaded++;
+            if (imagesLoaded === imagesToLoad) {
+                addTechnicalLog(`🎨 Загружено ${imagesLoaded} картинок для карты!`);
+                drawMap();
+            }
+        };
+        img.onerror = () => {
+            imagesLoaded++;
+            if (imagesLoaded === imagesToLoad) {
+                addTechnicalLog(`⚠️ Картинки не найдены. Используем цветные квадраты.`);
+                drawMap();
+            }
+        };
+        img.src = path;
+    }
+    for (const [key, filename] of Object.entries(tileFiles)) {
+        tryLoadImage(key, `images/${filename}`);
+    }
+};
+window.updateTileDisplaySize = updateTileDisplaySize;
+window.drawMap = drawMap;
+window.startMoveTo = startMoveTo;
+window.stopMoving = stopMoving;
+window.loadOtherPlayers = loadOtherPlayers;

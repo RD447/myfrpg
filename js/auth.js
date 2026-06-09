@@ -28,32 +28,32 @@ async function loginPlayer(username, password) {
                 return false;
             }
             
-            currentPlayer.id = data.id;
-            currentPlayer.username = data.username;
-            currentPlayer.level = data.level;
-            currentPlayer.exp = data.exp;
-            currentPlayer.hp = data.hp;
-            currentPlayer.maxHp = data.max_hp;
-            currentPlayer.str = data.str;
-            currentPlayer.def = data.def;
-            currentPlayer.gold = data.gold;
-            currentPlayer.wood = data.wood;
-            currentPlayer.ore = data.ore;
-            currentPlayer.skillPoints = data.skill_points;
-            currentPlayer.skill_power_strike = data.skill_power_strike || 0;
-            currentPlayer.skill_endurance = data.skill_endurance || 0;
-            currentPlayer.skill_berserk = data.skill_berserk || 0;
-            currentPlayer.character_class = data.character_class || 'Мечник';
-            currentPlayer.upgradePoints = data.upgrade_points || 2;
+            window.currentPlayer.id = data.id;
+            window.currentPlayer.username = data.username;
+            window.currentPlayer.level = data.level;
+            window.currentPlayer.exp = data.exp;
+            window.currentPlayer.hp = data.hp;
+            window.currentPlayer.maxHp = data.max_hp;
+            window.currentPlayer.str = data.str;
+            window.currentPlayer.def = data.def;
+            window.currentPlayer.gold = data.gold;
+            window.currentPlayer.wood = data.wood;
+            window.currentPlayer.ore = data.ore;
+            window.currentPlayer.skillPoints = data.skill_points;
+            window.currentPlayer.skill_power_strike = data.skill_power_strike || 0;
+            window.currentPlayer.skill_endurance = data.skill_endurance || 0;
+            window.currentPlayer.skill_berserk = data.skill_berserk || 0;
+            window.currentPlayer.character_class = data.character_class || 'Мечник';
+            window.currentPlayer.upgradePoints = data.upgrade_points || 2;
             
-            playerExtraStr = data.extra_str || 0;
-            playerExtraDef = data.extra_def || 0;
-            playerExtraHp = data.extra_hp || 0;
+            window.playerExtraStr = data.extra_str || 0;
+            window.playerExtraDef = data.extra_def || 0;
+            window.playerExtraHp = data.extra_hp || 0;
             
             if (data.player_x !== undefined && data.player_x !== null) {
-                playerPos = { x: data.player_x, y: data.player_y };
+                window.playerPos = { x: data.player_x, y: data.player_y };
             } else {
-                playerPos = { x: 10, y: 10 };
+                window.playerPos = { x: 10, y: 10 };
             }
             
             // Загружаем инвентарь
@@ -71,14 +71,21 @@ async function loginPlayer(username, password) {
                 loadSkillsFromCloud(data.skills_data);
             }
             
-            addTechnicalLog(`☁️ Добро пожаловать, ${username}! (уровень ${currentPlayer.level})`);
-            isLoggedIn = true;
+            addTechnicalLog(`☁️ Добро пожаловать, ${username}! (уровень ${window.currentPlayer.level})`);
+            window.isLoggedIn = true;
             if (typeof startChatUpdates === 'function') startChatUpdates();
             saveSession(username, password);
             if (typeof updateUI === 'function') updateUI();
             if (typeof renderInventory === 'function') renderInventory();
             if (typeof renderSkills === 'function') renderSkills();
             if (typeof drawMap === 'function') drawMap();
+            
+            // Закрываем модальное окно входа
+            const loginModal = document.getElementById('loginModal');
+            const modalOverlay = document.getElementById('modalOverlay');
+            if (loginModal) loginModal.style.display = 'none';
+            if (modalOverlay) modalOverlay.style.display = 'none';
+            
             return true;
         } else {
             addTechnicalLog("❌ Игрок не найден. Нажмите РЕГИСТРАЦИЯ");
@@ -155,17 +162,17 @@ async function registerPlayer(username, password) {
 
 function logoutPlayer() {
     clearSession();
-    currentPlayer = {
+    window.currentPlayer = {
         id: null, username: null, level: 1, exp: 0, hp: 70, maxHp: 70,
         str: 12, def: 5, gold: 150, wood: 0, ore: 0, skillPoints: 2,
         upgradePoints: 2,
         skill_power_strike: 0, skill_endurance: 0, skill_berserk: 0,
         character_class: 'Мечник'
     };
-    playerExtraStr = 0;
-    playerExtraDef = 0;
-    playerExtraHp = 0;
-    isLoggedIn = false;
+    window.playerExtraStr = 0;
+    window.playerExtraDef = 0;
+    window.playerExtraHp = 0;
+    window.isLoggedIn = false;
     
     const loginForm = document.getElementById("loginForm");
     const playerInfo = document.getElementById("playerInfo");
@@ -188,10 +195,10 @@ function updateLoginUI() {
     
     if (!loginForm || !playerInfo) return;
     
-    if (isLoggedIn && currentPlayer.username) {
+    if (window.isLoggedIn && window.currentPlayer.username) {
         loginForm.style.display = "none";
         playerInfo.style.display = "block";
-        if (currentPlayerName) currentPlayerName.innerHTML = `⚔️ ${currentPlayer.username}`;
+        if (currentPlayerName) currentPlayerName.innerHTML = `⚔️ ${window.currentPlayer.username}`;
     } else {
         loginForm.style.display = "flex";
         playerInfo.style.display = "none";

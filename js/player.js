@@ -1,7 +1,7 @@
-// ======================== ПЕРЕМЕННЫЕ ИГРОКА (дополнительные) ========================
-let playerExtraStr = 0;
-let playerExtraDef = 0;
-let playerExtraHp = 0;
+// ======================== ДОПОЛНИТЕЛЬНЫЕ ПЕРЕМЕННЫЕ ========================
+window.playerExtraStr = window.playerExtraStr || 0;
+window.playerExtraDef = window.playerExtraDef || 0;
+window.playerExtraHp = window.playerExtraHp || 0;
 
 // ============ КЛАССЫ ============= //
 const characterClasses = {
@@ -13,55 +13,71 @@ const characterClasses = {
 };
 
 async function savePlayerToCloud() {
-    if (!supabaseClient || !currentPlayer?.id || !isLoggedIn) return;
+    if (!supabaseClient || !window.currentPlayer?.id || !window.isLoggedIn) return;
     const stats = recalcStats();
     await supabaseClient.from("players").update({
-        level: currentPlayer.level, exp: currentPlayer.exp, hp: currentPlayer.hp, max_hp: stats.maxHp,
-        str: stats.str, def: stats.def, gold: currentPlayer.gold, wood: currentPlayer.wood, ore: currentPlayer.ore,
-        skill_points: currentPlayer.skillPoints, upgrade_points: currentPlayer.upgradePoints,
-        skill_power_strike: currentPlayer.skill_power_strike, skill_endurance: currentPlayer.skill_endurance,
-        skill_berserk: currentPlayer.skill_berserk, character_class: currentPlayer.character_class,
-        extra_str: playerExtraStr, extra_def: playerExtraDef, extra_hp: playerExtraHp,
-        player_x: playerPos.x, player_y: playerPos.y
-    }).eq("id", currentPlayer.id);
+        level: window.currentPlayer.level,
+        exp: window.currentPlayer.exp,
+        hp: window.currentPlayer.hp,
+        max_hp: stats.maxHp,
+        str: stats.str,
+        def: stats.def,
+        gold: window.currentPlayer.gold,
+        wood: window.currentPlayer.wood,
+        ore: window.currentPlayer.ore,
+        skill_points: window.currentPlayer.skillPoints,
+        upgrade_points: window.currentPlayer.upgradePoints,
+        skill_power_strike: window.currentPlayer.skill_power_strike,
+        skill_endurance: window.currentPlayer.skill_endurance,
+        skill_berserk: window.currentPlayer.skill_berserk,
+        character_class: window.currentPlayer.character_class,
+        extra_str: window.playerExtraStr,
+        extra_def: window.playerExtraDef,
+        extra_hp: window.playerExtraHp,
+        player_x: window.playerPos.x,
+        player_y: window.playerPos.y
+    }).eq("id", window.currentPlayer.id);
 }
 
 async function changeClass(newClass) {
-    if (!isLoggedIn) return;
+    if (!window.isLoggedIn) return;
     if (getCurrentTile().type !== "safe") { addTechnicalLog("❌ Только в деревне"); return; }
-    if (currentPlayer.gold < 100) { addTechnicalLog("❌ Нужно 100 монет"); return; }
+    if (window.currentPlayer.gold < 100) { addTechnicalLog("❌ Нужно 100 монет"); return; }
     const cd = characterClasses[newClass];
     if (!cd) return;
-    currentPlayer.gold -= 100;
-    currentPlayer.character_class = newClass;
-    currentPlayer.str = cd.baseStr; currentPlayer.def = cd.baseDef; currentPlayer.maxHp = cd.baseHp; currentPlayer.hp = cd.baseHp;
+    window.currentPlayer.gold -= 100;
+    window.currentPlayer.character_class = newClass;
+    window.currentPlayer.str = cd.baseStr;
+    window.currentPlayer.def = cd.baseDef;
+    window.currentPlayer.maxHp = cd.baseHp;
+    window.currentPlayer.hp = cd.baseHp;
     addTechnicalLog(`✨ Вы сменили класс на ${cd.name}!`);
     updateUI(); savePlayerToCloud();
 }
 
 function upgradeStat(stat) {
-    if (!isLoggedIn) return;
-    if (currentPlayer.upgradePoints <= 0) { addTechnicalLog("❌ Нет очков статов"); return; }
-    currentPlayer.upgradePoints--;
-    if (stat === 'str') { playerExtraStr++; addTechnicalLog("⚔️ Сила +2"); }
-    else if (stat === 'def') { playerExtraDef++; addTechnicalLog("🛡️ Защита +2"); }
-    else if (stat === 'hp') { playerExtraHp++; currentPlayer.maxHp += 10; currentPlayer.hp += 10; addTechnicalLog("❤️ +10 HP"); }
+    if (!window.isLoggedIn) return;
+    if (window.currentPlayer.upgradePoints <= 0) { addTechnicalLog("❌ Нет очков статов"); return; }
+    window.currentPlayer.upgradePoints--;
+    if (stat === 'str') { window.playerExtraStr++; addTechnicalLog("⚔️ Сила +2"); }
+    else if (stat === 'def') { window.playerExtraDef++; addTechnicalLog("🛡️ Защита +2"); }
+    else if (stat === 'hp') { window.playerExtraHp++; window.currentPlayer.maxHp += 10; window.currentPlayer.hp += 10; addTechnicalLog("❤️ +10 HP"); }
     updateUI(); savePlayerToCloud();
 }
 
 function recalcStats() {
-    let bonusAtk = (equipment.weapon?.atk||0) + (equipment.ring?.atk||0);
-    let bonusDef = (equipment.armor?.def||0) + (equipment.ring?.def||0) + (skills?.endurance?.level||0)*2;
-    return { 
-        str: currentPlayer.str + playerExtraStr*2 + bonusAtk, 
-        def: currentPlayer.def + playerExtraDef*2 + bonusDef, 
-        maxHp: currentPlayer.maxHp + playerExtraHp*10 
+    let bonusAtk = (window.equipment.weapon?.atk||0) + (window.equipment.ring?.atk||0);
+    let bonusDef = (window.equipment.armor?.def||0) + (window.equipment.ring?.def||0) + (window.skills?.endurance?.level||0)*2;
+    return {
+        str: window.currentPlayer.str + window.playerExtraStr*2 + bonusAtk,
+        def: window.currentPlayer.def + window.playerExtraDef*2 + bonusDef,
+        maxHp: window.currentPlayer.maxHp + window.playerExtraHp*10
     };
 }
 
 function updateUI() {
-    if (!currentPlayer) return;
-    const expNeeded = currentPlayer.level * 150;
+    if (!window.currentPlayer) return;
+    const expNeeded = window.currentPlayer.level * 150;
     const stats = recalcStats();
     
     const heroHp = document.getElementById("heroHp");
@@ -81,32 +97,32 @@ function updateUI() {
     const questWood = document.getElementById("questWood");
     const campStatus = document.getElementById("campStatus");
     
-    if (heroHp) heroHp.innerText = currentPlayer.hp;
+    if (heroHp) heroHp.innerText = window.currentPlayer.hp;
     if (heroMaxHp) heroMaxHp.innerText = stats.maxHp;
-    if (heroLvl) heroLvl.innerText = currentPlayer.level;
-    if (heroExp) heroExp.innerText = currentPlayer.exp;
+    if (heroLvl) heroLvl.innerText = window.currentPlayer.level;
+    if (heroExp) heroExp.innerText = window.currentPlayer.exp;
     if (heroExpNeed) heroExpNeed.innerText = expNeeded;
-    if (heroGold) heroGold.innerText = currentPlayer.gold;
+    if (heroGold) heroGold.innerText = window.currentPlayer.gold;
     if (heroStr) heroStr.innerHTML = `${stats.str}`;
     if (heroDef) heroDef.innerHTML = `${stats.def}`;
-    if (heroWood) heroWood.innerText = currentPlayer.wood;
-    if (heroOre) heroOre.innerText = currentPlayer.ore;
-    if (heroSkillPoints) heroSkillPoints.innerText = currentPlayer.skillPoints;
-    if (heroUpgradePoints) heroUpgradePoints.innerText = currentPlayer.upgradePoints;
+    if (heroWood) heroWood.innerText = window.currentPlayer.wood;
+    if (heroOre) heroOre.innerText = window.currentPlayer.ore;
+    if (heroSkillPoints) heroSkillPoints.innerText = window.currentPlayer.skillPoints;
+    if (heroUpgradePoints) heroUpgradePoints.innerText = window.currentPlayer.upgradePoints;
     
-    if (typeof quests !== 'undefined' && quests) {
-        if (questGoblins) questGoblins.innerHTML = `${quests.goblins}/5`;
-        if (questOre) questOre.innerHTML = `${quests.ore}/10`;
-        if (questWood) questWood.innerHTML = `${quests.wood}/10`;
+    if (window.quests) {
+        if (questGoblins) questGoblins.innerHTML = `${window.quests.goblins}/5`;
+        if (questOre) questOre.innerHTML = `${window.quests.ore}/10`;
+        if (questWood) questWood.innerHTML = `${window.quests.wood}/10`;
     }
     
-    if (campStatus) campStatus.innerHTML = (typeof window.campActive !== 'undefined' && window.campActive) ? "🔥 Активен" : "Нет";
+    if (campStatus) campStatus.innerHTML = window.campActive ? "🔥 Активен" : "Нет";
     
     updateLoginUI();
     
     const classDisplay = document.getElementById("heroClassDisplay");
-    if (classDisplay && currentPlayer.character_class) {
-        const classData = characterClasses[currentPlayer.character_class] || characterClasses['Мечник'];
-        classDisplay.innerHTML = `${classData.icon || '⚔️'} ${currentPlayer.character_class}`;
+    if (classDisplay && window.currentPlayer.character_class) {
+        const classData = characterClasses[window.currentPlayer.character_class] || characterClasses['Мечник'];
+        classDisplay.innerHTML = `${classData.icon || '⚔️'} ${window.currentPlayer.character_class}`;
     }
 }

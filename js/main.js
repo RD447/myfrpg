@@ -1,26 +1,10 @@
-// ======================== ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ (защита) ========================
-if (typeof isLoggedIn === 'undefined') window.isLoggedIn = false;
-if (typeof currentPlayer === 'undefined') window.currentPlayer = null;
-if (typeof inventory === 'undefined') window.inventory = [];
-if (typeof equipment === 'undefined') window.equipment = { weapon: null, armor: null, ring: null };
-if (typeof skills === 'undefined') window.skills = null;
-if (typeof quests === 'undefined') window.quests = null;
-if (typeof playerPos === 'undefined') window.playerPos = { x: 10, y: 10 };
-if (typeof otherPlayers === 'undefined') window.otherPlayers = [];
-if (typeof window.campActive === 'undefined') window.campActive = false;
-if (typeof autoActive === 'undefined') window.autoActive = false;
-if (typeof autoType === 'undefined') window.autoType = null;
-if (typeof autoInterval === 'undefined') window.autoInterval = null;
-if (typeof moveInterval === 'undefined') window.moveInterval = null;
-
 // ======================== ИНИЦИАЛИЗАЦИЯ ========================
 if (typeof supabase !== "undefined") {
     supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     console.log("☁️ Supabase подключён");
 }
 
-// Глобальные переменные
-window.campActive = window.campActive || false;
+// Глобальные переменные для удобства
 let autoContent = document.getElementById("autoContent");
 
 // Функция загрузки онлайн игроков
@@ -158,7 +142,7 @@ function updateActionButtons() {
     }
     
     const stopBtn = document.getElementById("stopAutoBtn");
-    if (stopBtn) stopBtn.style.display = autoActive ? "block" : "none";
+    if (stopBtn) stopBtn.style.display = window.autoActive ? "block" : "none";
     
     let existingHealBtn = document.getElementById("campHealBtn");
     let existingCookBtn = document.getElementById("campCookBtn");
@@ -199,16 +183,16 @@ function updateAutoPanel(title, text, progress) {
 }
 
 function restHeal() {
-    if (!isLoggedIn) { addTechnicalLog("❌ Сначала войдите в аккаунт!"); return; }
+    if (!window.isLoggedIn) { addTechnicalLog("❌ Сначала войдите в аккаунт!"); return; }
     const stats = recalcStats();
-    if (currentPlayer.gold >= 5 && currentPlayer.hp < stats.maxHp) {
-        currentPlayer.gold -= 5;
+    if (window.currentPlayer.gold >= 5 && window.currentPlayer.hp < stats.maxHp) {
+        window.currentPlayer.gold -= 5;
         let heal = 10 + Math.floor(Math.random() * 10);
-        currentPlayer.hp = Math.min(stats.maxHp, currentPlayer.hp + heal);
+        window.currentPlayer.hp = Math.min(stats.maxHp, window.currentPlayer.hp + heal);
         addTechnicalLog(`💊 Вы отдохнули в деревне. +${heal} HP. -5 монет`);
         updateUI();
         savePlayerToCloud();
-    } else if (currentPlayer.hp >= stats.maxHp) {
+    } else if (window.currentPlayer.hp >= stats.maxHp) {
         addTechnicalLog("💚 Вы уже полностью здоровы!");
     } else {
         addTechnicalLog("❌ Не хватает монет (нужно 5)");
@@ -346,7 +330,7 @@ document.querySelectorAll(".tab-btn").forEach(btn => {
         if (tabContent) tabContent.classList.add("active");
         
         if (tabId === "online" && typeof loadOnlinePlayers === 'function') loadOnlinePlayers();
-        if (tabId === "chat" && isLoggedIn && typeof loadChatMessages === 'function') loadChatMessages();
+        if (tabId === "chat" && window.isLoggedIn && typeof loadChatMessages === 'function') loadChatMessages();
     };
 });
 
@@ -381,10 +365,10 @@ addTechnicalLog("👥 Вкладка ОНЛАЙН показывает акти�
 
 // Автосохранение
 setInterval(() => {
-    if (currentPlayer?.id && isLoggedIn && typeof savePlayerToCloud === 'function') savePlayerToCloud();
+    if (window.currentPlayer?.id && window.isLoggedIn && typeof savePlayerToCloud === 'function') savePlayerToCloud();
 }, 30000);
 setInterval(() => {
-    if (isLoggedIn && typeof loadOtherPlayers === 'function') loadOtherPlayers();
+    if (window.isLoggedIn && typeof loadOtherPlayers === 'function') loadOtherPlayers();
 }, 10000);
 if (typeof loadOnlinePlayers === 'function') setInterval(loadOnlinePlayers, 30000);
 
@@ -393,7 +377,7 @@ if (typeof loadSession === 'function') loadSession();
 
 // Принудительная проверка сессии при загрузке
 setTimeout(() => {
-    if (!isLoggedIn) {
+    if (!window.isLoggedIn) {
         const savedUser = localStorage.getItem('rpg_username');
         const savedPass = localStorage.getItem('rpg_password');
         if (savedUser && savedPass && typeof loginPlayer === 'function') {
@@ -412,3 +396,5 @@ document.body.addEventListener('click', () => {
 window.unequipItem = typeof unequipItem === 'function' ? unequipItem : function() {};
 window.showClassSelector = typeof showClassSelector === 'function' ? showClassSelector : function() {};
 window.closeModal = typeof closeModal === 'function' ? closeModal : function() {};
+window.updateActionButtons = updateActionButtons;
+window.updateAutoPanel = updateAutoPanel;
