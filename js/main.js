@@ -1,3 +1,18 @@
+// ======================== ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ (защита) ========================
+if (typeof isLoggedIn === 'undefined') window.isLoggedIn = false;
+if (typeof currentPlayer === 'undefined') window.currentPlayer = null;
+if (typeof inventory === 'undefined') window.inventory = [];
+if (typeof equipment === 'undefined') window.equipment = { weapon: null, armor: null, ring: null };
+if (typeof skills === 'undefined') window.skills = null;
+if (typeof quests === 'undefined') window.quests = null;
+if (typeof playerPos === 'undefined') window.playerPos = { x: 10, y: 10 };
+if (typeof otherPlayers === 'undefined') window.otherPlayers = [];
+if (typeof window.campActive === 'undefined') window.campActive = false;
+if (typeof autoActive === 'undefined') window.autoActive = false;
+if (typeof autoType === 'undefined') window.autoType = null;
+if (typeof autoInterval === 'undefined') window.autoInterval = null;
+if (typeof moveInterval === 'undefined') window.moveInterval = null;
+
 // ======================== ИНИЦИАЛИЗАЦИЯ ========================
 if (typeof supabase !== "undefined") {
     supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -5,7 +20,7 @@ if (typeof supabase !== "undefined") {
 }
 
 // Глобальные переменные
-window.campActive = false;
+window.campActive = window.campActive || false;
 let autoContent = document.getElementById("autoContent");
 
 // Функция загрузки онлайн игроков
@@ -88,6 +103,7 @@ document.addEventListener("mouseup", () => {
 
 // === ФУНКЦИИ UI ===
 function updateActionButtons() {
+    if (typeof getCurrentTile !== 'function') return;
     const tile = getCurrentTile();
     const fightBtn = document.getElementById("fightBtn");
     const gatherBtn = document.getElementById("gatherBtn");
@@ -251,8 +267,6 @@ if (loginBtn) {
         if (typeof loadOnlinePlayers === 'function') loadOnlinePlayers();
         if (typeof loadOtherPlayers === 'function') loadOtherPlayers();
         if (typeof drawMap === 'function') drawMap();
-        document.getElementById('loginModal').style.display = 'none';
-        document.getElementById('modalOverlay').style.display = 'none';
     };
 }
 
@@ -270,18 +284,16 @@ if (registerBtn) {
         if (typeof loadOnlinePlayers === 'function') loadOnlinePlayers();
         if (typeof loadOtherPlayers === 'function') loadOtherPlayers();
         if (typeof drawMap === 'function') drawMap();
-        document.getElementById('loginModal').style.display = 'none';
-        document.getElementById('modalOverlay').style.display = 'none';
     };
 }
 
 const logoutBtn = document.getElementById("logoutBtn");
-if (logoutBtn) logoutBtn.onclick = () => {
-    logoutPlayer();
-    if (typeof loadChatMessages === 'function') loadChatMessages();
-    document.getElementById('loginModal').style.display = 'flex';
-    document.getElementById('modalOverlay').style.display = 'block';
-};
+if (logoutBtn) {
+    logoutBtn.onclick = () => {
+        logoutPlayer();
+        if (typeof loadChatMessages === 'function') loadChatMessages();
+    };
+}
 
 const soundBtn = document.getElementById("soundBtn");
 if (soundBtn) {
@@ -351,7 +363,6 @@ if (autoContent) {
 }
 
 // === ЗАПУСК ===
-// Функции generateMap, loadAllTiles, updateTileDisplaySize, drawMap находятся в map.js
 setTimeout(() => {
     if (typeof generateMap === 'function') generateMap();
     if (typeof loadAllTiles === 'function') loadAllTiles();
@@ -370,7 +381,7 @@ addTechnicalLog("👥 Вкладка ОНЛАЙН показывает акти�
 
 // Автосохранение
 setInterval(() => {
-    if (currentPlayer.id && isLoggedIn && typeof savePlayerToCloud === 'function') savePlayerToCloud();
+    if (currentPlayer?.id && isLoggedIn && typeof savePlayerToCloud === 'function') savePlayerToCloud();
 }, 30000);
 setInterval(() => {
     if (isLoggedIn && typeof loadOtherPlayers === 'function') loadOtherPlayers();
@@ -387,12 +398,7 @@ setTimeout(() => {
         const savedPass = localStorage.getItem('rpg_password');
         if (savedUser && savedPass && typeof loginPlayer === 'function') {
             console.log("Восстановление сессии:", savedUser);
-            loginPlayer(savedUser, savedPass).then(() => {
-                const modal = document.getElementById('loginModal');
-                const overlay = document.getElementById('modalOverlay');
-                if (modal) modal.style.display = 'none';
-                if (overlay) overlay.style.display = 'none';
-            }).catch(() => {});
+            loginPlayer(savedUser, savedPass);
         }
     }
 }, 1000);
