@@ -1,5 +1,4 @@
-// ======================== УМЕНИЯ С СОХРАНЕНИЕМ ========================
-// Переменная skills объявлена в config.js
+// ======================== УМЕНИЯ ========================
 
 async function saveSkillsToCloud() { 
     if (!supabaseClient || !window.currentPlayer?.id || !window.isLoggedIn) return; 

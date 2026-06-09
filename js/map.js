@@ -3,10 +3,7 @@ const canvas = document.getElementById('worldMap');
 const ctx = canvas.getContext('2d');
 const MAP_SIZE = 20;
 let TILE_SIZE = 40;
-
 let mapTiles = [];
-
-// Загруженные тайлы (картинки)
 let loadedTiles = {};
 
 const TILES_DATA = {
@@ -202,9 +199,8 @@ canvas.addEventListener('click', (e) => {
     if (tileX >= 0 && tileX < MAP_SIZE && tileY >= 0 && tileY < MAP_SIZE) startMoveTo(tileX, tileY);
 });
 
-// Экспорт функций для других файлов
-window.generateMap = generateMap;
-window.loadAllTiles = function() {
+// Функция загрузки тайлов
+function loadAllTiles() {
     const tileFiles = {
         GRASS: 'grass.png', FOREST: 'forest.png', MOUNTAIN: 'mountain.png',
         VILLAGE: 'village.png', WATER: 'water.png', CAVE: 'cave.png',
@@ -234,7 +230,11 @@ window.loadAllTiles = function() {
     for (const [key, filename] of Object.entries(tileFiles)) {
         tryLoadImage(key, `images/${filename}`);
     }
-};
+}
+
+// Экспорт функций
+window.generateMap = generateMap;
+window.loadAllTiles = loadAllTiles;
 window.updateTileDisplaySize = updateTileDisplaySize;
 window.drawMap = drawMap;
 window.startMoveTo = startMoveTo;

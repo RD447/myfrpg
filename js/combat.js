@@ -1,6 +1,4 @@
 // ======================== БОЙ ========================
-// Переменные autoActive, autoType, autoInterval объявлены в config.js
-
 const enemies = {
     goblin: { name: "Гоблин", baseHp: 35, baseAtk: 9, gold: 8, exp: 25, quest: "goblins", icon: "👺" },
     troll: { name: "Тролль", baseHp: 55, baseAtk: 13, gold: 15, exp: 40, icon: "🗿" },

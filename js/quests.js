@@ -1,5 +1,4 @@
-// ======================== КВЕСТЫ С СОХРАНЕНИЕМ ========================
-// Переменная quests объявлена в config.js
+// ======================== КВЕСТЫ ========================
 
 async function saveQuestsToCloud() { 
     if (!supabaseClient || !window.currentPlayer?.id || !window.isLoggedIn) return; 
