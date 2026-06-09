@@ -1,7 +1,25 @@
+// ======================== SUPABASE ========================
 const SUPABASE_URL = "https://wxrrxnlyyugmduvnciem.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind4cnJ4bmx5eXVnbWR1dm5jaWVtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAyMzIzNjgsImV4cCI6MjA5NTgwODM2OH0.6YfLDjAJ2sKu_C6q_UiXBI_GWJRvtE-m21GzB86zisU";  // <-- ВСТАВЬТЕ СЮДА НОВЫЙ КЛЮЧ
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind4cnJ4bmx5eXVnbWR1dm5jaWVtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAyMzIzNjgsImV4cCI6MjA5NTgwODM2OH0.6YfLDjAJ2sKu_C6q_UiXBI_GWJRvtE-m21GzB86zisU";
 
 let supabaseClient = null;
+
+// ======================== ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ========================
+let isLoggedIn = false;
+let currentPlayer = null;
+let inventory = [];
+let equipment = { weapon: null, armor: null, ring: null };
+let skills = null;
+let quests = null;
+let playerPos = { x: 10, y: 10 };
+let otherPlayers = [];
+let campActive = false;
+let autoActive = false;
+let autoType = null;
+let autoInterval = null;
+let moveInterval = null;
+
+// ======================== ЗВУК ========================
 let soundEnabled = true;
 let audioCtx = null;
 
