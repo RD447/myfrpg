@@ -24,7 +24,6 @@
             margin: 0 auto;
         }
 
-        /* Верхняя панель */
         .top-bar {
             display: flex;
             justify-content: space-between;
@@ -45,10 +44,8 @@
         }
         .top-icon:hover { background: #c9a86a; color: #1a0f05; }
 
-        /* Основная сетка */
         .main-grid { display: grid; grid-template-columns: 280px 1fr 300px; gap: 15px; }
 
-        /* Панели */
         .panel {
             background: rgba(30, 20, 12, 0.85);
             backdrop-filter: blur(4px);
@@ -90,7 +87,6 @@
         progress::-webkit-progress-bar { background-color: #3d2a1a; border-radius: 10px; }
         progress::-webkit-progress-value { background-color: #f7c56e; border-radius: 10px; }
 
-        /* Карта */
         .map-area canvas {
             width: 100%;
             height: auto;
@@ -101,7 +97,6 @@
         }
         .map-hint { text-align: center; font-size: 0.65rem; color: #c9a86a; margin-top: 6px; }
 
-        /* Вкладки */
         .tabs { display: flex; gap: 5px; margin-bottom: 12px; flex-wrap: wrap; }
         .tab-btn {
             background: #3d2a1a;
@@ -117,7 +112,6 @@
         .tab-content { display: none; max-height: 350px; overflow-y: auto; }
         .tab-content.active { display: block; }
 
-        /* Чат */
         .chat-box {
             background: #1a0f05cc;
             border-radius: 12px;
@@ -147,7 +141,6 @@
             cursor: pointer;
         }
 
-        /* Инвентарь */
         .inventory-grid { max-height: 200px; overflow-y: auto; }
         .item-card {
             background: #2c1a0eaa;
@@ -199,7 +192,6 @@
             margin: 2px;
         }
 
-        /* Нижняя панель */
         .bottom-bar {
             margin-top: 15px;
             display: flex;
@@ -231,7 +223,6 @@
         .action-btn-camp.active { background: #d4a017; color: #1a0f05; }
         .action-btn-stop { background: #aa4444; }
 
-        /* Лог */
         .log-area {
             background: rgba(20, 15, 10, 0.85);
             backdrop-filter: blur(4px);
@@ -246,7 +237,6 @@
         }
         .log-entry { margin: 4px 0; border-left: 2px solid #f7c56e; padding-left: 8px; }
 
-        /* Общие элементы */
         .small-btn {
             background: #5a3a20;
             border: none;
@@ -263,21 +253,7 @@
             padding: 6px 12px;
             color: #f0dba0;
         }
-        .login-section {
-            background: #2c1a0ecc;
-            border-radius: 16px;
-            padding: 12px;
-            margin-bottom: 12px;
-        }
-        .login-input { display: flex; flex-direction: column; gap: 8px; margin-bottom: 8px; }
-        .current-player {
-            text-align: center;
-            margin-top: 8px;
-            padding: 6px;
-            background: #5a3a20;
-            border-radius: 30px;
-            color: #f7e0b0;
-        }
+        
         .hero-avatar {
             text-align: center;
             font-size: 48px;
@@ -291,7 +267,6 @@
         }
         .hero-class { text-align: center; font-size: 1rem; margin: 8px 0; color: #f7c56e; }
 
-        /* Авто-панель */
         .auto-panel {
             position: fixed;
             bottom: 20px;
@@ -333,13 +308,36 @@
             border: 2px solid #c9a86a;
         }
         
-        /* Скрытие модального окна при логине */
-        .hidden { display: none !important; }
+        /* Стили для форм логина */
+        .login-section {
+            background: #2c1a0ecc;
+            border-radius: 16px;
+            padding: 12px;
+            margin-bottom: 12px;
+        }
+        .login-input { display: flex; flex-direction: column; gap: 8px; margin-bottom: 8px; }
+        .current-player {
+            text-align: center;
+            margin-top: 8px;
+            padding: 6px;
+            background: #5a3a20;
+            border-radius: 30px;
+            color: #f7e0b0;
+        }
+        .logout-btn {
+            background: #8b3a3a;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 30px;
+            color: white;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 8px;
+        }
     </style>
 </head>
 <body>
 <div class="game-container">
-    <!-- Верхняя панель -->
     <div class="top-bar">
         <div class="top-bar-left">
             <div class="top-icon" id="jewelsBtn">👑</div>
@@ -354,7 +352,6 @@
         </div>
     </div>
 
-    <!-- Основная сетка -->
     <div class="main-grid">
         <!-- ЛЕВАЯ КОЛОНКА -->
         <div class="left-col">
@@ -382,11 +379,8 @@
                 <div class="stat-row">🛡️ Защита: <span id="heroDef">5</span></div>
                 <div class="stat-row">🌀 Очки умений: <span id="heroSkillPoints">2</span></div>
                 <div class="stat-row">📈 Очки статов: <span id="heroUpgradePoints">2</span></div>
-            </div>
-            <div class="panel">
-                <div class="panel-title">🏕️ Лагерь</div>
-                <div class="stat-row">Статус: <span id="campStatus">Нет</span></div>
-                <button class="small-btn upgrade-stat" data-stat="str" style="width:100%; margin-top:5px;">⚔️ Улучшить силу</button>
+                <div class="stat-row">🏕️ Лагерь: <span id="campStatus">Нет</span></div>
+                <button class="small-btn upgrade-stat" data-stat="str" style="width:100%; margin-top:8px;">⚔️ Улучшить силу</button>
                 <button class="small-btn upgrade-stat" data-stat="def" style="width:100%; margin-top:5px;">🛡️ Улучшить защиту</button>
                 <button class="small-btn upgrade-stat" data-stat="hp" style="width:100%; margin-top:5px;">❤️ Улучшить выносливость</button>
             </div>
@@ -440,7 +434,6 @@
         </div>
     </div>
 
-    <!-- Нижняя панель с кнопками действий -->
     <div class="bottom-bar">
         <button class="action-btn action-btn-danger" id="fightBtn" style="display: none;">⚔️ БОЙ</button>
         <button class="action-btn action-btn-success" id="gatherBtn" style="display: none;">🌲 СБОР</button>
@@ -449,7 +442,6 @@
         <button class="action-btn action-btn-stop" id="stopMoveBtn">🚫 СТОП ДВИЖЕНИЕ</button>
     </div>
 
-    <!-- Лог событий -->
     <div class="log-area" id="combatLog"><div class="log-entry">✨ Добро пожаловать в игру!</div></div>
 </div>
 
@@ -464,14 +456,19 @@
 </div>
 <div id="modalOverlay" style="display: block; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 999;"></div>
 
-<!-- Модальное окно выбора класса -->
+<!-- Скрытые элементы для auth.js -->
+<div id="loginForm" style="display: none;"></div>
+<div id="playerInfo" style="display: none;">
+    <div class="current-player" id="currentPlayerName">Игрок</div>
+    <button id="logoutBtn" class="logout-btn">Выйти</button>
+</div>
+
 <div id="classModal" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #2c1a0e; border: 3px solid #c9a86a; border-radius: 20px; padding: 20px; z-index: 1000; width: 320px;">
     <h3 style="color: #f7c56e; text-align:center;">🌀 ВЫБОР КЛАССА</h3>
     <div id="classButtons"></div>
     <button onclick="closeModal()" style="margin-top:16px; background:#8b3a3a; border:none; padding:10px; border-radius:30px; color:white; width:100%; cursor:pointer;">ЗАКРЫТЬ</button>
 </div>
 
-<!-- Авто-панель -->
 <div class="auto-panel" id="autoPanel">
     <div class="auto-header" id="autoHeader"><span id="autoTitle">⚔️ АВТОБОЙ</span><span>▼</span></div>
     <div class="auto-content" id="autoContent"><div id="autoText">Не активен</div><div class="auto-progress"><div class="auto-progress-fill" id="autoProgress"></div></div></div>
@@ -495,7 +492,6 @@
 <script src="js/main.js"></script>
 
 <script>
-    // Модальные окна
     function showLoginModal() { 
         document.getElementById('loginModal').style.display = 'flex'; 
         document.getElementById('modalOverlay').style.display = 'block'; 
@@ -513,27 +509,23 @@
     document.getElementById('modalOverlay').onclick = closeLoginModal;
     window.closeModal = closeModal;
     
-    // Функция обновления прогресс-баров
     function updateProgressBars() {
         if (typeof currentPlayer === 'undefined' || !currentPlayer) return;
-        let maxHp = 0;
-        let maxExp = 0;
         try {
+            let maxHp = 0;
             if (typeof recalcStats === 'function') {
                 maxHp = recalcStats().maxHp;
             } else {
                 maxHp = currentPlayer.maxHp || 70;
             }
-            maxExp = (currentPlayer.level || 1) * 150;
-        } catch(e) { return; }
-        
-        let hpProgress = document.getElementById('hpProgress');
-        let expProgress = document.getElementById('expProgress');
-        if (hpProgress) { hpProgress.value = currentPlayer.hp || 70; hpProgress.max = maxHp; }
-        if (expProgress) { expProgress.value = currentPlayer.exp || 0; expProgress.max = maxExp; }
+            let maxExp = (currentPlayer.level || 1) * 150;
+            let hpProgress = document.getElementById('hpProgress');
+            let expProgress = document.getElementById('expProgress');
+            if (hpProgress) { hpProgress.value = currentPlayer.hp || 70; hpProgress.max = maxHp; }
+            if (expProgress) { expProgress.value = currentPlayer.exp || 0; expProgress.max = maxExp; }
+        } catch(e) {}
     }
     
-    // Переопределяем updateUI для прогресс-баров
     if (typeof updateUI === 'function') {
         const originalUpdateUI = updateUI;
         updateUI = function() {
@@ -542,7 +534,6 @@
         };
     }
     
-    // Кнопки в топ-баре
     document.getElementById('logoutBtnTop').onclick = () => { 
         if (typeof logoutPlayer === 'function') logoutPlayer(); 
         showLoginModal(); 
@@ -554,58 +545,17 @@
     document.getElementById('highscoreBtn').onclick = () => addTechnicalLog("🏆 Таблица лидеров в разработке");
     document.getElementById('forumBtn').onclick = () => addTechnicalLog("💬 Форум временно недоступен");
     
-    // Функция закрытия модалки при логине
-    function onLoginSuccess() {
-        closeLoginModal();
-        if (typeof drawMap === 'function') drawMap();
-        if (typeof updateUI === 'function') updateUI();
-    }
-    
-    // Перехватываем loginPlayer для закрытия модалки
-    if (typeof loginPlayer === 'function') {
-        const originalLogin = loginPlayer;
-        window.loginPlayer = async function(username, password) {
-            const result = await originalLogin(username, password);
-            if (result) {
-                onLoginSuccess();
-            }
-            return result;
-        };
-        loginPlayer = window.loginPlayer;
-    }
-    
-    // Показ модалки логина если не залогинены
-    setTimeout(() => {
-        if (typeof isLoggedIn !== 'undefined' && !isLoggedIn) {
-            showLoginModal();
-        } else if (typeof isLoggedIn !== 'undefined' && isLoggedIn) {
-            closeLoginModal();
-            if (typeof drawMap === 'function') drawMap();
-        }
-    }, 500);
-    
-    // Обновляем ресурсы в топ-баре раз в секунду
-    setInterval(() => {
-        if (typeof currentPlayer !== 'undefined' && currentPlayer) {
-            let woodEl = document.getElementById('heroWood');
-            let oreEl = document.getElementById('heroOre');
-            let goldEl = document.getElementById('heroGold');
-            if (woodEl) woodEl.innerText = currentPlayer.wood || 0;
-            if (oreEl) oreEl.innerText = currentPlayer.ore || 0;
-            if (goldEl) goldEl.innerText = currentPlayer.gold || 0;
-        }
-        updateProgressBars();
-        if (typeof isLoggedIn !== 'undefined' && isLoggedIn) {
-            closeLoginModal();
-        }
-    }, 1000);
-    
-    // Принудительный вызов карты
     setTimeout(() => {
         if (typeof generateMap === 'function') generateMap();
+        if (typeof loadAllTiles === 'function') loadAllTiles();
         if (typeof drawMap === 'function') drawMap();
         if (typeof updateActionButtons === 'function') updateActionButtons();
-    }, 200);
+        if (typeof updateUI === 'function') updateUI();
+        if (typeof renderInventory === 'function') renderInventory();
+        if (typeof renderSkills === 'function') renderSkills();
+    }, 100);
+    
+    addTechnicalLog("🗺️ КАРТА 20×20! Кликайте по клеткам для перемещения");
 </script>
 </body>
 </html>
