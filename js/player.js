@@ -1,7 +1,4 @@
-// ======================== ДОПОЛНИТЕЛЬНЫЕ ПЕРЕМЕННЫЕ ========================
-window.playerExtraStr = window.playerExtraStr || 0;
-window.playerExtraDef = window.playerExtraDef || 0;
-window.playerExtraHp = window.playerExtraHp || 0;
+// ======================== ПЕРЕМЕННЫЕ ИГРОКА ========================
 
 // ============ КЛАССЫ ============= //
 const characterClasses = {
@@ -53,6 +50,43 @@ async function changeClass(newClass) {
     window.currentPlayer.hp = cd.baseHp;
     addTechnicalLog(`✨ Вы сменили класс на ${cd.name}!`);
     updateUI(); savePlayerToCloud();
+}
+
+function showClassSelector() {
+    const modal = document.getElementById("classModal");
+    const overlay = document.getElementById("modalOverlay");
+    const container = document.getElementById("classButtons");
+    
+    if (!modal || !overlay || !container) {
+        addTechnicalLog("❌ Ошибка: модальное окно не найдено");
+        return;
+    }
+    
+    container.innerHTML = "";
+    for (const [key, data] of Object.entries(characterClasses)) {
+        const btn = document.createElement("button");
+        btn.className = "small-btn";
+        btn.style.margin = "6px";
+        btn.style.padding = "10px";
+        btn.style.width = "calc(100% - 12px)";
+        btn.innerHTML = `${data.icon || data.name} ${data.name}<br><span style="font-size:0.6rem;">⚔️${data.baseStr} 🛡️${data.baseDef} ❤️${data.baseHp}</span>`;
+        btn.onclick = () => {
+            changeClass(key);
+            modal.style.display = "none";
+            overlay.style.display = "none";
+        };
+        container.appendChild(btn);
+    }
+    
+    modal.style.display = "block";
+    overlay.style.display = "block";
+}
+
+function closeModal() {
+    const modal = document.getElementById("classModal");
+    const overlay = document.getElementById("modalOverlay");
+    if (modal) modal.style.display = "none";
+    if (overlay) overlay.style.display = "none";
 }
 
 function upgradeStat(stat) {
@@ -110,7 +144,7 @@ function updateUI() {
     if (heroSkillPoints) heroSkillPoints.innerText = window.currentPlayer.skillPoints;
     if (heroUpgradePoints) heroUpgradePoints.innerText = window.currentPlayer.upgradePoints;
     
-    if (window.quests) {
+    if (typeof window.quests !== 'undefined') {
         if (questGoblins) questGoblins.innerHTML = `${window.quests.goblins}/5`;
         if (questOre) questOre.innerHTML = `${window.quests.ore}/10`;
         if (questWood) questWood.innerHTML = `${window.quests.wood}/10`;

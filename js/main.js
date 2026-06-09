@@ -4,7 +4,7 @@ if (typeof supabase !== "undefined") {
     console.log("☁️ Supabase подключён");
 }
 
-// Глобальные переменные для удобства
+// Глобальные переменные
 let autoContent = document.getElementById("autoContent");
 
 // Функция загрузки онлайн игроков
@@ -125,7 +125,13 @@ function updateActionButtons() {
         newClassBtn.id = "changeClassBtn";
         newClassBtn.className = "btn btn-camp";
         newClassBtn.innerHTML = "🔄 СМЕНИТЬ КЛАСС (100✨)";
-        newClassBtn.onclick = () => showClassSelector();
+        newClassBtn.onclick = () => {
+            if (typeof showClassSelector === 'function') {
+                showClassSelector();
+            } else {
+                addTechnicalLog("❌ Функция выбора класса не найдена");
+            }
+        };
         const actionBar = document.getElementById("actionBar");
         if (actionBar) actionBar.appendChild(newClassBtn);
         
@@ -153,7 +159,9 @@ function updateActionButtons() {
             healCampBtn.id = "campHealBtn";
             healCampBtn.className = "btn btn-success";
             healCampBtn.innerHTML = "💊 ЛЕЧЕНИЕ (5✨)";
-            healCampBtn.onclick = () => campHeal();
+            healCampBtn.onclick = () => {
+                if (typeof campHeal === 'function') campHeal();
+            };
             const actionBar = document.getElementById("actionBar");
             if (actionBar) actionBar.appendChild(healCampBtn);
         }
@@ -162,7 +170,9 @@ function updateActionButtons() {
             cookCampBtn.id = "campCookBtn";
             cookCampBtn.className = "btn btn-camp";
             cookCampBtn.innerHTML = "🍲 ГОТОВКА (2🌲)";
-            cookCampBtn.onclick = () => campCook();
+            cookCampBtn.onclick = () => {
+                if (typeof campCook === 'function') campCook();
+            };
             const actionBar = document.getElementById("actionBar");
             if (actionBar) actionBar.appendChild(cookCampBtn);
         }
